@@ -30,11 +30,27 @@ npm run typecheck    # TypeScript check without building
 - `store/index.ts` - Main app state: user progress, XP, streaks, lesson completion
 - `store/practice-store.ts` - Practice mode: sessions, AI-generated exercises, mastery tracking
 
-**Lesson System**: Lessons are defined in `content/curriculum.ts` with four step types:
-- `instruction` - Tutorial content with optional code examples
-- `code-exercise` - Write code validated by test cases
-- `fill-in-blank` - Complete partial code
-- `quiz` - Multiple choice questions
+**Lesson System**: Modular curriculum structure for scalability:
+- **Lesson Files**: Each lesson in its own file (`src/content/modules/[module-name]/[lesson-id].ts`)
+- **Module Structure**:
+  ```
+  src/content/modules/
+  ├── 01-getting-started/
+  │   ├── 01-hello-typescript.ts
+  │   ├── 02-basic-types.ts
+  │   ├── 03-type-inference.ts
+  │   └── index.ts                    # Aggregates lessons + module definition
+  ├── 02-functions/
+  │   ├── 04-function-basics.ts
+  │   └── index.ts
+  └── index.ts                        # Main aggregator (imports all modules)
+  ```
+- **curriculum.ts**: Thin re-export layer (12 lines) that imports from `modules/index.ts`
+- **Step Types**: Four discriminated union types for lessons:
+  - `instruction` - Tutorial content with optional code examples
+  - `code-exercise` - Write code validated by test cases
+  - `fill-in-blank` - Complete partial code
+  - `quiz` - Multiple choice questions
 
 The `LessonPlayer` component renders steps via discriminated union pattern - each step type has its own component (InstructionStep, CodeExerciseStep, etc.).
 

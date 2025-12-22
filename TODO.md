@@ -99,10 +99,17 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [ ] Track AI hint usage for analytics
 
 ### Phase 6: Content Creation
-**Sprint 1: Foundations (Lessons 4-15)**
-- [ ] Module 2: Functions (4 lessons)
-- [ ] Module 3: Objects & Interfaces (4 lessons)
-- [ ] Module 4: Arrays & Collections (4 lessons)
+**Sprint 1: Foundations (Lessons 1-15)** ✅ **COMPLETE**
+- [x] Module 1: Getting Started (3 lessons) - Hello TypeScript, Basic Types, Type Inference
+- [x] Module 2: Functions (4 lessons) - Function Basics, Parameters & Defaults, Arrow Functions, Function Types
+- [x] Module 3: Objects & Interfaces (4 lessons) - Object Types, Interfaces, Optional & Readonly, Type vs Interface
+- [x] Module 4: Arrays & Collections (4 lessons) - Typed Arrays, Array Methods, Tuples, Records & Maps
+- [x] **Curriculum Refactor**: Modular file structure implemented
+  - [x] Each lesson in its own file (`src/content/modules/[module-name]/[lesson-id].ts`)
+  - [x] Module index files aggregating lessons
+  - [x] Main aggregator at `src/content/modules/index.ts`
+  - [x] `curriculum.ts` reduced from ~3,400 lines to 12 lines (thin re-export layer)
+  - [x] Scalable architecture ready for 48 more lessons
 
 **Sprint 2: Intermediate (Lessons 16-31)**
 - [ ] Module 5: Advanced Types (4 lessons)
