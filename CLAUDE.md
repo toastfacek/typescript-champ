@@ -48,12 +48,14 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
 ### Backend (server/)
 
 Express API server for AI-powered exercise generation:
-- `routes/exercise.ts` - Generate exercises via Claude API
+- `routes/exercise.ts` - Single (`/generate`) and batch (`/generate-batch`) exercise generation
 - `routes/goal.ts` - Learning goal analysis
-- `services/claude.ts` - Claude API client
+- `services/claude.ts` - Claude API client (uses `claude-sonnet-4-20250514`)
 - `prompts/` - Structured prompts for different exercise types
 
-API runs separately from frontend - connect via `FRONTEND_URL` env var for CORS.
+API runs separately from frontend. Server binds to `0.0.0.0` for Railway deployment.
+
+**Batch Generation**: Generates 5 exercises in parallel (3 concurrent max) for instant loading. Frontend maintains a queue and auto-refills when < 2 exercises remain.
 
 ## Key Types
 
@@ -69,10 +71,19 @@ type PracticeTopic = 'basic-types' | 'functions' | 'objects' | 'arrays' | ...
 
 ## Environment Variables
 
-Frontend (`.env.local`):
-- `VITE_SUPABASE_URL` - Supabase project URL
-- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
+Frontend (`.env.local` or Railway):
+- `VITE_API_URL` - Backend API URL (e.g., `https://backend-xxx.up.railway.app`)
+- `VITE_SUPABASE_URL` - Supabase project URL (optional, uses localStorage without it)
+- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key (optional)
 
-Backend:
-- `CLAUDE_API_KEY` - Anthropic API key for exercise generation
-- `FRONTEND_URL` - Frontend origin for CORS (default: http://localhost:5173)
+Backend (Railway):
+- `ANTHROPIC_API_KEY` - Anthropic API key for exercise generation
+- `FRONTEND_URL` - Frontend origin for CORS (e.g., `https://frontend-xxx.up.railway.app`)
+- `PORT` - Auto-set by Railway (server reads this)
+
+## Deployment (Railway)
+
+Both frontend and backend are deployed on Railway:
+- **Frontend**: Vite preview with `--host 0.0.0.0`, uses `allowedHosts` in vite.config.ts
+- **Backend**: Express server, root directory set to `server/`, port must match Railway networking config
+- CORS is configured to allow the Railway frontend URL

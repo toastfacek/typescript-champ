@@ -56,10 +56,10 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ## In Progress
 
 ### Practice Mode - Remaining Work
-- [ ] Deploy server to Railway with `ANTHROPIC_API_KEY`
-- [ ] Set `VITE_API_URL` in frontend to Railway URL
-- [ ] Test end-to-end exercise generation
-- [ ] Add exercise caching (pre-generate popular topic/difficulty combos)
+- [x] Deploy server to Railway with `ANTHROPIC_API_KEY`
+- [x] Set `VITE_API_URL` in frontend to Railway URL
+- [x] Test end-to-end exercise generation
+- [x] Add batch exercise generation (5 exercises pre-loaded per session)
 - [ ] Practice XP integration (50% of normal XP)
 
 ### Goal-Driven Learning Paths
@@ -132,9 +132,9 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ```
 server/
 ├── src/
-│   ├── index.ts                    # Express app
+│   ├── index.ts                    # Express app (0.0.0.0 binding for Railway)
 │   ├── routes/
-│   │   ├── exercise.ts             # POST /api/exercise/generate
+│   │   ├── exercise.ts             # POST /api/exercise/generate, /generate-batch
 │   │   └── goal.ts                 # POST /api/goal/analyze
 │   ├── services/
 │   │   ├── claude.ts               # Claude API wrapper
@@ -164,10 +164,12 @@ src/
 
 ### Exercise Generation Flow
 1. User selects topic + difficulty + exercise type
-2. Frontend calls `POST /api/exercise/generate`
-3. Backend generates exercise with Claude
-4. Backend validates (schema + security + tests)
-5. Frontend displays using existing step components
+2. Session starts → batch generation begins (5 exercises in background)
+3. Frontend calls `POST /api/exercise/generate-batch` for batch or `/generate` for single
+4. Backend generates exercises with Claude (3 concurrent max to avoid rate limits)
+5. Backend validates each (schema + security + tests)
+6. Frontend queues exercises → instant loading for subsequent exercises
+7. When queue < 2, automatically fetches more in background
 
 ### Validation Rules
 - Schema validation with Zod
