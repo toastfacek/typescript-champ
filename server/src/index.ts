@@ -7,8 +7,16 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // Middleware
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'https://frontend-production-3593.up.railway.app'
+].filter(Boolean)
+
+console.log('Allowed CORS origins:', allowedOrigins)
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: allowedOrigins,
   credentials: true
 }))
 app.use(express.json())
