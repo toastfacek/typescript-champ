@@ -8,12 +8,13 @@ import type {
   PracticeStats,
   MasteryLevel
 } from '@/types/practice'
-import { generateExercise as apiGenerateExercise } from '@/services/api-client'
+import { generateExercise as apiGenerateExercise, generateExerciseBatch } from '@/services/api-client'
 
 interface PracticeState {
   // Current session
   currentSession: PracticeSession | null
   currentExercise: PracticeExercise | null
+  exerciseQueue: PracticeExercise[]
   isGenerating: boolean
   generationError: string | null
 
@@ -28,6 +29,7 @@ interface PracticeState {
   ) => void
   endSession: () => void
   generateNextExercise: () => Promise<void>
+  generateBatch: () => Promise<void>
   completeExercise: (success: boolean, timeSeconds: number) => void
   getStats: (topic: PracticeTopic) => PracticeStats
   resetStats: () => void
@@ -68,6 +70,7 @@ export const usePracticeStore = create<PracticeState>()(
       // Initial state
       currentSession: null,
       currentExercise: null,
+      exerciseQueue: [],
       isGenerating: false,
       generationError: null,
       practiceStats: {} as Record<PracticeTopic, PracticeStats>,
@@ -86,8 +89,14 @@ export const usePracticeStore = create<PracticeState>()(
         set({
           currentSession: session,
           currentExercise: null,
+          exerciseQueue: [],
           generationError: null
         })
+
+        // Start batch generation in background
+        setTimeout(() => {
+          get().generateBatch()
+        }, 0)
       },
 
       endSession: () => {
@@ -110,16 +119,32 @@ export const usePracticeStore = create<PracticeState>()(
       },
 
       generateNextExercise: async () => {
-        const { currentSession } = get()
+        const { currentSession, exerciseQueue } = get()
         if (!currentSession) {
           set({ generationError: 'No active session' })
           return
         }
 
+        // If we have exercises in the queue, use the next one
+        if (exerciseQueue.length > 0) {
+          const [nextExercise, ...remainingQueue] = exerciseQueue
+          set({
+            currentExercise: nextExercise,
+            exerciseQueue: remainingQueue,
+            isGenerating: false
+          })
+
+          // If queue is getting low, generate more in background
+          if (remainingQueue.length < 2) {
+            get().generateBatch()
+          }
+          return
+        }
+
+        // No exercises in queue, generate one
         set({ isGenerating: true, generationError: null })
 
         try {
-          // Determine exercise type
           let exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz'
           if (currentSession.exerciseType === 'mixed') {
             const types: Array<'code-exercise' | 'fill-in-blank' | 'quiz'> = [
@@ -151,6 +176,34 @@ export const usePracticeStore = create<PracticeState>()(
             isGenerating: false,
             generationError: error instanceof Error ? error.message : 'Unknown error'
           })
+        }
+      },
+
+      generateBatch: async () => {
+        const { currentSession, isGenerating } = get()
+        if (!currentSession || isGenerating) return
+
+        try {
+          const exerciseTypes: ('code-exercise' | 'fill-in-blank' | 'quiz')[] =
+            currentSession.exerciseType === 'mixed'
+              ? ['code-exercise', 'fill-in-blank', 'quiz']
+              : [currentSession.exerciseType as 'code-exercise' | 'fill-in-blank' | 'quiz']
+
+          const response = await generateExerciseBatch({
+            topic: currentSession.topic,
+            difficulty: currentSession.difficulty,
+            count: 5,
+            exerciseTypes
+          })
+
+          if (response.success && response.exercises.length > 0) {
+            set(state => ({
+              exerciseQueue: [...state.exerciseQueue, ...response.exercises]
+            }))
+          }
+        } catch (error) {
+          console.error('Batch generation error:', error)
+          // Don't set error state - this is a background operation
         }
       },
 

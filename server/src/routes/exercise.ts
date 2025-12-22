@@ -170,6 +170,180 @@ exerciseRouter.post('/generate', async (req, res) => {
   }
 })
 
+// Batch generate multiple exercises
+const BatchGenerateSchema = z.object({
+  topic: z.string().min(1).max(100),
+  difficulty: z.enum(['easy', 'medium', 'hard']),
+  count: z.number().min(1).max(10).default(5),
+  exerciseTypes: z.array(z.enum(['code-exercise', 'fill-in-blank', 'quiz'])).optional(),
+  themeContext: z.object({
+    projectType: z.string().optional(),
+    domain: z.string().optional(),
+    exampleEntities: z.array(z.string()).optional(),
+    techStack: z.array(z.string()).optional()
+  }).optional()
+})
+
+exerciseRouter.post('/generate-batch', async (req, res) => {
+  try {
+    const parseResult = BatchGenerateSchema.safeParse(req.body)
+    if (!parseResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid request',
+        details: parseResult.error.errors
+      })
+    }
+
+    const { topic, difficulty, count, exerciseTypes, themeContext } = parseResult.data
+    const types = exerciseTypes || ['code-exercise', 'fill-in-blank', 'quiz']
+
+    const exercises: unknown[] = []
+    const errors: string[] = []
+    const startTime = Date.now()
+
+    // Generate exercises in parallel (max 3 concurrent to avoid rate limits)
+    const batchSize = 3
+    for (let i = 0; i < count; i += batchSize) {
+      const batch = []
+      for (let j = i; j < Math.min(i + batchSize, count); j++) {
+        const exerciseType = types[j % types.length]
+        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, themeContext))
+      }
+
+      const results = await Promise.allSettled(batch)
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+          exercises.push(result.value)
+        } else if (result.status === 'rejected') {
+          errors.push(result.reason?.message || 'Generation failed')
+        }
+      }
+    }
+
+    const totalTimeMs = Date.now() - startTime
+
+    res.json({
+      success: true,
+      exercises,
+      metadata: {
+        requested: count,
+        generated: exercises.length,
+        failed: errors.length,
+        totalTimeMs,
+        errors: errors.length > 0 ? errors : undefined
+      }
+    })
+  } catch (error) {
+    console.error('Batch generation error:', error)
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+})
+
+// Helper function for single exercise generation
+async function generateSingleExercise(
+  topic: string,
+  difficulty: 'easy' | 'medium' | 'hard',
+  exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz',
+  themeContext?: any
+) {
+  let systemPrompt: string
+  let userPrompt: string
+
+  switch (exerciseType) {
+    case 'code-exercise':
+      systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT
+      userPrompt = buildCodeExercisePrompt(topic, difficulty, themeContext)
+      break
+    case 'fill-in-blank':
+      systemPrompt = FILL_BLANK_SYSTEM_PROMPT
+      userPrompt = buildFillBlankPrompt(topic, difficulty, themeContext)
+      break
+    case 'quiz':
+      systemPrompt = QUIZ_SYSTEM_PROMPT
+      userPrompt = buildQuizPrompt(topic, difficulty, themeContext)
+      break
+  }
+
+  const generated = await completeWithJSON(userPrompt, {
+    systemPrompt,
+    temperature: 0.8
+  })
+
+  // Validate
+  let validation
+  switch (exerciseType) {
+    case 'code-exercise':
+      validation = validateCodeExercise(generated)
+      break
+    case 'fill-in-blank':
+      validation = validateFillBlank(generated)
+      break
+    case 'quiz':
+      validation = validateQuiz(generated)
+      break
+  }
+
+  if (!validation.valid) {
+    throw new Error(`Validation failed: ${validation.errors.join(', ')}`)
+  }
+
+  const exerciseId = `practice-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+  let step: unknown
+  switch (exerciseType) {
+    case 'code-exercise':
+      step = {
+        id: `step-${exerciseId}`,
+        order: 1,
+        type: 'code-exercise',
+        title: (generated as any).title,
+        instructions: (generated as any).instructions,
+        starterCode: (generated as any).starterCode,
+        solutionCode: (generated as any).solutionCode,
+        testCases: (generated as any).testCases,
+        hints: (generated as any).hints
+      }
+      break
+    case 'fill-in-blank':
+      step = {
+        id: `step-${exerciseId}`,
+        order: 1,
+        type: 'fill-in-blank',
+        title: (generated as any).title,
+        instructions: (generated as any).instructions,
+        codeTemplate: (generated as any).codeTemplate,
+        blanks: (generated as any).blanks,
+        hints: (generated as any).hints
+      }
+      break
+    case 'quiz':
+      step = {
+        id: `step-${exerciseId}`,
+        order: 1,
+        type: 'quiz',
+        title: (generated as any).title,
+        question: (generated as any).question,
+        codeContext: (generated as any).codeContext,
+        options: (generated as any).options,
+        explanation: (generated as any).explanation
+      }
+      break
+  }
+
+  return {
+    id: exerciseId,
+    type: exerciseType,
+    topic,
+    difficulty,
+    step,
+    generatedAt: new Date().toISOString()
+  }
+}
+
 // Get available topics
 exerciseRouter.get('/topics', (req, res) => {
   res.json({

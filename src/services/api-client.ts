@@ -66,6 +66,31 @@ export async function generateExercise(params: {
   })
 }
 
+export interface BatchGenerateResponse {
+  success: boolean
+  exercises: GenerateExerciseResponse['exercise'][]
+  metadata: {
+    requested: number
+    generated: number
+    failed: number
+    totalTimeMs: number
+    errors?: string[]
+  }
+}
+
+export async function generateExerciseBatch(params: {
+  topic: PracticeTopic
+  difficulty: PracticeDifficulty
+  count?: number
+  exerciseTypes?: ('code-exercise' | 'fill-in-blank' | 'quiz')[]
+  themeContext?: ThemeContext
+}): Promise<BatchGenerateResponse> {
+  return fetchJson<BatchGenerateResponse>('/api/exercise/generate-batch', {
+    method: 'POST',
+    body: JSON.stringify({ count: 5, ...params })
+  })
+}
+
 // Goal API
 
 export async function analyzeGoal(goalDescription: string): Promise<GoalAnalysisResponse> {
