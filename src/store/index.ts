@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User, UserProgress, LessonProgress, UserSettings } from '@/types'
+import { syncUserProgress, syncLessonProgress, syncUserSettings } from '@/services/supabase-sync'
 
 interface AppState {
   // User state
@@ -57,24 +58,43 @@ export const useStore = create<AppState>()(
       // Actions
       setUser: (user) => set({ user }),
 
-      setProgress: (progress) => set({ progress }),
+      setProgress: (progress) => {
+        set({ progress })
+        // Auto-sync to Supabase (fire-and-forget)
+        syncUserProgress(progress).catch(err => console.error('Sync error:', err))
+      },
 
       updateProgress: (updates) =>
-        set((state) => ({
-          progress: state.progress
+        set((state) => {
+          const newProgress = state.progress
             ? { ...state.progress, ...updates }
-            : { ...defaultProgress, ...updates },
-        })),
+            : { ...defaultProgress, ...updates }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
+
+          return { progress: newProgress }
+        }),
 
       setLessonProgress: (lessonId, progress) =>
-        set((state) => ({
-          lessonProgress: { ...state.lessonProgress, [lessonId]: progress },
-        })),
+        set((state) => {
+          // Auto-sync to Supabase (fire-and-forget)
+          syncLessonProgress(progress).catch(err => console.error('Sync error:', err))
+
+          return { lessonProgress: { ...state.lessonProgress, [lessonId]: progress } }
+        }),
 
       updateSettings: (updates) =>
-        set((state) => ({
-          settings: { ...state.settings, ...updates },
-        })),
+        set((state) => {
+          const newSettings = { ...state.settings, ...updates }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          if (state.user?.id) {
+            syncUserSettings(state.user.id, newSettings).catch(err => console.error('Sync error:', err))
+          }
+
+          return { settings: newSettings }
+        }),
 
       addXP: (amount) =>
         set((state) => {
@@ -82,13 +102,16 @@ export const useStore = create<AppState>()(
           const newTotalXP = state.progress.totalXP + amount
           // Calculate new level based on XP
           const newLevel = calculateLevel(newTotalXP)
-          return {
-            progress: {
-              ...state.progress,
-              totalXP: newTotalXP,
-              level: newLevel,
-            },
+          const newProgress = {
+            ...state.progress,
+            totalXP: newTotalXP,
+            level: newLevel,
           }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
+
+          return { progress: newProgress }
         }),
 
       completeLesson: (lessonId, xpEarned) =>
@@ -116,24 +139,37 @@ export const useStore = create<AppState>()(
             }
           }
 
+          const newProgress = {
+            ...currentProgress,
+            totalXP: newTotalXP,
+            level: calculateLevel(newTotalXP),
+            lessonsCompleted: [...currentProgress.lessonsCompleted, lessonId],
+            lastActivityDate: today,
+            currentStreak: newStreak,
+            longestStreak: Math.max(currentProgress.longestStreak, newStreak),
+          }
+
+          const newLessonProgress = {
+            ...state.lessonProgress[lessonId],
+            lessonId,
+            userId: currentProgress.userId,
+            status: 'completed' as const,
+            completedAt: new Date(),
+            xpEarned,
+            currentStepIndex: state.lessonProgress[lessonId]?.currentStepIndex || 0,
+            stepsCompleted: state.lessonProgress[lessonId]?.stepsCompleted || [],
+            attempts: state.lessonProgress[lessonId]?.attempts || 1,
+          }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
+          syncLessonProgress(newLessonProgress).catch(err => console.error('Sync error:', err))
+
           return {
-            progress: {
-              ...currentProgress,
-              totalXP: newTotalXP,
-              level: calculateLevel(newTotalXP),
-              lessonsCompleted: [...currentProgress.lessonsCompleted, lessonId],
-              lastActivityDate: today,
-              currentStreak: newStreak,
-              longestStreak: Math.max(currentProgress.longestStreak, newStreak),
-            },
+            progress: newProgress,
             lessonProgress: {
               ...state.lessonProgress,
-              [lessonId]: {
-                ...state.lessonProgress[lessonId],
-                status: 'completed',
-                completedAt: new Date(),
-                xpEarned,
-              },
+              [lessonId]: newLessonProgress,
             },
           }
         }),

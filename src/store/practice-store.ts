@@ -9,6 +9,8 @@ import type {
   MasteryLevel
 } from '@/types/practice'
 import { generateExercise as apiGenerateExercise, generateExerciseBatch } from '@/services/api-client'
+import { syncPracticeStats } from '@/services/supabase-sync'
+import { useStore } from './index'
 
 interface PracticeState {
   // Current session
@@ -197,9 +199,14 @@ export const usePracticeStore = create<PracticeState>()(
           })
 
           if (response.success && response.exercises.length > 0) {
-            set(state => ({
-              exerciseQueue: [...state.exerciseQueue, ...response.exercises]
-            }))
+            const validExercises: PracticeExercise[] = response.exercises.filter(
+              (ex): ex is PracticeExercise => ex !== undefined && ex !== null
+            )
+            if (validExercises.length > 0) {
+              set(state => ({
+                exerciseQueue: [...state.exerciseQueue, ...validExercises]
+              }))
+            }
           }
         } catch (error) {
           console.error('Batch generation error:', error)
@@ -250,6 +257,12 @@ export const usePracticeStore = create<PracticeState>()(
           ...currentSession,
           exercisesAttempted: currentSession.exercisesAttempted + 1,
           exercisesCompleted: currentSession.exercisesCompleted + (success ? 1 : 0)
+        }
+
+        // Auto-sync to Supabase (fire-and-forget)
+        const userId = useStore.getState().user?.id
+        if (userId) {
+          syncPracticeStats(userId, updatedStats).catch(err => console.error('Sync error:', err))
         }
 
         set({

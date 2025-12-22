@@ -1,13 +1,22 @@
-import { Card, ProgressBar, Badge } from '@/components/ui'
+import { useNavigate } from 'react-router-dom'
+import { Card, ProgressBar, Badge, Button } from '@/components/ui'
 import { XPCounter, StreakBadge } from '@/components/gamification'
 import { useStore } from '@/store'
+import { useAuth } from '@/contexts/AuthContext'
 import { getProgressToNextLevel, getXPForNextLevel, LEVEL_THRESHOLDS } from '@/types'
 import { curriculum } from '@/content/curriculum'
 
 export function ProfilePage() {
+  const { isAuthenticated, signOut } = useAuth()
+  const navigate = useNavigate()
   const user = useStore((state) => state.user)
   const progress = useStore((state) => state.progress)
   const lessonProgress = useStore((state) => state.lessonProgress)
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/')
+  }
 
   const totalXP = progress?.totalXP || 0
   const level = progress?.level || 1
@@ -144,7 +153,7 @@ export function ProfilePage() {
       </Card>
 
       {/* Achievements Preview */}
-      <Card>
+      <Card className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Achievements</h2>
           <span className="text-sm text-gray-500">Coming soon</span>
@@ -169,6 +178,32 @@ export function ProfilePage() {
             </div>
           ))}
         </div>
+      </Card>
+
+      {/* Account Settings */}
+      <Card>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Account</h2>
+        {!isAuthenticated ? (
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-gray-600 text-sm mb-3">
+              You're currently using demo mode. Your progress is saved locally.
+            </p>
+            <Button variant="primary" onClick={() => navigate('/auth')}>
+              Sign Up to Sync Progress
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-success-50 rounded-lg p-4">
+              <p className="text-success-700 text-sm">
+                Your progress is synced across all your devices.
+              </p>
+            </div>
+            <Button variant="outline" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </div>
+        )}
       </Card>
     </div>
   )
