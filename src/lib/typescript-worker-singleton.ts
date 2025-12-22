@@ -1,7 +1,22 @@
-import * as ts from 'typescript'
+// DiagnosticCategory values (matches TypeScript's values)
+export const DiagnosticCategory = {
+  Warning: 0,
+  Error: 1,
+  Suggestion: 2,
+  Message: 3,
+} as const
+
+// Serializable version of ts.Diagnostic (matches worker output)
+export interface SerializedDiagnostic {
+  start: number | undefined
+  length: number | undefined
+  category: number
+  code: number
+  messageText: string
+}
 
 export interface CompileResult {
-  diagnostics: ts.Diagnostic[]
+  diagnostics: SerializedDiagnostic[]
   outputCode: string | null
   success: boolean
 }
@@ -13,7 +28,7 @@ interface CompileRequest {
 
 interface CompileResponse {
   id: string
-  diagnostics: ts.Diagnostic[]
+  diagnostics: SerializedDiagnostic[]
   outputCode: string | null
   success: boolean
 }

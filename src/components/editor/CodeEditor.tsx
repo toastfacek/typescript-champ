@@ -5,8 +5,8 @@ import { EditorView } from '@codemirror/view'
 import { linter } from '@codemirror/lint'
 import type { Diagnostic } from '@codemirror/lint'
 import { autocompletion } from '@codemirror/autocomplete'
-import * as ts from 'typescript'
 import { useTypeScriptWorker } from '@/lib/useTypeScriptWorker'
+import { DiagnosticCategory } from '@/lib/typescript-worker-singleton'
 
 interface CodeEditorProps {
   code: string
@@ -82,14 +82,6 @@ export function CodeEditor({
         const result = await compileDebounced(code, 300)
         
         return result.diagnostics.map((diagnostic): Diagnostic => {
-          // Get message text
-          let messageText = ''
-          if (typeof diagnostic.messageText === 'string') {
-            messageText = diagnostic.messageText
-          } else {
-            messageText = diagnostic.messageText.messageText
-          }
-
           // Calculate positions
           const start = diagnostic.start || 0
           const end = start + (diagnostic.length || 0)
@@ -97,8 +89,8 @@ export function CodeEditor({
           return {
             from: start,
             to: end,
-            severity: diagnostic.category === ts.DiagnosticCategory.Error ? 'error' : 'warning',
-            message: messageText,
+            severity: diagnostic.category === DiagnosticCategory.Error ? 'error' : 'warning',
+            message: diagnostic.messageText,
           }
         })
       } catch (error) {

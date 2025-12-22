@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react'
-import * as ts from 'typescript'
+import { SerializedDiagnostic } from './typescript-worker-singleton'
 
 export interface CompileResult {
-  diagnostics: ts.Diagnostic[]
+  diagnostics: SerializedDiagnostic[]
   outputCode: string | null
   success: boolean
 }
@@ -14,7 +14,7 @@ interface CompileRequest {
 
 interface CompileResponse {
   id: string
-  diagnostics: ts.Diagnostic[]
+  diagnostics: SerializedDiagnostic[]
   outputCode: string | null
   success: boolean
 }

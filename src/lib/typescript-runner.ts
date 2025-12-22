@@ -3,29 +3,15 @@
  * Provides real type checking and better error messages.
  */
 
-import { compileTypeScript } from './typescript-worker-singleton'
-import * as ts from 'typescript'
-
-/**
- * Format TypeScript diagnostic message
- */
-function formatDiagnostic(diagnostic: ts.Diagnostic): string {
-  let messageText = ''
-  if (typeof diagnostic.messageText === 'string') {
-    messageText = diagnostic.messageText
-  } else {
-    messageText = diagnostic.messageText.messageText
-  }
-  return messageText
-}
+import { compileTypeScript, SerializedDiagnostic, DiagnosticCategory } from './typescript-worker-singleton'
 
 /**
  * Format TypeScript errors for display
  */
-function formatTypeScriptErrors(diagnostics: ts.Diagnostic[]): string {
+function formatTypeScriptErrors(diagnostics: SerializedDiagnostic[]): string {
   const errors = diagnostics
-    .filter(d => d.category === ts.DiagnosticCategory.Error)
-    .map(formatDiagnostic)
+    .filter(d => d.category === DiagnosticCategory.Error)
+    .map(d => d.messageText)
   
   if (errors.length === 0) {
     return ''
