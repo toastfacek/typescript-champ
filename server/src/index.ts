@@ -39,6 +39,6 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   })
 })
 
-app.listen(PORT, () => {
+app.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`TypeScript Champ API running on port ${PORT}`)
 })
