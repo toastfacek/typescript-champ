@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { XPCounter, StreakBadge } from '@/components/gamification'
 import { useStore } from '@/store'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function Header() {
   const user = useStore((state) => state.user)
   const progress = useStore((state) => state.progress)
+  const { isAuthenticated, signOut } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -51,18 +53,27 @@ export function Header() {
               </>
             )}
 
-            {user ? (
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/profile"
+                  className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center hover:bg-primary-200 transition-colors"
+                >
                   <span className="text-primary-600 font-medium text-sm">
-                    {user.displayName.charAt(0).toUpperCase()}
+                    {user?.displayName.charAt(0).toUpperCase() || '?'}
                   </span>
-                </div>
+                </Link>
+                <button
+                  onClick={signOut}
+                  className="text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Sign Out
+                </button>
               </div>
             ) : (
               <Link
                 to="/auth"
-                className="btn-primary text-sm"
+                className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               >
                 Sign In
               </Link>
