@@ -24,10 +24,10 @@ export function CurriculumPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-display font-bold text-surface-100 mb-2">
           {curriculum.title}
         </h1>
-        <p className="text-gray-600">{curriculum.description}</p>
+        <p className="text-surface-300">{curriculum.description}</p>
       </div>
 
       <div className="space-y-8">
@@ -43,7 +43,7 @@ export function CurriculumPage() {
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
                     isComplete
                       ? 'bg-success-500 text-white'
-                      : 'bg-primary-100 text-primary-600'
+                      : 'bg-accent-500/20 text-accent-400 border border-accent-500/30'
                   }`}
                 >
                   {isComplete ? (
@@ -55,26 +55,26 @@ export function CurriculumPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-display font-semibold text-surface-100">
                     {module.title}
                   </h2>
-                  <p className="text-sm text-gray-500">{module.description}</p>
+                  <p className="text-sm text-surface-400">{module.description}</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-surface-500">
                     {Math.round(moduleProgress * 100)}% complete
                   </span>
                   <ProgressBar
                     progress={moduleProgress}
                     size="sm"
-                    color={isComplete ? 'success' : 'primary'}
+                    color={isComplete ? 'success' : 'accent'}
                     className="w-24"
                   />
                 </div>
               </div>
 
               {/* Lessons List */}
-              <div className="ml-5 pl-9 border-l-2 border-gray-200 space-y-3">
+              <div className="ml-5 pl-9 border-l-2 border-surface-700 space-y-3">
                 {module.lessons.map((lessonId) => {
                   const lesson = lessons[lessonId]
                   if (!lesson) return null
@@ -94,9 +94,9 @@ export function CurriculumPage() {
                           isLocked ? 'opacity-50' : ''
                         } ${
                           status === 'completed'
-                            ? 'border-success-200 bg-success-50/50'
+                            ? 'border-success-500/30 bg-success-500/10'
                             : status === 'in-progress'
-                            ? 'border-primary-200 bg-primary-50/50'
+                            ? 'border-accent-500/30 bg-accent-500/10'
                             : ''
                         }`}
                         padding="sm"
@@ -108,8 +108,8 @@ export function CurriculumPage() {
                               status === 'completed'
                                 ? 'bg-success-500 text-white'
                                 : status === 'in-progress'
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-gray-100 text-gray-400'
+                                ? 'bg-accent-500 text-surface-900'
+                                : 'bg-surface-700 text-surface-500'
                             }`}
                           >
                             {status === 'completed' ? (
@@ -129,11 +129,11 @@ export function CurriculumPage() {
 
                           {/* Lesson Info */}
                           <div className="flex-1">
-                            <h3 className="font-medium text-gray-900">
+                            <h3 className="font-medium text-surface-100">
                               {lesson.title}
                             </h3>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-surface-500">
                                 {lesson.estimatedMinutes} min
                               </span>
                               <Badge
@@ -148,7 +148,7 @@ export function CurriculumPage() {
                               >
                                 {lesson.difficulty}
                               </Badge>
-                              <span className="text-xs text-secondary-500 font-medium">
+                              <span className="text-xs text-gold-400 font-medium">
                                 +{lesson.xpReward} XP
                               </span>
                             </div>
@@ -156,7 +156,7 @@ export function CurriculumPage() {
 
                           {/* Arrow */}
                           <svg
-                            className="w-5 h-5 text-gray-400"
+                            className="w-5 h-5 text-surface-600"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
