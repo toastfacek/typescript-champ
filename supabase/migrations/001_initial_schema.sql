@@ -82,52 +82,67 @@ ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.practice_stats ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile" ON public.profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- RLS Policies for user_progress
+DROP POLICY IF EXISTS "Users can view own progress" ON public.user_progress;
 CREATE POLICY "Users can view own progress" ON public.user_progress
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own progress" ON public.user_progress;
 CREATE POLICY "Users can update own progress" ON public.user_progress
   FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own progress" ON public.user_progress;
 CREATE POLICY "Users can insert own progress" ON public.user_progress
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- RLS Policies for lesson_progress
+DROP POLICY IF EXISTS "Users can view own lesson progress" ON public.lesson_progress;
 CREATE POLICY "Users can view own lesson progress" ON public.lesson_progress
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own lesson progress" ON public.lesson_progress;
 CREATE POLICY "Users can update own lesson progress" ON public.lesson_progress
   FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own lesson progress" ON public.lesson_progress;
 CREATE POLICY "Users can insert own lesson progress" ON public.lesson_progress
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- RLS Policies for user_settings
+DROP POLICY IF EXISTS "Users can view own settings" ON public.user_settings;
 CREATE POLICY "Users can view own settings" ON public.user_settings
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own settings" ON public.user_settings;
 CREATE POLICY "Users can update own settings" ON public.user_settings
   FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own settings" ON public.user_settings;
 CREATE POLICY "Users can insert own settings" ON public.user_settings
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- RLS Policies for practice_stats
+DROP POLICY IF EXISTS "Users can view own practice stats" ON public.practice_stats;
 CREATE POLICY "Users can view own practice stats" ON public.practice_stats
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own practice stats" ON public.practice_stats;
 CREATE POLICY "Users can update own practice stats" ON public.practice_stats
   FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own practice stats" ON public.practice_stats;
 CREATE POLICY "Users can insert own practice stats" ON public.practice_stats
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
