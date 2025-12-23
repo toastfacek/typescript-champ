@@ -33,16 +33,17 @@ export function CodeExerciseStep({
   const [output, setOutput] = useState<OutputLine[]>([])
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
+  const [isRunningTests, setIsRunningTests] = useState(false)
   const [currentHintIndex, setCurrentHintIndex] = useState(-1)
   const [showSolution, setShowSolution] = useState(false)
 
-  const runCode = useCallback(async () => {
+  // Execute code and show console output (no tests)
+  const executeCode = useCallback(async () => {
     setIsRunning(true)
     setOutput([])
-    setTestResults([])
+    setTestResults([]) // Clear test results when just running code
 
     try {
-      // First, run the user's code to capture console output
       const result = await runTypeScriptCode(code)
 
       const outputLogs: OutputLine[] = (result.logs || []).map((log) => ({
@@ -50,7 +51,7 @@ export function CodeExerciseStep({
         content: log,
       }))
 
-      // Check for type errors first
+      // Check for type errors
       if (result.typeErrors) {
         outputLogs.push({
           type: 'error',
@@ -72,6 +73,49 @@ export function CodeExerciseStep({
         })
         setOutput(outputLogs)
         setIsRunning(false)
+        return
+      }
+
+      setOutput(outputLogs)
+    } catch (err) {
+      setOutput([{
+        type: 'error',
+        content: `Execution error: ${err instanceof Error ? err.message : String(err)}`
+      }])
+    }
+
+    setIsRunning(false)
+  }, [code])
+
+  // Run test assertions
+  const runTests = useCallback(async () => {
+    setIsRunningTests(true)
+    // Keep output visible, but clear test results
+    setTestResults([])
+
+    try {
+      // First check if code compiles
+      const compileCheck = await runTypeScriptCode(code)
+      
+      if (compileCheck.typeErrors) {
+        setTestResults([{
+          id: 'compile-error',
+          description: 'Code has type errors',
+          passed: false,
+          error: compileCheck.typeErrors,
+        }])
+        setIsRunningTests(false)
+        return
+      }
+
+      if (!compileCheck.success) {
+        setTestResults([{
+          id: 'runtime-error',
+          description: 'Code has runtime errors',
+          passed: false,
+          error: compileCheck.error || 'Unknown error',
+        }])
+        setIsRunningTests(false)
         return
       }
 
@@ -99,10 +143,9 @@ export function CodeExerciseStep({
         })
       }
 
-      setOutput(outputLogs)
       setTestResults(results)
 
-      // Check if all tests passed
+      // Check if all tests passed - only complete on test success
       const allPassed = results.every((r) => r.passed)
       if (allPassed) {
         setOutput((prev) => [...prev, { type: 'success', content: 'All tests passed! ✓' }])
@@ -111,13 +154,15 @@ export function CodeExerciseStep({
         }
       }
     } catch (err) {
-      setOutput([{
-        type: 'error',
-        content: `Execution error: ${err instanceof Error ? err.message : String(err)}`
+      setTestResults([{
+        id: 'test-error',
+        description: 'Test execution failed',
+        passed: false,
+        error: `Execution error: ${err instanceof Error ? err.message : String(err)}`
       }])
     }
 
-    setIsRunning(false)
+    setIsRunningTests(false)
   }, [code, step.testCases, isComplete, onComplete])
 
   const showHint = useCallback(() => {
@@ -179,23 +224,39 @@ export function CodeExerciseStep({
       <div className="flex items-center gap-2 mb-4">
         <Button
           variant="primary"
-          onClick={runCode}
+          onClick={executeCode}
           isLoading={isRunning}
-          disabled={isRunning}
+          disabled={isRunning || isRunningTests}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Run Code
+          Run
         </Button>
 
-        <Button variant="outline" onClick={resetCode}>
+        <Button
+          variant="success"
+          onClick={runTests}
+          isLoading={isRunningTests}
+          disabled={isRunning || isRunningTests}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          Check Solution
+        </Button>
+
+        <Button variant="outline" onClick={resetCode} disabled={isRunning || isRunningTests}>
           Reset
         </Button>
 
         {step.hints.length > 0 && currentHintIndex < step.hints.length - 1 && (
-          <Button variant="ghost" onClick={showHint}>
+          <Button 
+            variant="ghost" 
+            onClick={showHint}
+            disabled={isRunning || isRunningTests}
+          >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
@@ -204,7 +265,12 @@ export function CodeExerciseStep({
         )}
 
         {!showSolution && !isComplete && (
-          <Button variant="ghost" onClick={revealSolution} className="ml-auto">
+          <Button 
+            variant="ghost" 
+            onClick={revealSolution} 
+            className="ml-auto"
+            disabled={isRunning || isRunningTests}
+          >
             Show Solution
           </Button>
         )}
@@ -225,7 +291,7 @@ export function CodeExerciseStep({
       )}
 
       {/* Output Panel */}
-      <OutputPanel output={output} isRunning={isRunning} className="mb-4" />
+      <OutputPanel output={output} isRunning={isRunning || isRunningTests} className="mb-4" />
 
       {/* Test Results */}
       {testResults.length > 0 && (
