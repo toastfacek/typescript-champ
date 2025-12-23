@@ -85,31 +85,31 @@ export function HomePage() {
 
       {/* Stats Section */}
       {progress && (
-        <section className="py-12 px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <section className="py-12 px-4 overflow-visible">
+          <div className="max-w-4xl mx-auto overflow-visible">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-visible">
               {/* XP Card */}
-              <Card variant="gradient" className="relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent-500/10 rounded-full blur-2xl group-hover:bg-accent-500/20 transition-colors" />
-                <div className="relative">
+              <Card variant="gradient" className="relative group overflow-visible">
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-accent-500/10 rounded-full blur-3xl group-hover:bg-accent-500/20 transition-colors" />
+                <div className="relative z-10">
                   <div className="text-surface-500 text-sm font-medium mb-2">Total Experience</div>
                   <XPCounter size="lg" showLevel={true} className="justify-start" />
                 </div>
               </Card>
 
               {/* Streak Card */}
-              <Card variant="gradient" className="relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gold-500/10 rounded-full blur-2xl group-hover:bg-gold-500/20 transition-colors" />
-                <div className="relative">
+              <Card variant="gradient" className="relative group overflow-visible">
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-gold-500/10 rounded-full blur-3xl group-hover:bg-gold-500/20 transition-colors" />
+                <div className="relative z-10">
                   <div className="text-surface-500 text-sm font-medium mb-2">Day Streak</div>
                   <StreakBadge size="lg" />
                 </div>
               </Card>
 
               {/* Progress Card */}
-              <Card variant="gradient" className="relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-success-500/10 rounded-full blur-2xl group-hover:bg-success-500/20 transition-colors" />
-                <div className="relative">
+              <Card variant="gradient" className="relative group overflow-visible">
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-success-500/10 rounded-full blur-3xl group-hover:bg-success-500/20 transition-colors" />
+                <div className="relative z-10">
                   <div className="text-surface-500 text-sm font-medium mb-2">Lessons Complete</div>
                   <div className="flex items-baseline gap-2 mb-3">
                     <span className="text-3xl font-bold font-heading text-surface-100">{completedCount}</span>
@@ -283,9 +283,9 @@ export function HomePage() {
       {/* CTA Section */}
       <section className="py-20 px-4">
         <div className="max-w-2xl mx-auto">
-          <Card variant="gradient" padding="lg" className="text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent-500/5 to-gold-500/5" />
-            <div className="relative">
+          <Card variant="gradient" padding="lg" className="text-center relative overflow-visible">
+            <div className="absolute -inset-4 bg-gradient-to-br from-accent-500/5 to-gold-500/5 blur-2xl rounded-3xl" />
+            <div className="relative z-10">
               <h2 className="font-heading text-2xl font-bold text-surface-100 mb-3">
                 Ready to become a TypeScript pro?
               </h2>
