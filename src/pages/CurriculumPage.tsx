@@ -142,7 +142,7 @@ export function CurriculumPage() {
                                     ? 'success'
                                     : lesson.difficulty === 'intermediate'
                                     ? 'warning'
-                                    : 'error'
+                                    : 'danger'
                                 }
                                 size="sm"
                               >

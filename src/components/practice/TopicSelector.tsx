@@ -1,4 +1,4 @@
-import { Card } from '@/components/ui'
+import { SelectionGroup, SelectionItem, Badge } from '@/components/ui'
 import type { PracticeTopic, TopicInfo, MasteryLevel } from '@/types/practice'
 import { usePracticeStore } from '@/store/practice-store'
 
@@ -14,11 +14,11 @@ const TOPICS: TopicInfo[] = [
   { id: 'classes', name: 'Classes', description: 'Classes, inheritance, and access modifiers' }
 ]
 
-const MASTERY_COLORS: Record<MasteryLevel, string> = {
-  learning: 'bg-gray-100 text-gray-600',
-  practicing: 'bg-blue-100 text-blue-600',
-  confident: 'bg-green-100 text-green-600',
-  mastered: 'bg-yellow-100 text-yellow-700'
+const MASTERY_VARIANTS: Record<MasteryLevel, 'default' | 'accent' | 'success' | 'gold'> = {
+  learning: 'default',
+  practicing: 'accent',
+  confident: 'success',
+  mastered: 'gold'
 }
 
 const MASTERY_LABELS: Record<MasteryLevel, string> = {
@@ -37,62 +37,58 @@ export function TopicSelector({ selectedTopic, onSelectTopic }: TopicSelectorPro
   const getStats = usePracticeStore((s) => s.getStats)
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <SelectionGroup
+      value={selectedTopic || null}
+      onChange={(value) => onSelectTopic(value as PracticeTopic)}
+      layout="grid"
+      columns={3}
+      gap="md"
+    >
       {TOPICS.map((topic) => {
         const stats = getStats(topic.id)
-        const isSelected = selectedTopic === topic.id
 
         return (
-          <Card
+          <SelectionItem
             key={topic.id}
-            hover
-            className={`cursor-pointer transition-all ${
-              isSelected
-                ? 'ring-2 ring-primary-500 border-primary-500 bg-primary-50'
-                : ''
-            }`}
-            padding="md"
-            onClick={() => onSelectTopic(topic.id)}
+            value={topic.id}
+            variant="accent"
+            className="p-4"
           >
             <div className="flex justify-between items-start mb-2">
-              <h3 className="font-semibold text-gray-900">{topic.name}</h3>
+              <h3 className="font-heading font-semibold text-surface-100">{topic.name}</h3>
               {stats.totalAttempts > 0 && (
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${
-                    MASTERY_COLORS[stats.masteryLevel]
-                  }`}
-                >
+                <Badge variant={MASTERY_VARIANTS[stats.masteryLevel]} size="sm">
                   {MASTERY_LABELS[stats.masteryLevel]}
-                </span>
+                </Badge>
               )}
             </div>
-            <p className="text-sm text-gray-500 mb-3">{topic.description}</p>
+            <p className="text-sm text-surface-400 mb-3">{topic.description}</p>
 
             {stats.totalAttempts > 0 ? (
-              <div className="text-xs text-gray-400 space-y-1">
+              <div className="text-xs text-surface-500 space-y-1">
                 <div className="flex justify-between">
                   <span>Completed</span>
-                  <span className="font-medium text-gray-600">
+                  <span className="font-medium text-surface-300 font-mono">
                     {stats.totalCompleted} / {stats.totalAttempts}
                   </span>
                 </div>
                 {stats.lastPracticed && (
                   <div className="flex justify-between">
                     <span>Last practiced</span>
-                    <span className="font-medium text-gray-600">
+                    <span className="font-medium text-surface-300">
                       {new Date(stats.lastPracticed).toLocaleDateString()}
                     </span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-xs text-gray-400 italic">
+              <div className="text-xs text-surface-500 italic">
                 Not practiced yet
               </div>
             )}
-          </Card>
+          </SelectionItem>
         )
       })}
-    </div>
+    </SelectionGroup>
   )
 }

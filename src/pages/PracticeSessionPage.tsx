@@ -64,9 +64,9 @@ export function PracticeSessionPage() {
         <SessionHeader session={currentSession} onEnd={handleEndSession} />
         <Card className="mt-6" padding="lg">
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4" />
-            <p className="text-lg font-medium text-gray-700">Generating exercise...</p>
-            <p className="text-sm text-gray-500 mt-2">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500 mb-4" />
+            <p className="text-lg font-medium text-surface-200">Generating exercise...</p>
+            <p className="text-sm text-surface-400 mt-2">
               Our AI is creating a unique {currentSession.difficulty} exercise about {currentSession.topic}
             </p>
           </div>
@@ -83,8 +83,8 @@ export function PracticeSessionPage() {
         <Card className="mt-6" padding="lg">
           <div className="flex flex-col items-center justify-center py-12">
             <div className="text-4xl mb-4">😕</div>
-            <p className="text-lg font-medium text-gray-700 mb-2">Failed to generate exercise</p>
-            <p className="text-sm text-red-600 mb-4">{generationError}</p>
+            <p className="text-lg font-medium text-surface-200 mb-2">Failed to generate exercise</p>
+            <p className="text-sm text-danger-400 mb-4">{generationError}</p>
             <div className="flex gap-3">
               <Button onClick={handleNextExercise}>Try Again</Button>
               <Button variant="outline" onClick={handleEndSession}>End Session</Button>
@@ -108,14 +108,14 @@ export function PracticeSessionPage() {
 
       {/* Exercise Title */}
       <div className="mt-6 mb-4">
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+        <div className="flex items-center gap-2 text-sm text-surface-400 mb-1">
           <span className="capitalize">{currentSession.topic}</span>
           <span>•</span>
           <span className="capitalize">{currentSession.difficulty}</span>
           <span>•</span>
           <span className="capitalize">{currentExercise.type.replace('-', ' ')}</span>
         </div>
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-heading font-semibold text-surface-100">
           {'title' in step && step.title ? step.title : 'Exercise'}
         </h2>
       </div>
@@ -181,27 +181,27 @@ function SessionHeader({ session, onEnd }: SessionHeaderProps) {
     : 0
 
   return (
-    <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200 p-4">
+    <div className="flex items-center justify-between bg-surface-800/50 rounded-xl border border-surface-700/50 p-4">
       <div>
-        <h1 className="text-lg font-semibold text-gray-900">Practice Session</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-lg font-heading font-semibold text-surface-100">Practice Session</h1>
+        <p className="text-sm text-surface-400">
           {session.topic} • {session.difficulty}
         </p>
       </div>
 
       <div className="flex items-center gap-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary-600">
+          <div className="text-2xl font-heading font-bold text-success-400">
             {session.exercisesCompleted}
           </div>
-          <div className="text-xs text-gray-500">Completed</div>
+          <div className="text-xs text-surface-500">Completed</div>
         </div>
 
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-600">
+          <div className="text-2xl font-heading font-bold text-surface-300">
             {session.exercisesAttempted}
           </div>
-          <div className="text-xs text-gray-500">Attempted</div>
+          <div className="text-xs text-surface-500">Attempted</div>
         </div>
 
         {session.exercisesAttempted > 0 && (
@@ -209,9 +209,9 @@ function SessionHeader({ session, onEnd }: SessionHeaderProps) {
             <ProgressBar
               progress={completionRate / 100}
               size="sm"
-              color={completionRate >= 80 ? 'success' : 'primary'}
+              color={completionRate >= 80 ? 'success' : 'accent'}
             />
-            <div className="text-xs text-gray-500 text-center mt-1">
+            <div className="text-xs text-surface-500 text-center mt-1">
               {completionRate}% success
             </div>
           </div>
