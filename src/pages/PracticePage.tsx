@@ -24,8 +24,8 @@ export function PracticePage() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice Mode</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-heading font-bold text-surface-50 mb-2">Practice Mode</h1>
+        <p className="text-surface-300">
           Sharpen your TypeScript skills with AI-generated exercises.
           Choose a topic, difficulty, and start practicing!
         </p>
@@ -33,7 +33,7 @@ export function PracticePage() {
 
       {/* Topic Selection */}
       <Card className="mb-6" padding="lg">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-heading font-semibold text-surface-100 mb-4">
           1. Choose a Topic
         </h2>
         <TopicSelector
@@ -44,7 +44,7 @@ export function PracticePage() {
 
       {/* Difficulty Selection */}
       <Card className="mb-6" padding="lg">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-heading font-semibold text-surface-100 mb-4">
           2. Select Difficulty
         </h2>
         <DifficultyPicker selected={difficulty} onChange={setDifficulty} />
@@ -52,29 +52,29 @@ export function PracticePage() {
 
       {/* Exercise Type Selection */}
       <Card className="mb-6" padding="lg">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-heading font-semibold text-surface-100 mb-4">
           3. Exercise Type
         </h2>
         <ExerciseTypeSelector selected={exerciseType} onChange={setExerciseType} />
       </Card>
 
       {/* Start Button */}
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-3">
         <Button
           size="lg"
           onClick={handleStartPractice}
           disabled={!selectedTopic}
           className="px-12"
+          glow={!!selectedTopic}
         >
           Start Practice
         </Button>
+        {!selectedTopic && (
+          <p className="text-center text-sm text-surface-500">
+            Select a topic to begin
+          </p>
+        )}
       </div>
-
-      {!selectedTopic && (
-        <p className="text-center text-sm text-gray-500 mt-3">
-          Select a topic to begin
-        </p>
-      )}
     </div>
   )
 }

@@ -38,20 +38,20 @@ export function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Profile Header */}
-      <Card className="mb-8">
+      <Card className="mb-8" variant="gradient" glow="accent">
         <div className="flex items-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
-            <span className="text-3xl font-bold text-white">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-glow">
+            <span className="text-3xl font-heading font-bold text-surface-900">
               {user?.displayName?.charAt(0).toUpperCase() || 'L'}
             </span>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+          <div className="flex-1">
+            <h1 className="text-2xl font-heading font-bold text-surface-50">
               {user?.displayName || 'Learner'}
             </h1>
-            <p className="text-gray-500">TypeScript Apprentice</p>
-            <div className="flex items-center gap-4 mt-2">
-              <Badge variant="primary" size="md">
+            <p className="text-surface-400">TypeScript Apprentice</p>
+            <div className="flex items-center gap-4 mt-3">
+              <Badge variant="accent" size="md">
                 Level {level}
               </Badge>
               <XPCounter size="sm" showLevel={false} />
@@ -62,56 +62,56 @@ export function ProfilePage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-primary-600">{totalXP}</div>
-          <div className="text-sm text-gray-500">Total XP</div>
+        <Card className="text-center" hover>
+          <div className="text-3xl font-heading font-bold text-gold-300">{totalXP}</div>
+          <div className="text-sm text-surface-400">Total XP</div>
         </Card>
 
-        <Card className="text-center">
+        <Card className="text-center" hover>
           <div className="flex justify-center mb-1">
             <StreakBadge size="lg" showLabel={false} />
           </div>
-          <div className="text-3xl font-bold text-orange-500">{currentStreak}</div>
-          <div className="text-sm text-gray-500">Day Streak</div>
+          <div className="text-3xl font-heading font-bold text-gold-300">{currentStreak}</div>
+          <div className="text-sm text-surface-400">Day Streak</div>
         </Card>
 
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-success-600">{lessonsCompleted}</div>
-          <div className="text-sm text-gray-500">Lessons Done</div>
+        <Card className="text-center" hover>
+          <div className="text-3xl font-heading font-bold text-success-300">{lessonsCompleted}</div>
+          <div className="text-sm text-surface-400">Lessons Done</div>
         </Card>
 
-        <Card className="text-center">
-          <div className="text-3xl font-bold text-secondary-600">{longestStreak}</div>
-          <div className="text-sm text-gray-500">Best Streak</div>
+        <Card className="text-center" hover>
+          <div className="text-3xl font-heading font-bold text-accent-300">{longestStreak}</div>
+          <div className="text-sm text-surface-400">Best Streak</div>
         </Card>
       </div>
 
       {/* Level Progress */}
       <Card className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Level Progress</h2>
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-            <span className="text-xl font-bold text-primary-600">{level}</span>
+        <h2 className="text-lg font-heading font-semibold text-surface-50 mb-4">Level Progress</h2>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-accent-500/20 flex items-center justify-center border border-accent-500/30">
+            <span className="text-xl font-heading font-bold text-accent-300">{level}</span>
           </div>
           <div className="flex-1">
-            <div className="flex justify-between text-sm text-gray-600 mb-1">
+            <div className="flex justify-between text-sm text-surface-400 mb-2">
               <span>Level {level}</span>
               <span>Level {level + 1}</span>
             </div>
-            <ProgressBar progress={progressToNext} size="lg" />
-            <div className="text-center text-sm text-gray-500 mt-1">
+            <ProgressBar progress={progressToNext} size="lg" color="accent" />
+            <div className="text-center text-sm text-surface-500 mt-2 font-mono">
               {xpInCurrentLevel} / {xpNeededForNext} XP
             </div>
           </div>
-          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-            <span className="text-xl font-bold text-gray-400">{level + 1}</span>
+          <div className="w-12 h-12 rounded-full bg-surface-800 flex items-center justify-center border border-surface-700">
+            <span className="text-xl font-heading font-bold text-surface-500">{level + 1}</span>
           </div>
         </div>
       </Card>
 
       {/* Course Progress */}
       <Card className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Course Progress</h2>
+        <h2 className="text-lg font-heading font-semibold text-surface-50 mb-4">Course Progress</h2>
         <div className="space-y-4">
           {curriculum.modules.map((module) => {
             const completed = module.lessons.filter(
@@ -121,44 +121,44 @@ export function ProfilePage() {
 
             return (
               <div key={module.id}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="font-medium text-gray-700">{module.title}</span>
-                  <span className="text-gray-500">
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="font-medium text-surface-200">{module.title}</span>
+                  <span className="text-surface-400 font-mono">
                     {completed}/{module.lessons.length}
                   </span>
                 </div>
                 <ProgressBar
                   progress={moduleProgress}
                   size="sm"
-                  color={moduleProgress === 1 ? 'success' : 'primary'}
+                  color={moduleProgress === 1 ? 'success' : 'accent'}
                 />
               </div>
             )
           })}
         </div>
 
-        <div className="mt-6 pt-4 border-t border-gray-100">
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-gray-900">Overall Progress</span>
-            <span className="text-primary-600 font-bold">
+        <div className="mt-6 pt-6 border-t border-surface-700">
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-heading font-semibold text-surface-100">Overall Progress</span>
+            <span className="text-accent-300 font-bold font-mono text-lg">
               {Math.round((lessonsCompleted / totalLessons) * 100)}%
             </span>
           </div>
           <ProgressBar
             progress={lessonsCompleted / totalLessons}
             size="md"
-            className="mt-2"
+            color="accent"
           />
         </div>
       </Card>
 
       {/* Achievements Preview */}
       <Card className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Achievements</h2>
-          <span className="text-sm text-gray-500">Coming soon</span>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-heading font-semibold text-surface-50">Achievements</h2>
+          <span className="text-sm text-surface-500 px-3 py-1 bg-surface-800/50 rounded-full border border-surface-700">Coming soon</span>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { icon: '🎯', name: 'First Steps', locked: lessonsCompleted < 1 },
             { icon: '🔥', name: 'Week Warrior', locked: longestStreak < 7 },
@@ -167,12 +167,14 @@ export function ProfilePage() {
           ].map((achievement) => (
             <div
               key={achievement.name}
-              className={`text-center p-4 rounded-lg ${
-                achievement.locked ? 'opacity-40' : 'bg-primary-50'
+              className={`text-center p-4 rounded-lg border transition-all ${
+                achievement.locked
+                  ? 'opacity-40 bg-surface-800/30 border-surface-700'
+                  : 'bg-accent-500/10 border-accent-500/30 shadow-glow-sm'
               }`}
             >
-              <div className="text-3xl mb-2">{achievement.icon}</div>
-              <div className="text-xs font-medium text-gray-700">
+              <div className="text-4xl mb-2">{achievement.icon}</div>
+              <div className="text-xs font-medium text-surface-300">
                 {achievement.name}
               </div>
             </div>
@@ -182,20 +184,20 @@ export function ProfilePage() {
 
       {/* Account Settings */}
       <Card>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Account</h2>
+        <h2 className="text-lg font-heading font-semibold text-surface-50 mb-4">Account</h2>
         {!isAuthenticated ? (
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-gray-600 text-sm mb-3">
+          <div className="bg-gold-500/10 border border-gold-500/20 rounded-lg p-4">
+            <p className="text-surface-300 text-sm mb-3">
               You're currently using demo mode. Your progress is saved locally.
             </p>
-            <Button variant="primary" onClick={() => navigate('/auth')}>
+            <Button variant="primary" onClick={() => navigate('/auth')} glow>
               Sign Up to Sync Progress
             </Button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="bg-success-50 rounded-lg p-4">
-              <p className="text-success-700 text-sm">
+            <div className="bg-success-500/10 border border-success-500/20 rounded-lg p-4">
+              <p className="text-success-300 text-sm">
                 Your progress is synced across all your devices.
               </p>
             </div>

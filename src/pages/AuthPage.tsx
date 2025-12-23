@@ -72,27 +72,30 @@ export function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">TypeScript Champ</h1>
-          <p className="text-gray-600">
+          <div className="w-16 h-16 bg-accent-500 rounded-xl flex items-center justify-center shadow-glow mx-auto mb-4">
+            <span className="text-surface-900 font-heading font-bold text-2xl">TS</span>
+          </div>
+          <h1 className="text-3xl font-heading font-bold text-surface-50 mb-2">TypeScript Champ</h1>
+          <p className="text-surface-300">
             {mode === 'signin' && 'Welcome back!'}
             {mode === 'signup' && 'Start your TypeScript journey'}
             {mode === 'magic-link' && 'Sign in with magic link'}
           </p>
         </div>
 
-        <Card>
+        <Card variant="gradient">
           {mode !== 'magic-link' && (
             <div className="flex gap-2 mb-6">
               <button
                 type="button"
                 onClick={() => switchMode('signin')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+                className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${
                   mode === 'signin'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-accent-500 to-accent-400 text-surface-900 shadow-glow'
+                    : 'bg-surface-800 text-surface-300 hover:bg-surface-700 border border-surface-600'
                 }`}
               >
                 Sign In
@@ -100,10 +103,10 @@ export function AuthPage() {
               <button
                 type="button"
                 onClick={() => switchMode('signup')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+                className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${
                   mode === 'signup'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-accent-500 to-accent-400 text-surface-900 shadow-glow'
+                    : 'bg-surface-800 text-surface-300 hover:bg-surface-700 border border-surface-600'
                 }`}
               >
                 Sign Up
@@ -113,9 +116,9 @@ export function AuthPage() {
 
           {magicLinkSent ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-success-500/20 border border-success-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-8 h-8 text-success-600"
+                  className="w-8 h-8 text-success-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -128,9 +131,9 @@ export function AuthPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Check your email</h3>
-              <p className="text-gray-600 mb-6">
-                We've sent a magic link to <strong>{email}</strong>. Click the link to sign in.
+              <h3 className="text-lg font-heading font-semibold text-surface-50 mb-2">Check your email</h3>
+              <p className="text-surface-300 mb-6">
+                We've sent a magic link to <strong className="text-accent-400">{email}</strong>. Click the link to sign in.
               </p>
               <Button variant="ghost" onClick={() => switchMode('signin')}>
                 Back to sign in
@@ -138,10 +141,10 @@ export function AuthPage() {
             </div>
           ) : (
             <>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 {mode === 'signup' && (
                   <div>
-                    <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="displayName" className="block text-sm font-medium text-surface-200 mb-2">
                       Name
                     </label>
                     <input
@@ -149,7 +152,7 @@ export function AuthPage() {
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-surface-600 bg-surface-800 text-surface-100 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 placeholder:text-surface-500"
                       placeholder="Your name"
                       required
                     />
@@ -157,7 +160,7 @@ export function AuthPage() {
                 )}
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-surface-200 mb-2">
                     Email
                   </label>
                   <input
@@ -165,7 +168,7 @@ export function AuthPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-surface-600 bg-surface-800 text-surface-100 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 placeholder:text-surface-500"
                     placeholder="you@example.com"
                     required
                   />
@@ -173,7 +176,7 @@ export function AuthPage() {
 
                 {mode !== 'magic-link' && (
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="password" className="block text-sm font-medium text-surface-200 mb-2">
                       Password
                     </label>
                     <input
@@ -181,24 +184,24 @@ export function AuthPage() {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-4 py-2.5 border border-surface-600 bg-surface-800 text-surface-100 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 placeholder:text-surface-500"
                       placeholder="••••••••"
                       required
                       minLength={6}
                     />
                     {mode === 'signup' && (
-                      <p className="mt-1 text-xs text-gray-500">At least 6 characters</p>
+                      <p className="mt-2 text-xs text-surface-400">At least 6 characters</p>
                     )}
                   </div>
                 )}
 
                 {error && (
-                  <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-lg">
+                  <div className="bg-danger-500/10 border border-danger-500/30 text-danger-300 px-4 py-3 rounded-lg">
                     {error}
                   </div>
                 )}
 
-                <Button type="submit" className="w-full" isLoading={isLoading}>
+                <Button type="submit" className="w-full" isLoading={isLoading} glow>
                   {mode === 'signup' && 'Create Account'}
                   {mode === 'signin' && 'Sign In'}
                   {mode === 'magic-link' && 'Send Magic Link'}
@@ -210,7 +213,7 @@ export function AuthPage() {
                   <button
                     type="button"
                     onClick={() => switchMode('magic-link')}
-                    className="w-full text-center text-sm text-gray-600 hover:text-gray-900"
+                    className="w-full text-center text-sm text-surface-400 hover:text-accent-400 transition-colors"
                   >
                     Or sign in with magic link
                   </button>
@@ -218,20 +221,20 @@ export function AuthPage() {
                   <button
                     type="button"
                     onClick={() => switchMode('signin')}
-                    className="w-full text-center text-sm text-gray-600 hover:text-gray-900"
+                    className="w-full text-center text-sm text-surface-400 hover:text-accent-400 transition-colors"
                   >
                     Back to sign in
                   </button>
                 )}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-center text-sm text-gray-600">
+              <div className="mt-6 pt-6 border-t border-surface-700">
+                <p className="text-center text-sm text-surface-400">
                   Continue as a guest?{' '}
                   <button
                     type="button"
                     onClick={() => navigate('/')}
-                    className="text-primary-600 hover:text-primary-700 font-medium"
+                    className="text-accent-400 hover:text-accent-300 font-medium transition-colors"
                   >
                     Try demo mode
                   </button>
