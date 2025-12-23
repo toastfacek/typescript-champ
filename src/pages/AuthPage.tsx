@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Card, Button, Input } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 
 type AuthMode = 'signin' | 'signup' | 'magic-link'
@@ -143,56 +142,36 @@ export function AuthPage() {
             <>
               <form onSubmit={handleSubmit} className="space-y-5">
                 {mode === 'signup' && (
-                  <div>
-                    <label htmlFor="displayName" className="block text-sm font-medium text-surface-200 mb-2">
-                      Name
-                    </label>
-                    <input
-                      id="displayName"
-                      type="text"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-surface-600 bg-surface-800 text-surface-100 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 placeholder:text-surface-500"
-                      placeholder="Your name"
-                      required
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-surface-200 mb-2">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-surface-600 bg-surface-800 text-surface-100 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 placeholder:text-surface-500"
-                    placeholder="you@example.com"
+                  <Input
+                    label="Name"
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Your name"
                     required
                   />
-                </div>
+                )}
+
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                />
 
                 {mode !== 'magic-link' && (
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-surface-200 mb-2">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-surface-600 bg-surface-800 text-surface-100 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 placeholder:text-surface-500"
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                    {mode === 'signup' && (
-                      <p className="mt-2 text-xs text-surface-400">At least 6 characters</p>
-                    )}
-                  </div>
+                  <Input
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    helperText={mode === 'signup' ? 'At least 6 characters' : undefined}
+                  />
                 )}
 
                 {error && (

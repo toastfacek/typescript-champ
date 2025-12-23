@@ -50,7 +50,7 @@ export function HomePage() {
           </div>
 
           {/* Heading */}
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 animate-slide-up">
+          <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 animate-slide-up">
             <span className="text-surface-100">Master TypeScript</span>
             <br />
             <span className="text-gradient">One Challenge at a Time</span>
@@ -112,7 +112,7 @@ export function HomePage() {
                 <div className="relative">
                   <div className="text-surface-500 text-sm font-medium mb-2">Lessons Complete</div>
                   <div className="flex items-baseline gap-2 mb-3">
-                    <span className="text-3xl font-bold font-display text-surface-100">{completedCount}</span>
+                    <span className="text-3xl font-bold font-heading text-surface-100">{completedCount}</span>
                     <span className="text-surface-500">/ {totalLessons}</span>
                   </div>
                   <ProgressBar
@@ -131,7 +131,7 @@ export function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="font-display text-2xl font-bold text-surface-100">Your Learning Path</h2>
+              <h2 className="font-heading text-2xl font-bold text-surface-100">Your Learning Path</h2>
               <p className="text-surface-500 mt-1">Pick up where you left off</p>
             </div>
             <Link 
@@ -164,7 +164,7 @@ export function HomePage() {
                   <div className="flex items-center gap-6">
                     {/* Module Number */}
                     <div className={`
-                      w-12 h-12 rounded-xl flex items-center justify-center font-display font-bold text-lg
+                      w-12 h-12 rounded-xl flex items-center justify-center font-heading font-bold text-lg
                       ${moduleCompleted 
                         ? 'bg-success-500/20 text-success-400 border border-success-500/30' 
                         : 'bg-surface-700/50 text-surface-400 border border-surface-600 group-hover:border-accent-500/30 group-hover:text-accent-400'
@@ -223,7 +223,7 @@ export function HomePage() {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-bold text-surface-100 mb-4">
+            <h2 className="font-heading text-3xl font-bold text-surface-100 mb-4">
               Why TypeScript Champ?
             </h2>
             <p className="text-surface-500">Learn the way that actually sticks</p>
@@ -286,7 +286,7 @@ export function HomePage() {
           <Card variant="gradient" padding="lg" className="text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-accent-500/5 to-gold-500/5" />
             <div className="relative">
-              <h2 className="font-display text-2xl font-bold text-surface-100 mb-3">
+              <h2 className="font-heading text-2xl font-bold text-surface-100 mb-3">
                 Ready to become a TypeScript pro?
               </h2>
               <p className="text-surface-400 mb-6">

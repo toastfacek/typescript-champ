@@ -76,7 +76,7 @@ export function XPCounter({ size = 'md', showLevel = true, className }: XPCounte
       <div className="flex flex-col">
         <span
           className={clsx(
-            'font-bold font-display text-gold-400',
+            'font-bold font-heading text-gold-400',
             s.text,
             isAnimating && 'text-glow-gold'
           )}

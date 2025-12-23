@@ -24,7 +24,7 @@ export function CurriculumPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-display font-bold text-surface-100 mb-2">
+        <h1 className="text-3xl font-heading font-bold text-surface-100 mb-2">
           {curriculum.title}
         </h1>
         <p className="text-surface-300">{curriculum.description}</p>
@@ -55,7 +55,7 @@ export function CurriculumPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-display font-semibold text-surface-100">
+                  <h2 className="text-xl font-heading font-semibold text-surface-100">
                     {module.title}
                   </h2>
                   <p className="text-sm text-surface-400">{module.description}</p>

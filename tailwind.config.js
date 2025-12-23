@@ -21,7 +21,7 @@ export default {
           900: '#0f172a',
           950: '#020617',
         },
-        // Cyan accent - TypeScript vibes but more vibrant
+        // Primary accent - Cyan (TypeScript vibes)
         accent: {
           50: '#ecfeff',
           100: '#cffafe',
@@ -34,7 +34,7 @@ export default {
           800: '#155e75',
           900: '#164e63',
         },
-        // Warm gold for XP, achievements, gamification
+        // Secondary accent - Gold (gamification, rewards)
         gold: {
           50: '#fffbeb',
           100: '#fef3c7',
@@ -47,7 +47,7 @@ export default {
           800: '#92400e',
           900: '#78350f',
         },
-        // Success green - more muted and sophisticated
+        // Semantic - Success
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -60,7 +60,7 @@ export default {
           800: '#166534',
           900: '#14532d',
         },
-        // Error/warning - coral red
+        // Semantic - Danger/Error
         danger: {
           50: '#fff1f2',
           100: '#ffe4e6',
@@ -73,14 +73,41 @@ export default {
           800: '#9f1239',
           900: '#881337',
         },
+        // Semantic - Warning (alias to gold for consistency)
+        warning: {
+          50: '#fffbeb',
+          100: '#fef3c7',
+          200: '#fde68a',
+          300: '#fcd34d',
+          400: '#fbbf24',
+          500: '#f59e0b',
+          600: '#d97706',
+          700: '#b45309',
+          800: '#92400e',
+          900: '#78350f',
+        },
       },
       fontFamily: {
-        display: ['Outfit', 'system-ui', 'sans-serif'],
+        heading: ['Outfit', 'system-ui', 'sans-serif'],
         sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
       },
       fontSize: {
         '2xs': ['0.625rem', { lineHeight: '0.75rem' }],
+        // Heading scale
+        'display-2xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'display-lg': ['3rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        'display-md': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        'display-sm': ['1.875rem', { lineHeight: '1.3', letterSpacing: '-0.01em' }],
+        'display-xs': ['1.5rem', { lineHeight: '1.3', letterSpacing: '-0.01em' }],
+      },
+      // Standardized spacing scale for consistency
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '112': '28rem',
+        '128': '32rem',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

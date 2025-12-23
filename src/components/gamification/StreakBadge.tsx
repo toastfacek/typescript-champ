@@ -64,7 +64,7 @@ export function StreakBadge({ size = 'md', showLabel = true, className }: Streak
       {showLabel && (
         <span
           className={clsx(
-            'font-bold font-display',
+            'font-bold font-heading',
             s.text,
             isActive ? 'text-gold-400' : 'text-surface-500'
           )}
