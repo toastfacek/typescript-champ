@@ -100,20 +100,20 @@ export function FillInBlankStep({
               onChange={(e) => handleInputChange(blankId, e.target.value)}
               placeholder={blank.placeholder}
               className={`
-                w-24 px-2 py-1 mx-1 text-center font-mono text-sm rounded border-2
-                focus:outline-none focus:ring-2 focus:ring-primary-300
-                placeholder:text-gray-400
+                w-24 px-2 py-1 mx-1 text-center font-mono text-sm rounded-md border-2
+                focus:outline-none focus:ring-2 focus:ring-accent-500/50
+                placeholder:text-surface-500
                 ${isChecked
                   ? isCorrect
-                    ? 'border-green-500 bg-green-50 text-green-700'
-                    : 'border-red-500 bg-red-50 text-red-700 animate-shake'
-                  : 'border-gray-300 bg-white text-gray-900'
+                    ? 'border-success-500 bg-success-500/10 text-success-300'
+                    : 'border-danger-500 bg-danger-500/10 text-danger-300 animate-shake'
+                  : 'border-surface-600 bg-surface-800/50 text-surface-200'
                 }
               `}
               disabled={isComplete}
             />
             {isChecked && !isCorrect && blank.hint && (
-              <span className="absolute left-0 top-full mt-1 text-xs text-red-600 whitespace-nowrap">
+              <span className="absolute left-0 top-full mt-1 text-xs text-danger-400 whitespace-nowrap">
                 {blank.hint}
               </span>
             )}
@@ -139,13 +139,15 @@ export function FillInBlankStep({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4 text-purple-600">
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-        <span className="text-sm font-medium">Fill in the Blanks</span>
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-lg">
+          <svg className="w-4 h-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <span className="text-sm font-medium text-primary-400">Fill in the Blanks</span>
+        </div>
         {isComplete && (
-          <span className="ml-auto text-success-500 text-sm font-medium flex items-center gap-1">
+          <span className="ml-auto text-success-400 text-sm font-medium flex items-center gap-1.5 px-3 py-1 bg-success-500/10 border border-success-500/20 rounded-lg">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
@@ -155,13 +157,13 @@ export function FillInBlankStep({
       </div>
 
       {/* Instructions */}
-      <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
-        <p className="text-gray-700">{step.instructions}</p>
+      <div className="mb-6 p-4 bg-primary-500/10 rounded-lg border border-primary-500/20">
+        <p className="text-surface-200">{step.instructions}</p>
       </div>
 
       {/* Code Template */}
-      <div className="bg-gray-900 rounded-lg p-4 mb-4">
-        <pre className="font-mono text-sm text-gray-100 whitespace-pre-wrap">
+      <div className="bg-surface-900 rounded-lg p-4 mb-6 border border-surface-700/50">
+        <pre className="font-mono text-sm text-surface-200 whitespace-pre-wrap">
           {renderTemplate()}
         </pre>
       </div>
@@ -195,7 +197,7 @@ export function FillInBlankStep({
           {step.hints.slice(0, currentHintIndex + 1).map((hint, i) => (
             <div
               key={i}
-              className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 animate-slide-up"
+              className="p-3 bg-gold-500/10 border border-gold-500/30 rounded-lg text-sm text-gold-300 animate-slide-up"
             >
               <span className="font-medium">Hint {i + 1}:</span> {hint}
             </div>
@@ -205,12 +207,12 @@ export function FillInBlankStep({
 
       {/* Success Message */}
       {isComplete && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 animate-pop">
-          <div className="flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="p-4 bg-success-500/10 border border-success-500/30 rounded-lg animate-pop">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="font-medium">All blanks filled correctly!</span>
+            <span className="font-medium text-success-300">All blanks filled correctly!</span>
           </div>
         </div>
       )}

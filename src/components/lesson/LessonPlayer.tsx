@@ -143,31 +143,31 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
     currentStep.type === 'instruction' || completedSteps.has(currentStep.id)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-40 glass-strong border-b border-surface-700/50">
         <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')}>
-              <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Exit
             </Button>
-            <span className="text-sm font-medium text-gray-600">
+            <span className="text-sm font-medium text-surface-200">
               {lesson.title}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-surface-500 font-mono">
               {currentStepIndex + 1} / {totalSteps}
             </span>
           </div>
-          <ProgressBar progress={progress} size="sm" color="primary" />
+          <ProgressBar progress={progress} size="sm" color="accent" />
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Card className="mb-6">
+        <Card variant="glass" className="mb-6">
           {renderStep(currentStep)}
         </Card>
 
@@ -178,7 +178,7 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
             onClick={handlePrevious}
             disabled={currentStepIndex === 0}
           >
-            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Previous
@@ -188,9 +188,10 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
             variant={canProceed ? 'primary' : 'outline'}
             onClick={handleNext}
             disabled={!canProceed}
+            glow={canProceed}
           >
             {currentStepIndex === totalSteps - 1 ? 'Complete' : 'Next'}
-            <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Button>
