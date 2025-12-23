@@ -33,21 +33,21 @@ export function XPCounter({ size = 'md', showLevel = true, className }: XPCounte
   const sizes = {
     sm: {
       container: 'gap-1.5',
-      icon: 'w-4 h-4',
+      icon: 'w-5 h-5',
       text: 'text-sm',
       level: 'text-xs',
     },
     md: {
       container: 'gap-2',
-      icon: 'w-5 h-5',
+      icon: 'w-6 h-6',
       text: 'text-base',
       level: 'text-sm',
     },
     lg: {
       container: 'gap-3',
-      icon: 'w-6 h-6',
-      text: 'text-lg',
-      level: 'text-base',
+      icon: 'w-8 h-8',
+      text: 'text-2xl',
+      level: 'text-sm',
     },
   }
 
@@ -58,13 +58,13 @@ export function XPCounter({ size = 'md', showLevel = true, className }: XPCounte
       {/* XP Icon */}
       <div
         className={clsx(
-          'flex items-center justify-center rounded-full bg-secondary-100',
+          'flex items-center justify-center rounded-xl bg-gold-500/20 border border-gold-500/30',
           s.icon,
-          'p-1'
+          'p-1.5'
         )}
       >
         <svg
-          className={clsx('text-secondary-500', isAnimating && 'xp-animate')}
+          className={clsx('text-gold-400', isAnimating && 'xp-animate')}
           viewBox="0 0 24 24"
           fill="currentColor"
         >
@@ -76,19 +76,19 @@ export function XPCounter({ size = 'md', showLevel = true, className }: XPCounte
       <div className="flex flex-col">
         <span
           className={clsx(
-            'font-bold text-secondary-600',
+            'font-bold font-display text-gold-400',
             s.text,
-            isAnimating && 'text-secondary-500'
+            isAnimating && 'text-glow-gold'
           )}
         >
-          {displayXP.toLocaleString()} XP
+          {displayXP.toLocaleString()} <span className="text-surface-500 font-normal">XP</span>
         </span>
         {showLevel && (
           <div className="flex items-center gap-2">
-            <span className={clsx('text-gray-500', s.level)}>Level {level}</span>
-            <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <span className={clsx('text-surface-500', s.level)}>Level {level}</span>
+            <div className="w-16 h-1.5 bg-surface-700 rounded-full overflow-hidden">
               <div
-                className="h-full bg-secondary-400 rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-gold-500 to-gold-400 rounded-full transition-all duration-500"
                 style={{ width: `${progressToNext * 100}%` }}
               />
             </div>
