@@ -207,10 +207,23 @@ export function validateQuiz(exercise: unknown): ValidationResult {
 }
 
 export function validateFocusedPracticeMiniLesson(miniLesson: unknown): ValidationResult {
+  // #region agent log
+  const fs = require('fs')
+  const logPath = '/Users/jesselee/Projects/typescript-champ/.cursor/debug.log'
+  try {
+    fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:entry',message:'Starting validation',data:{hasMiniLesson:!!miniLesson,type:typeof miniLesson,keys:miniLesson&&typeof miniLesson==='object'?Object.keys(miniLesson):[]},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+  } catch {}
+  // #endregion
+
   const errors: string[] = []
   const warnings: string[] = []
 
   if (!miniLesson || typeof miniLesson !== 'object') {
+    // #region agent log
+    try {
+      fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:early-exit',message:'Mini-lesson is not an object',data:{miniLesson},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+    } catch {}
+    // #endregion
     return {
       valid: false,
       errors: ['Mini-lesson must be an object'],
@@ -219,6 +232,12 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
   }
 
   const data = miniLesson as any
+
+  // #region agent log
+  try {
+    fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:data-check',message:'Checking data structure',data:{hasInstruction:!!data.instruction,hasExercises:Array.isArray(data.exercises),exercisesLength:data.exercises?.length,hasEstimatedMinutes:typeof data.estimatedMinutes==='number'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+  } catch {}
+  // #endregion
 
   // Validate instruction
   if (!data.instruction || typeof data.instruction !== 'object') {
@@ -242,11 +261,21 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
 
   // Validate exercises array
   if (!Array.isArray(data.exercises) || data.exercises.length < 2 || data.exercises.length > 3) {
+    // #region agent log
+    try {
+      fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:exercises-array-error',message:'Exercises array validation failed',data:{isArray:Array.isArray(data.exercises),length:data.exercises?.length,exercises:data.exercises},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+    } catch {}
+    // #endregion
     errors.push('Mini-lesson must have 2-3 exercises')
   } else {
     let hasCodeExercise = false
     for (let i = 0; i < data.exercises.length; i++) {
       const exercise = data.exercises[i]
+      // #region agent log
+      try {
+        fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:exercise-loop',message:`Validating exercise ${i+1}`,data:{exerciseType:exercise?.type,hasType:!!exercise?.type,exerciseKeys:Object.keys(exercise||{})},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+      } catch {}
+      // #endregion
       if (!exercise.type || !['code-exercise', 'fill-in-blank', 'quiz'].includes(exercise.type)) {
         errors.push(`Exercise ${i + 1} must have a valid type`)
         continue
@@ -255,14 +284,29 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
       if (exercise.type === 'code-exercise') {
         hasCodeExercise = true
         const result = validateCodeExercise(exercise)
+        // #region agent log
+        try {
+          fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:code-exercise-result',message:`Code exercise ${i+1} validation`,data:{valid:result.valid,errors:result.errors,warnings:result.warnings},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+        } catch {}
+        // #endregion
         errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
         warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
       } else if (exercise.type === 'fill-in-blank') {
         const result = validateFillBlank(exercise)
+        // #region agent log
+        try {
+          fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:fill-blank-result',message:`Fill blank ${i+1} validation`,data:{valid:result.valid,errors:result.errors},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+        } catch {}
+        // #endregion
         errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
         warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
       } else if (exercise.type === 'quiz') {
         const result = validateQuiz(exercise)
+        // #region agent log
+        try {
+          fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:quiz-result',message:`Quiz ${i+1} validation`,data:{valid:result.valid,errors:result.errors},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+        } catch {}
+        // #endregion
         errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
         warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
       }
@@ -277,6 +321,12 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
   if (typeof data.estimatedMinutes !== 'number' || data.estimatedMinutes < 1) {
     warnings.push('estimatedMinutes should be a positive number')
   }
+
+  // #region agent log
+  try {
+    fs.appendFileSync(logPath, JSON.stringify({location:'validator.ts:validateFocusedPracticeMiniLesson:final-result',message:'Validation complete',data:{valid:errors.length===0,errorsCount:errors.length,warningsCount:warnings.length,errors,warnings},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+  } catch {}
+  // #endregion
 
   return {
     valid: errors.length === 0,
