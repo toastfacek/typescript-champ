@@ -114,6 +114,7 @@ Return a JSON object with this exact structure:
     },
     {
       "type": "quiz",
+      "title": "Exercise title",
       "question": "Question text",
       "codeContext": "Optional code snippet",
       "options": [
