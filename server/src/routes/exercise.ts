@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
-import { completeWithJSON } from '../services/claude.js'
+import { completeWithJSON } from '../services/gemini.js'
 import {
   validateCodeExercise,
   validateFillBlank,
@@ -72,7 +72,7 @@ exerciseRouter.post('/generate', async (req, res) => {
         break
     }
 
-    // Generate exercise from Claude
+    // Generate exercise from Gemini
     const startTime = Date.now()
     const generated = await completeWithJSON(userPrompt, {
       systemPrompt,
@@ -158,7 +158,7 @@ exerciseRouter.post('/generate', async (req, res) => {
         generatedAt: new Date().toISOString(),
         aiMetadata: {
           generationTimeMs,
-          modelUsed: 'claude-sonnet-4-20250514'
+          modelUsed: 'gemini-3-flash-preview'
         }
       },
       validation: {
@@ -377,7 +377,7 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
     // Build prompt
     const userPrompt = buildFocusedPracticePrompt(lessonContext, practiceDifficulty || 'medium')
 
-    // Generate mini-lesson from Claude
+    // Generate mini-lesson from Gemini
     const startTime = Date.now()
     const generated = await completeWithJSON(userPrompt, {
       systemPrompt: FOCUSED_PRACTICE_SYSTEM_PROMPT,
@@ -469,7 +469,7 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
       },
       metadata: {
         generationTimeMs,
-        modelUsed: 'claude-sonnet-4-20250514'
+        modelUsed: 'gemini-3-flash-preview'
       }
     })
   } catch (error) {

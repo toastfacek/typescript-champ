@@ -46,7 +46,7 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ### Practice Mode MVP ✅ (Dec 2024)
 - [x] **Backend API (Railway-ready)**
   - Express server with CORS (`server/src/index.ts`)
-  - Claude API wrapper (`server/src/services/claude.ts`)
+  - Gemini API wrapper (`server/src/services/gemini.ts`)
   - Exercise validation with security checks (`server/src/services/validator.ts`)
   - Exercise generation endpoint (`server/src/routes/exercise.ts`)
   - Goal analysis endpoint (`server/src/routes/goal.ts`)
@@ -89,7 +89,7 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - Use plain language suitable for absolute beginners
 
 ### Practice Mode - Remaining Work
-- [x] Deploy server to Railway with `ANTHROPIC_API_KEY`
+- [x] Deploy server to Railway with `GOOGLE_API_KEY` (migrated from Claude to Gemini)
 - [x] Set `VITE_API_URL` in frontend to Railway URL
 - [x] Test end-to-end exercise generation
 - [x] Add batch exercise generation (5 exercises pre-loaded per session)
@@ -126,7 +126,7 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [ ] Daily goal system
 
 ### Phase 5: AI Hints
-- [ ] Create Supabase Edge Function for Claude API proxy
+- [ ] Create Supabase Edge Function for Gemini API proxy
 - [ ] AI hint hook with rate limiting
 - [ ] Contextual hint display UI
 - [ ] Track AI hint usage for analytics
@@ -211,7 +211,7 @@ server/
 │   │   ├── exercise.ts             # POST /api/exercise/generate, /generate-batch
 │   │   └── goal.ts                 # POST /api/goal/analyze
 │   ├── services/
-│   │   ├── claude.ts               # Claude API wrapper
+│   │   ├── gemini.ts               # Gemini API wrapper
 │   │   └── validator.ts            # Schema + security validation
 │   └── prompts/
 │       ├── code-exercise.ts
@@ -240,7 +240,7 @@ src/
 1. User selects topic + difficulty + exercise type
 2. Session starts → batch generation begins (5 exercises in background)
 3. Frontend calls `POST /api/exercise/generate-batch` for batch or `/generate` for single
-4. Backend generates exercises with Claude (3 concurrent max to avoid rate limits)
+4. Backend generates exercises with Gemini (3 concurrent max to avoid rate limits)
 5. Backend validates each (schema + security + tests)
 6. Frontend queues exercises → instant loading for subsequent exercises
 7. When queue < 2, automatically fetches more in background

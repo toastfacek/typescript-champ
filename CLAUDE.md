@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TypeScript Champ is an interactive TypeScript learning platform modeled after Duolingo. It features 25-minute learning sessions, gamification (XP, streaks, levels), and AI-powered exercise generation using Claude API.
+TypeScript Champ is an interactive TypeScript learning platform modeled after Duolingo. It features 25-minute learning sessions, gamification (XP, streaks, levels), and AI-powered exercise generation using Gemini API.
 
 ## Commands
 
@@ -15,7 +15,7 @@ npm run dev          # Start dev server at http://localhost:5173
 npm run build        # TypeScript check + Vite build
 npm run lint         # ESLint
 
-# Backend API server (Express + Claude API)
+# Backend API server (Express + Gemini API)
 cd server
 npm install
 npm run dev          # Start API at http://localhost:3001
@@ -72,7 +72,7 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
 Express API server for AI-powered exercise generation:
 - `routes/exercise.ts` - Single (`/generate`) and batch (`/generate-batch`) exercise generation
 - `routes/goal.ts` - Learning goal analysis
-- `services/claude.ts` - Claude API client (uses `claude-sonnet-4-20250514`)
+- `services/gemini.ts` - Gemini API client (uses `gemini-3-flash-preview`)
 - `prompts/` - Structured prompts for different exercise types
 
 API runs separately from frontend. Server binds to `0.0.0.0` for Railway deployment.
@@ -114,8 +114,8 @@ Frontend (`.env.local` or Railway):
 - `VITE_SUPABASE_URL` - Supabase project URL (optional, uses localStorage without it)
 - `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key (optional)
 
-Backend (Railway):
-- `ANTHROPIC_API_KEY` - Anthropic API key for exercise generation
+Backend (`.env` or Railway):
+- `GOOGLE_API_KEY` or `GEMINI_API_KEY` - Google Gemini API key for exercise generation
 - `FRONTEND_URL` - Frontend origin for CORS (e.g., `https://frontend-xxx.up.railway.app`)
 - `PORT` - Auto-set by Railway (server reads this)
 

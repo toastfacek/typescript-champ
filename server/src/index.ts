@@ -1,3 +1,7 @@
+// Load .env file for local development (Railway provides env vars automatically)
+// This is safe to import - it only loads .env if the file exists
+import 'dotenv/config'
+
 import express from 'express'
 import cors from 'cors'
 import { exerciseRouter } from './routes/exercise.js'
