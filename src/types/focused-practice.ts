@@ -18,7 +18,8 @@ export interface FocusedPracticeSession {
 }
 
 export interface FocusedPracticeMiniLesson {
-  concept: Concept
+  lessonId: string
+  lessonTitle: string
   steps: LessonStep[]
   estimatedMinutes: number
 }
@@ -33,13 +34,14 @@ export interface ConceptProgress {
 }
 
 export interface GenerateFocusedPracticeRequest {
-  concept: Concept
-  difficulty: 'easy' | 'medium' | 'hard'
-  lessonContext?: {
+  lessonContext: {
     lessonId: string
     lessonTitle: string
-    relatedConcepts?: string[]
+    lessonDescription: string
+    lessonTags: string[]
+    difficulty: 'beginner' | 'intermediate' | 'advanced'
   }
+  practiceDifficulty?: 'easy' | 'medium' | 'hard'
 }
 
 export interface GenerateFocusedPracticeResponse {

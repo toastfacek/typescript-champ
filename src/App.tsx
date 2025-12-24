@@ -74,7 +74,7 @@ export default function App() {
           <Route path="/curriculum" element={<CurriculumPage />} />
           <Route path="/practice" element={<PracticePage />} />
           <Route path="/practice/session" element={<PracticeSessionPage />} />
-          <Route path="/practice/focused/:conceptId" element={<FocusedPracticePage />} />
+          <Route path="/practice/focused/:lessonId" element={<FocusedPracticePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/lesson/:lessonId" element={<LessonPage />} />
           <Route path="/auth" element={<AuthPage />} />

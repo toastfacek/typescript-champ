@@ -11,9 +11,9 @@ import type {
 import type {
   FocusedPracticeSession,
   FocusedPracticeMiniLesson,
-  ConceptProgress,
-  Concept
+  ConceptProgress
 } from '@/types/focused-practice'
+import type { Lesson } from '@/types/lesson'
 import { generateExercise as apiGenerateExercise, generateExerciseBatch, generateFocusedPractice } from '@/services/api-client'
 import { syncPracticeStats } from '@/services/supabase-sync'
 import { useStore } from './index'
@@ -52,7 +52,7 @@ interface PracticeState {
   resetStats: () => void
 
   // Focused practice actions
-  startFocusedSession: (concept: Concept, lessonId: string | null, difficulty?: 'easy' | 'medium' | 'hard') => Promise<void>
+  startFocusedSession: (lesson: Lesson) => Promise<void>
   endFocusedSession: () => void
   completeFocusedStep: (stepId: string) => void
   setFocusedCurrentStepIndex: (index: number) => void
@@ -316,7 +316,7 @@ export const usePracticeStore = create<PracticeState>()(
       },
 
       // Focused practice actions
-      startFocusedSession: async (concept, lessonId, difficulty = 'medium') => {
+      startFocusedSession: async (lesson) => {
         set({
           isGeneratingFocused: true,
           focusedGenerationError: null,
@@ -326,13 +326,14 @@ export const usePracticeStore = create<PracticeState>()(
 
         try {
           const response = await generateFocusedPractice({
-            concept,
-            difficulty,
-            lessonContext: lessonId ? {
-              lessonId,
-              lessonTitle: 'Lesson', // Could be enhanced to fetch actual title
-              relatedConcepts: []
-            } : undefined
+            lessonContext: {
+              lessonId: lesson.id,
+              lessonTitle: lesson.title,
+              lessonDescription: lesson.description,
+              lessonTags: lesson.tags,
+              difficulty: lesson.difficulty
+            },
+            practiceDifficulty: 'medium'
           })
 
           if (!response.success || !response.miniLesson) {
@@ -341,9 +342,9 @@ export const usePracticeStore = create<PracticeState>()(
 
           const session: FocusedPracticeSession = {
             id: `focused-${Date.now()}`,
-            conceptId: concept.id,
-            conceptName: concept.name,
-            lessonId,
+            conceptId: lesson.id,
+            conceptName: lesson.title,
+            lessonId: lesson.id,
             startedAt: new Date(),
             stepsCompleted: 0,
             totalSteps: response.miniLesson.steps.length

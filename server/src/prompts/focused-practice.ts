@@ -1,11 +1,13 @@
-export const FOCUSED_PRACTICE_SYSTEM_PROMPT = `You are an expert TypeScript educator creating focused practice mini-lessons for learners who want to deepen their understanding of a specific concept.
+export const FOCUSED_PRACTICE_SYSTEM_PROMPT = `You are an expert TypeScript educator creating focused practice mini-lessons for learners who want to deepen their understanding of a specific lesson topic.
 
 Your mini-lessons must:
-1. Start with a clear, concise explanation of the concept
-2. Include 2-3 varied exercises (mix of code-exercise, fill-in-blank, and quiz)
-3. Progress from easier to more challenging within the mini-lesson
-4. Be self-contained and runnable in a browser environment
-5. Build understanding through explanation → practice → reinforcement
+1. Start with a clear, comprehensive explanation of the lesson's key concepts
+2. Address common points of confusion learners have with this topic
+3. Include 2-3 varied exercises (mix of code-exercise, fill-in-blank, and quiz)
+4. Progress from easier to more challenging within the mini-lesson
+5. Be self-contained and runnable in a browser environment
+6. Build understanding through explanation → practice → reinforcement
+7. Provide more detailed explanations than the original lesson, especially for concepts that often confuse learners
 
 SECURITY RULES - NEVER generate code containing:
 - eval() or Function()
@@ -19,51 +21,59 @@ SECURITY RULES - NEVER generate code containing:
 Keep exercises focused on pure TypeScript/JavaScript logic.`
 
 export function buildFocusedPracticePrompt(
-  concept: { id: string; name: string; description: string },
-  difficulty: 'easy' | 'medium' | 'hard',
-  lessonContext?: { lessonId: string; lessonTitle: string; relatedConcepts?: string[] }
+  lessonContext: {
+    lessonId: string
+    lessonTitle: string
+    lessonDescription: string
+    lessonTags: string[]
+    difficulty: 'beginner' | 'intermediate' | 'advanced'
+  },
+  practiceDifficulty: 'easy' | 'medium' | 'hard'
 ): string {
-  const contextSection = lessonContext
-    ? `
-CONTEXT: The learner just completed the lesson "${lessonContext.lessonTitle}" and wants focused practice on "${concept.name}".
-${lessonContext.relatedConcepts ? `Related concepts they've seen: ${lessonContext.relatedConcepts.join(', ')}` : ''}
-Make the practice feel like a natural extension of what they learned.`
-    : ''
+  const contextSection = `
+LESSON CONTEXT:
+- Title: "${lessonContext.lessonTitle}"
+- Description: ${lessonContext.lessonDescription}
+- Tags: ${lessonContext.lessonTags.join(', ')}
+- Original Difficulty: ${lessonContext.difficulty}
+
+The learner has completed this lesson but wants more practice with deeper explanations. Focus on:
+1. Explaining concepts that commonly confuse learners
+2. Providing more examples and use cases
+3. Clarifying edge cases and nuances
+4. Reinforcing understanding through varied exercises
 
   const difficultyGuide = {
     easy: `
-DIFFICULTY: EASY
-- Keep explanations simple and direct
-- Exercises should reinforce the core concept clearly
+PRACTICE DIFFICULTY: EASY
+- Keep explanations clear and accessible
+- Exercises should reinforce core concepts from the lesson
 - Use straightforward examples
 - 2 exercises total (1 code-exercise, 1 quiz or fill-in-blank)`,
     medium: `
-DIFFICULTY: MEDIUM
-- Provide a bit more depth in the explanation
+PRACTICE DIFFICULTY: MEDIUM
+- Provide deeper explanations with more examples
 - Exercises should require some problem-solving
-- Include edge cases
+- Include edge cases and common pitfalls
 - 3 exercises total (mix of types)`,
     hard: `
-DIFFICULTY: HARD
-- Deep dive into the concept with nuanced explanation
+PRACTICE DIFFICULTY: HARD
+- Deep dive with nuanced explanations
 - Exercises should challenge understanding
 - Include tricky edge cases and advanced applications
 - 3 exercises total (mix of types, at least one code-exercise)`
   }
 
-  return `Create a focused practice mini-lesson for the concept: "${concept.name}"
+  return `Create a focused practice mini-lesson for the lesson: "${lessonContext.lessonTitle}"
 
-CONCEPT DETAILS:
-- ID: ${concept.id}
-- Description: ${concept.description}
 ${contextSection}
-${difficultyGuide[difficulty]}
+${difficultyGuide[practiceDifficulty]}
 
 Return a JSON object with this exact structure:
 {
   "instruction": {
-    "title": "Clear title explaining what this concept is",
-    "content": "Markdown content explaining the concept clearly. Use examples, analogies, and practical use cases. Should be comprehensive but concise (2-4 paragraphs).",
+    "title": "Clear title reviewing and expanding on the lesson topic",
+    "content": "Markdown content that reviews the lesson's key concepts with deeper explanations. Address common points of confusion. Use examples, analogies, and practical use cases. Should be comprehensive (3-5 paragraphs) with more detail than the original lesson.",
     "codeExample": {
       "code": "// TypeScript code demonstrating the concept\\n// Include comments explaining key points",
       "language": "typescript",
@@ -134,6 +144,6 @@ REQUIREMENTS:
 7. The instruction should reference the concept name and provide practical context
 8. estimatedMinutes should reflect total time (instruction + exercises)
 
-Make this feel like a focused, cohesive mini-lesson that deepens understanding of "${concept.name}".`
+Make this feel like a focused, cohesive mini-lesson that deepens understanding of "${lessonContext.lessonTitle}". Provide explanations that go beyond what was covered in the original lesson, especially for concepts that learners often find confusing.`
 }
 

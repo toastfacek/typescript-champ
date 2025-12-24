@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react'
-import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import type { LessonStep } from '@/types'
 import { usePracticeStore } from '@/store/practice-store'
 import { Button, Card, ProgressBar } from '@/components/ui'
@@ -7,17 +7,12 @@ import { InstructionStep } from '@/components/lesson/InstructionStep'
 import { CodeExerciseStep } from '@/components/lesson/CodeExerciseStep'
 import { FillInBlankStep } from '@/components/lesson/FillInBlankStep'
 import { QuizStep } from '@/components/lesson/QuizStep'
+import { lessons } from '@/content/curriculum'
 import type { CodeExerciseStep as CodeExerciseStepType, FillInBlankStep as FillInBlankStepType, QuizStep as QuizStepType } from '@/types'
 
 export function FocusedPracticePage() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const { conceptId } = useParams<{ conceptId: string }>()
-  const [searchParams] = useSearchParams()
-  const lessonId = searchParams.get('lessonId')
-  
-  // Get concept from location state if available, otherwise construct from conceptId
-  const conceptFromState = (location.state as any)?.concept as { id: string; name: string; description: string } | undefined
+  const { lessonId } = useParams<{ lessonId: string }>()
 
   const currentFocusedSession = usePracticeStore((s) => s.currentFocusedSession)
   const focusedMiniLesson = usePracticeStore((s) => s.focusedMiniLesson)
@@ -29,25 +24,24 @@ export function FocusedPracticePage() {
   const endFocusedSession = usePracticeStore((s) => s.endFocusedSession)
   const completeFocusedStep = usePracticeStore((s) => s.completeFocusedStep)
 
-  // Start session if conceptId is provided and no session exists
+  // Start session if lessonId is provided and no session exists
   useEffect(() => {
-    if (conceptId && !currentFocusedSession && !focusedMiniLesson && !isGeneratingFocused) {
-      // Use concept from state if available, otherwise construct from conceptId
-      const concept = conceptFromState || {
-        id: conceptId,
-        name: conceptId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-        description: `Practice exercises for ${conceptId}`
+    if (lessonId && !currentFocusedSession && !focusedMiniLesson && !isGeneratingFocused) {
+      const lesson = lessons[lessonId]
+      if (!lesson) {
+        navigate('/practice')
+        return
       }
-      startFocusedSession(concept, lessonId || null)
+      startFocusedSession(lesson)
     }
-  }, [conceptId, currentFocusedSession, focusedMiniLesson, isGeneratingFocused, lessonId, conceptFromState, startFocusedSession])
+  }, [lessonId, currentFocusedSession, focusedMiniLesson, isGeneratingFocused, startFocusedSession, navigate])
 
-  // Redirect if no conceptId
+  // Redirect if no lessonId
   useEffect(() => {
-    if (!conceptId) {
-      navigate('/curriculum')
+    if (!lessonId) {
+      navigate('/practice')
     }
-  }, [conceptId, navigate])
+  }, [lessonId, navigate])
 
   const handleStepComplete = useCallback((stepId: string) => {
     completeFocusedStep(stepId)
@@ -114,13 +108,11 @@ export function FocusedPracticePage() {
               <p className="text-sm text-danger-400 mb-4">{focusedGenerationError}</p>
               <div className="flex gap-3">
                 <Button onClick={() => {
-                  const concept = conceptFromState || {
-                    id: conceptId || '',
-                    name: conceptId?.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || '',
-                    description: ''
-                  }
-                  if (concept.id) {
-                    startFocusedSession(concept, lessonId || null)
+                  if (lessonId) {
+                    const lesson = lessons[lessonId]
+                    if (lesson) {
+                      startFocusedSession(lesson)
+                    }
                   }
                 }}>Try Again</Button>
                 <Button variant="outline" onClick={handleExit}>Exit</Button>
@@ -198,7 +190,7 @@ export function FocusedPracticePage() {
               Exit
             </Button>
             <span className="text-sm font-medium text-surface-200">
-              Focused Practice: {currentFocusedSession.conceptName}
+              Focused Practice: {focusedMiniLesson?.lessonTitle || currentFocusedSession?.conceptName || 'Loading...'}
             </span>
             <span className="text-sm text-surface-500 font-mono">
               {focusedCurrentStepIndex + 1} / {totalSteps}

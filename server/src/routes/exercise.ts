@@ -351,17 +351,14 @@ async function generateSingleExercise(
 
 // Generate focused practice mini-lesson
 const GenerateFocusedPracticeSchema = z.object({
-  concept: z.object({
-    id: z.string().min(1),
-    name: z.string().min(1),
-    description: z.string().min(1)
-  }),
-  difficulty: z.enum(['easy', 'medium', 'hard']),
   lessonContext: z.object({
     lessonId: z.string(),
     lessonTitle: z.string(),
-    relatedConcepts: z.array(z.string()).optional()
-  }).optional()
+    lessonDescription: z.string(),
+    lessonTags: z.array(z.string()),
+    difficulty: z.enum(['beginner', 'intermediate', 'advanced'])
+  }),
+  practiceDifficulty: z.enum(['easy', 'medium', 'hard']).optional().default('medium')
 })
 
 exerciseRouter.post('/generate-focused', async (req, res) => {
@@ -375,10 +372,10 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
       })
     }
 
-    const { concept, difficulty, lessonContext } = parseResult.data
+    const { lessonContext, practiceDifficulty } = parseResult.data
 
     // Build prompt
-    const userPrompt = buildFocusedPracticePrompt(concept, difficulty, lessonContext)
+    const userPrompt = buildFocusedPracticePrompt(lessonContext, practiceDifficulty || 'medium')
 
     // Generate mini-lesson from Claude
     const startTime = Date.now()
@@ -461,7 +458,8 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
     res.json({
       success: true,
       miniLesson: {
-        concept,
+        lessonId: lessonContext.lessonId,
+        lessonTitle: lessonContext.lessonTitle,
         steps: allSteps,
         estimatedMinutes: data.estimatedMinutes || 10
       },
