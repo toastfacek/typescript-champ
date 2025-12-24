@@ -41,7 +41,7 @@ The learner has completed this lesson but wants more practice with deeper explan
 1. Explaining concepts that commonly confuse learners
 2. Providing more examples and use cases
 3. Clarifying edge cases and nuances
-4. Reinforcing understanding through varied exercises
+4. Reinforcing understanding through varied exercises`
 
   const difficultyGuide = {
     easy: `
