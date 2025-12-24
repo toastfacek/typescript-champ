@@ -125,8 +125,18 @@ Return a JSON object with this exact structure:
         },
         {
           "id": "b",
-          "text": "Option B",
+          "text": "Option B (correct answer)",
           "isCorrect": true
+        },
+        {
+          "id": "c",
+          "text": "Option C",
+          "isCorrect": false
+        },
+        {
+          "id": "d",
+          "text": "Option D",
+          "isCorrect": false
         }
       ],
       "explanation": "Clear explanation of the correct answer"
@@ -144,6 +154,7 @@ REQUIREMENTS:
 6. Test cases must use if/throw pattern (no assert libraries)
 7. The instruction should reference the concept name and provide practical context
 8. estimatedMinutes should reflect total time (instruction + exercises)
+9. For quiz exercises: EXACTLY 4 options, EXACTLY 1 correct answer (isCorrect: true)
 
 Make this feel like a focused, cohesive mini-lesson that deepens understanding of "${lessonContext.lessonTitle}". Provide explanations that go beyond what was covered in the original lesson, especially for concepts that learners often find confusing.`
 }
