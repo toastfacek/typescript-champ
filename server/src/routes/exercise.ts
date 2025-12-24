@@ -362,12 +362,9 @@ const GenerateFocusedPracticeSchema = z.object({
 })
 
 exerciseRouter.post('/generate-focused', async (req, res) => {
-  console.log('[DEBUG] generate-focused: Request received', JSON.stringify(req.body))
-
   try {
     const parseResult = GenerateFocusedPracticeSchema.safeParse(req.body)
     if (!parseResult.success) {
-      console.log('[DEBUG] generate-focused: Request validation failed', parseResult.error.errors)
       return res.status(400).json({
         success: false,
         error: 'Invalid request',
@@ -388,26 +385,11 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
     })
     const generationTimeMs = Date.now() - startTime
 
-    const generatedAny = generated as any
-    console.log('[DEBUG] generate-focused: AI generated content', {
-      hasInstruction: !!generatedAny?.instruction,
-      exercisesCount: Array.isArray(generatedAny?.exercises) ? generatedAny.exercises.length : 0,
-      generatedKeys: Object.keys(generatedAny || {})
-    })
-
     // Validate generated content
     const validation = validateFocusedPracticeMiniLesson(generated)
 
-    console.log('[DEBUG] generate-focused: Validation result', {
-      valid: validation.valid,
-      errorsCount: validation.errors.length,
-      errors: validation.errors,
-      warnings: validation.warnings
-    })
-
     if (!validation.valid) {
       console.error('Generated mini-lesson failed validation:', validation.errors)
-      console.log('[DEBUG] generate-focused: First 500 chars of generated content:', JSON.stringify(generated).substring(0, 500))
       return res.status(422).json({
         success: false,
         error: 'Generated mini-lesson failed validation',

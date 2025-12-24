@@ -324,26 +324,17 @@ export const usePracticeStore = create<PracticeState>()(
           focusedCompletedSteps: new Set<string>()
         })
 
-        // #region agent log
-        const requestPayload = {
-          lessonContext: {
-            lessonId: lesson.id,
-            lessonTitle: lesson.title,
-            lessonDescription: lesson.description,
-            lessonTags: lesson.tags,
-            difficulty: lesson.difficulty
-          },
-          practiceDifficulty: 'medium' as const
-        }
-        fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'practice-store.ts:startFocusedSession',message:'Request payload being sent to API',data:{lessonId:lesson.id,lessonTitle:lesson.title,hasDescription:!!lesson.description,tagsLength:lesson.tags?.length,difficulty:lesson.difficulty,fullPayload:requestPayload},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A-B'})}).catch(()=>{});
-        // #endregion
-
         try {
-          const response = await generateFocusedPractice(requestPayload)
-
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'practice-store.ts:startFocusedSession:response',message:'API response received',data:{success:response.success,hasMinilesson:!!response.miniLesson,error:response.error,validation:response.validation},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-          // #endregion
+          const response = await generateFocusedPractice({
+            lessonContext: {
+              lessonId: lesson.id,
+              lessonTitle: lesson.title,
+              lessonDescription: lesson.description,
+              lessonTags: lesson.tags,
+              difficulty: lesson.difficulty
+            },
+            practiceDifficulty: 'medium'
+          })
 
           if (!response.success || !response.miniLesson) {
             throw new Error(response.error || 'Failed to generate focused practice')
@@ -366,9 +357,6 @@ export const usePracticeStore = create<PracticeState>()(
             focusedCurrentStepIndex: 0
           })
         } catch (error) {
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'practice-store.ts:startFocusedSession:catch',message:'Error caught in startFocusedSession',data:{errorMessage:error instanceof Error ? error.message : String(error),errorName:error instanceof Error ? error.name : 'unknown',errorDetails:(error as any)?.details || null},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-          // #endregion
           set({
             isGeneratingFocused: false,
             focusedGenerationError: error instanceof Error ? error.message : 'Unknown error'

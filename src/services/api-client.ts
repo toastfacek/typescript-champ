@@ -95,32 +95,10 @@ export async function generateExerciseBatch(params: {
 // Focused Practice API
 
 export async function generateFocusedPractice(params: GenerateFocusedPracticeRequest): Promise<GenerateFocusedPracticeResponse> {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api-client.ts:generateFocusedPractice',message:'Calling API with params',data:{params},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-  // #endregion
-
-  const url = `${API_BASE_URL}/api/exercise/generate-focused`
-  const response = await fetch(url, {
+  return fetchJson<GenerateFocusedPracticeResponse>('/api/exercise/generate-focused', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params)
   })
-  
-  const data = await response.json()
-  
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api-client.ts:generateFocusedPractice:response',message:'Raw API response',data:{status:response.status,ok:response.ok,data},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C-E'})}).catch(()=>{});
-  // #endregion
-
-  if (!response.ok) {
-    throw new ApiError(
-      data.error || 'Request failed',
-      response.status,
-      data.details || data.validationErrors
-    )
-  }
-  
-  return data as GenerateFocusedPracticeResponse
 }
 
 // Goal API

@@ -207,17 +207,10 @@ export function validateQuiz(exercise: unknown): ValidationResult {
 }
 
 export function validateFocusedPracticeMiniLesson(miniLesson: unknown): ValidationResult {
-  console.log('[DEBUG] validateFocusedPracticeMiniLesson: Starting validation', {
-    hasMiniLesson: !!miniLesson,
-    type: typeof miniLesson,
-    keys: miniLesson && typeof miniLesson === 'object' ? Object.keys(miniLesson) : []
-  })
-
   const errors: string[] = []
   const warnings: string[] = []
 
   if (!miniLesson || typeof miniLesson !== 'object') {
-    console.log('[DEBUG] validateFocusedPracticeMiniLesson: Mini-lesson is not an object')
     return {
       valid: false,
       errors: ['Mini-lesson must be an object'],
@@ -226,13 +219,6 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
   }
 
   const data = miniLesson as any
-
-  console.log('[DEBUG] validateFocusedPracticeMiniLesson: Data structure check', {
-    hasInstruction: !!data.instruction,
-    hasExercises: Array.isArray(data.exercises),
-    exercisesLength: data.exercises?.length,
-    hasEstimatedMinutes: typeof data.estimatedMinutes === 'number'
-  })
 
   // Validate instruction
   if (!data.instruction || typeof data.instruction !== 'object') {
@@ -256,21 +242,11 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
 
   // Validate exercises array
   if (!Array.isArray(data.exercises) || data.exercises.length < 2 || data.exercises.length > 3) {
-    console.log('[DEBUG] validateFocusedPracticeMiniLesson: Exercises array validation failed', {
-      isArray: Array.isArray(data.exercises),
-      length: data.exercises?.length
-    })
     errors.push('Mini-lesson must have 2-3 exercises')
   } else {
     let hasCodeExercise = false
     for (let i = 0; i < data.exercises.length; i++) {
       const exercise = data.exercises[i]
-      console.log(`[DEBUG] validateFocusedPracticeMiniLesson: Validating exercise ${i+1}`, {
-        exerciseType: exercise?.type,
-        hasType: !!exercise?.type,
-        exerciseKeys: Object.keys(exercise || {})
-      })
-      
       if (!exercise.type || !['code-exercise', 'fill-in-blank', 'quiz'].includes(exercise.type)) {
         errors.push(`Exercise ${i + 1} must have a valid type`)
         continue
@@ -279,27 +255,14 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
       if (exercise.type === 'code-exercise') {
         hasCodeExercise = true
         const result = validateCodeExercise(exercise)
-        console.log(`[DEBUG] validateFocusedPracticeMiniLesson: Code exercise ${i+1} validation`, {
-          valid: result.valid,
-          errors: result.errors,
-          warnings: result.warnings
-        })
         errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
         warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
       } else if (exercise.type === 'fill-in-blank') {
         const result = validateFillBlank(exercise)
-        console.log(`[DEBUG] validateFocusedPracticeMiniLesson: Fill blank ${i+1} validation`, {
-          valid: result.valid,
-          errors: result.errors
-        })
         errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
         warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
       } else if (exercise.type === 'quiz') {
         const result = validateQuiz(exercise)
-        console.log(`[DEBUG] validateFocusedPracticeMiniLesson: Quiz ${i+1} validation`, {
-          valid: result.valid,
-          errors: result.errors
-        })
         errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
         warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
       }
@@ -314,14 +277,6 @@ export function validateFocusedPracticeMiniLesson(miniLesson: unknown): Validati
   if (typeof data.estimatedMinutes !== 'number' || data.estimatedMinutes < 1) {
     warnings.push('estimatedMinutes should be a positive number')
   }
-
-  console.log('[DEBUG] validateFocusedPracticeMiniLesson: Validation complete', {
-    valid: errors.length === 0,
-    errorsCount: errors.length,
-    warningsCount: warnings.length,
-    errors,
-    warnings
-  })
 
   return {
     valid: errors.length === 0,
