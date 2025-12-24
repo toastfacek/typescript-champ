@@ -218,8 +218,8 @@
 
 /* Card overrides */
 [data-theme="light"] .card {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  border-color: rgba(203, 213, 225, 0.5) !important; /* surface-300 */
+  background-color: rgba(248, 250, 252, 0.95) !important; /* surface-50 with higher opacity for better contrast */
+  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 with more opacity */
 }
 
 [data-theme="light"] .card-hover:hover {
@@ -229,8 +229,8 @@
 
 /* Gradient variant card overrides for light mode */
 [data-theme="light"] [data-card-variant="gradient"] {
-  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95)) !important;
-  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 with more opacity */
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98)) !important;
+  border-color: rgba(203, 213, 225, 0.7) !important; /* surface-300 with more opacity for better contrast */
 }
 
 [data-theme="light"] [data-card-variant="gradient"]:hover {
@@ -311,6 +311,61 @@
 
 [data-theme="light"] .hover\:text-surface-200:hover {
   color: #0f172a !important; /* surface-900 on hover */
+}
+
+/* ============================================
+   Light Mode Contrast Improvements
+   ============================================ */
+
+/* Inline code snippets - much better contrast in light mode */
+[data-theme="light"] .lesson-content code {
+  background-color: rgba(6, 182, 212, 0.15) !important; /* accent-500/15 - slightly stronger */
+  color: #0891b2 !important; /* accent-600 - much darker cyan for readability */
+  border-color: rgba(6, 182, 212, 0.4) !important; /* accent-500/40 - more visible border */
+  font-weight: 500 !important; /* Slightly bolder for better legibility */
+}
+
+/* Learn badge - better contrast */
+[data-theme="light"] .lesson-content [class*="bg-accent-500/10"] {
+  background-color: rgba(6, 182, 212, 0.15) !important; /* accent-500/15 */
+  border-color: rgba(6, 182, 212, 0.3) !important; /* accent-500/30 */
+}
+
+[data-theme="light"] .lesson-content [class*="bg-accent-500/10"] .text-accent-400,
+[data-theme="light"] .lesson-content [class*="bg-accent-500/10"] svg.text-accent-400 {
+  color: #0891b2 !important; /* accent-600 - darker for better contrast */
+}
+
+/* Body text - darker in light mode for better readability */
+[data-theme="light"] .lesson-content .text-surface-300 {
+  color: #334155 !important; /* surface-700 - much darker */
+}
+
+[data-theme="light"] .lesson-content li.text-surface-300 {
+  color: #475569 !important; /* surface-600 - good contrast */
+}
+
+/* Headings - ensure good contrast */
+[data-theme="light"] .lesson-content .text-surface-50,
+[data-theme="light"] .lesson-content .text-surface-100 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* Header title text - ensure good contrast */
+[data-theme="light"] .text-surface-200 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* Glass variant cards - ensure good contrast */
+[data-theme="light"] [data-card-variant="glass"] {
+  background-color: rgba(255, 255, 255, 0.95) !important; /* white with high opacity */
+  border-color: rgba(203, 213, 225, 0.7) !important; /* surface-300 with more opacity */
+  backdrop-filter: blur(20px) !important;
+}
+
+[data-theme="light"] [data-card-variant="glass"]:hover {
+  background-color: rgba(255, 255, 255, 1) !important; /* fully opaque on hover */
+  border-color: rgba(6, 182, 212, 0.4) !important; /* accent border on hover */
 }
 
 /* ============================================
