@@ -78,7 +78,7 @@ npm comes with Node.js - no separate installation needed!`,
     "@types/node": "^20.0.0"
   }
 }`,
-        language: 'json',
+        language: 'javascript',
         highlight: [5, 6, 7, 8, 10, 11, 14, 15],
       },
     },
