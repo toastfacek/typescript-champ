@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom'
 import type { LessonStep } from '@/types'
 import { usePracticeStore } from '@/store/practice-store'
@@ -28,8 +28,6 @@ export function FocusedPracticePage() {
   const startFocusedSession = usePracticeStore((s) => s.startFocusedSession)
   const endFocusedSession = usePracticeStore((s) => s.endFocusedSession)
   const completeFocusedStep = usePracticeStore((s) => s.completeFocusedStep)
-
-  const [hintsUsed, setHintsUsed] = useState(0)
 
   // Start session if conceptId is provided and no session exists
   useEffect(() => {
@@ -77,7 +75,7 @@ export function FocusedPracticePage() {
   }, [focusedCurrentStepIndex, setFocusedCurrentStepIndex])
 
   const handleHintUsed = useCallback(() => {
-    setHintsUsed((prev) => prev + 1)
+    // Track hints if needed in the future
   }, [])
 
   const handleExit = useCallback(() => {
