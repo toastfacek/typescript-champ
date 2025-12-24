@@ -22,6 +22,7 @@ interface AppState {
   updateSettings: (settings: Partial<UserSettings>) => void
   addXP: (amount: number) => void
   completeLesson: (lessonId: string, xpEarned: number) => void
+  redoLesson: (lessonId: string) => void
   setLoading: (loading: boolean) => void
   toggleSidebar: () => void
   reset: () => void
@@ -121,44 +122,59 @@ export const useStore = create<AppState>()(
 
           if (alreadyCompleted) return state
 
-          const newTotalXP = currentProgress.totalXP + xpEarned
-          const today = new Date().toISOString().split('T')[0]
-          const lastDate = currentProgress.lastActivityDate
+          const existingLessonProgress = state.lessonProgress[lessonId]
+          const hasEarnedXP = existingLessonProgress?.hasEarnedXP === true
 
-          // Calculate streak
-          let newStreak = currentProgress.currentStreak
-          if (lastDate !== today) {
-            const yesterday = new Date()
-            yesterday.setDate(yesterday.getDate() - 1)
-            const yesterdayStr = yesterday.toISOString().split('T')[0]
+          // If XP was already earned (redo scenario), skip XP and streak updates
+          let newProgress: UserProgress
+          if (hasEarnedXP) {
+            // Don't add XP or update streaks, just mark as completed
+            newProgress = {
+              ...currentProgress,
+              lessonsCompleted: [...currentProgress.lessonsCompleted, lessonId],
+            }
+          } else {
+            // First time completion - award XP and update streaks
+            const newTotalXP = currentProgress.totalXP + xpEarned
+            const today = new Date().toISOString().split('T')[0]
+            const lastDate = currentProgress.lastActivityDate
 
-            if (lastDate === yesterdayStr) {
-              newStreak += 1
-            } else if (lastDate !== today) {
-              newStreak = 1
+            // Calculate streak
+            let newStreak = currentProgress.currentStreak
+            if (lastDate !== today) {
+              const yesterday = new Date()
+              yesterday.setDate(yesterday.getDate() - 1)
+              const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+              if (lastDate === yesterdayStr) {
+                newStreak += 1
+              } else if (lastDate !== today) {
+                newStreak = 1
+              }
+            }
+
+            newProgress = {
+              ...currentProgress,
+              totalXP: newTotalXP,
+              level: calculateLevel(newTotalXP),
+              lessonsCompleted: [...currentProgress.lessonsCompleted, lessonId],
+              lastActivityDate: today,
+              currentStreak: newStreak,
+              longestStreak: Math.max(currentProgress.longestStreak, newStreak),
             }
           }
 
-          const newProgress = {
-            ...currentProgress,
-            totalXP: newTotalXP,
-            level: calculateLevel(newTotalXP),
-            lessonsCompleted: [...currentProgress.lessonsCompleted, lessonId],
-            lastActivityDate: today,
-            currentStreak: newStreak,
-            longestStreak: Math.max(currentProgress.longestStreak, newStreak),
-          }
-
-          const newLessonProgress = {
-            ...state.lessonProgress[lessonId],
+          const newLessonProgress: LessonProgress = {
+            ...existingLessonProgress,
             lessonId,
             userId: currentProgress.userId,
             status: 'completed' as const,
             completedAt: new Date(),
-            xpEarned,
-            currentStepIndex: state.lessonProgress[lessonId]?.currentStepIndex || 0,
-            stepsCompleted: state.lessonProgress[lessonId]?.stepsCompleted || [],
-            attempts: state.lessonProgress[lessonId]?.attempts || 1,
+            xpEarned: hasEarnedXP ? (existingLessonProgress?.xpEarned || 0) : xpEarned,
+            currentStepIndex: existingLessonProgress?.currentStepIndex || 0,
+            stepsCompleted: existingLessonProgress?.stepsCompleted || [],
+            attempts: (existingLessonProgress?.attempts || 0) + 1,
+            hasEarnedXP: hasEarnedXP || true, // Set to true if not already set
           }
 
           // Auto-sync to Supabase (fire-and-forget)
@@ -170,6 +186,48 @@ export const useStore = create<AppState>()(
             lessonProgress: {
               ...state.lessonProgress,
               [lessonId]: newLessonProgress,
+            },
+          }
+        }),
+
+      redoLesson: (lessonId) =>
+        set((state) => {
+          const currentProgress = state.progress || defaultProgress
+          const existingLessonProgress = state.lessonProgress[lessonId]
+
+          // Remove from completed list
+          const newLessonsCompleted = currentProgress.lessonsCompleted.filter(
+            (id) => id !== lessonId
+          )
+
+          // Reset lesson progress but preserve hasEarnedXP flag
+          const resetLessonProgress: LessonProgress = {
+            lessonId,
+            userId: currentProgress.userId,
+            status: 'not-started' as const,
+            currentStepIndex: 0,
+            stepsCompleted: [],
+            xpEarned: existingLessonProgress?.xpEarned || 0,
+            attempts: existingLessonProgress?.attempts || 0,
+            hasEarnedXP: existingLessonProgress?.hasEarnedXP || false, // Preserve the flag
+            // Clear completedAt but keep startedAt if it exists
+            startedAt: existingLessonProgress?.startedAt,
+          }
+
+          const newProgress: UserProgress = {
+            ...currentProgress,
+            lessonsCompleted: newLessonsCompleted,
+          }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
+          syncLessonProgress(resetLessonProgress).catch(err => console.error('Sync error:', err))
+
+          return {
+            progress: newProgress,
+            lessonProgress: {
+              ...state.lessonProgress,
+              [lessonId]: resetLessonProgress,
             },
           }
         }),

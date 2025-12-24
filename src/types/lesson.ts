@@ -1,3 +1,16 @@
+// Key concept for glossary panel
+export interface KeyConcept {
+  id: string
+  term: string           // e.g., "Variable"
+  definition: string     // Brief explanation
+  syntax?: string        // Optional syntax pattern (e.g., "let name: type = value;")
+  example?: {
+    code: string
+    explanation: string  // What this code does
+  }
+  whyItMatters?: string  // Real-world context
+}
+
 // Lesson metadata and structure
 export interface Lesson {
   id: string
@@ -11,6 +24,7 @@ export interface Lesson {
   prerequisites: string[]
   tags: string[]
   steps: LessonStep[]
+  keyConcepts?: KeyConcept[]
 }
 
 // Individual step within a lesson

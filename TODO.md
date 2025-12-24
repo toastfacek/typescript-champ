@@ -33,6 +33,16 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [x] Gamification basics (XP, levels, streaks)
 - [x] UI component library
 
+### Key Concepts Glossary Panel ✅ (Dec 2024)
+- [x] **Type System**: Added `KeyConcept` interface and `keyConcepts` field to `Lesson` type
+- [x] **UI Component**: Created `KeyConceptsPanel.tsx` with floating panel, accordion expansion, and concept details
+- [x] **Integration**: Integrated panel into `LessonPlayer` component
+- [x] **Content**: Added key concepts to first 4 lessons:
+  - [x] 01-hello-typescript.ts (6 concepts: Variable, let Keyword, Type Annotation, String, Number, Boolean)
+  - [x] 02-basic-types.ts (4 concepts: Quotes, Template Literals, Operators, Comparison Operators)
+  - [x] 03-type-inference.ts (2 concepts: Type Inference, const vs let)
+  - [x] 04-function-basics.ts (5 concepts: Function, Parameter, Return Type, Return Value, void)
+
 ### Practice Mode MVP ✅ (Dec 2024)
 - [x] **Backend API (Railway-ready)**
   - Express server with CORS (`server/src/index.ts`)
@@ -54,6 +64,29 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ---
 
 ## In Progress
+
+### Key Concepts Glossary - Remaining Work
+- [ ] Add key concepts to remaining Foundation lessons (05-15):
+  - [ ] 05-parameters-defaults.ts (Optional Parameters, Default Parameters, Required Parameters)
+  - [ ] 06-arrow-functions.ts (Arrow Functions, this binding, Implicit Returns)
+  - [ ] 07-function-types.ts (Function Types, Type Aliases, Higher-Order Functions)
+  - [ ] 08-object-types.ts (Object Types, Property Types, Nested Objects)
+  - [ ] 09-interfaces.ts (Interfaces, Interface Extension, Interface vs Type)
+  - [ ] 10-optional-readonly.ts (Optional Properties, Readonly Properties, Partial/Readonly utilities)
+  - [ ] 11-type-vs-interface.ts (Type Aliases, Interface Declaration Merging, When to Use Each)
+  - [ ] 12-typed-arrays.ts (Array Types, Array Syntax, Array Initialization)
+  - [ ] 13-array-methods.ts (Array Methods, map/filter/reduce, Method Chaining)
+  - [ ] 14-tuples.ts (Tuples, Fixed-Length Arrays, Tuple Destructuring)
+  - [ ] 15-records-maps.ts (Record Type, Map Type, Object vs Map)
+- [ ] Add key concepts to Intermediate lessons (16-31) as they're created
+- [ ] Add key concepts to AI/Agent lessons (32-63) as they're created
+
+**Implementation Notes for Key Concepts**:
+- Review each lesson's content to identify foundational concepts that beginners might not know
+- Focus on: programming basics (what is X?), syntax explanation (what does Y mean?), and context (why do we need Z?)
+- Follow the pattern from lessons 01-04: 2-6 concepts per lesson, each with definition, syntax, example, and "why it matters"
+- Concepts should explain prerequisite knowledge, not just repeat lesson content
+- Use plain language suitable for absolute beginners
 
 ### Practice Mode - Remaining Work
 - [x] Deploy server to Railway with `ANTHROPIC_API_KEY`
@@ -134,6 +167,40 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ---
 
 ## New Features Implemented
+
+### Key Concepts Glossary Panel (Dec 2024)
+
+**Purpose**: Help beginners understand foundational programming concepts, syntax, and context without disrupting lesson flow.
+
+**Architecture**:
+```
+src/
+├── types/
+│   └── lesson.ts                    # KeyConcept interface, keyConcepts field on Lesson
+├── components/lesson/
+│   ├── KeyConceptsPanel.tsx         # Floating panel with accordion UI
+│   └── LessonPlayer.tsx             # Renders panel when keyConcepts exist
+└── content/modules/
+    └── [module]/[lesson].ts         # Each lesson defines keyConcepts array
+```
+
+**Features**:
+- Floating panel in bottom-right corner (collapsible)
+- Accordion expansion for each concept
+- Displays: definition, syntax pattern, code example with explanation, "why it matters" context
+- Badge showing concept count
+- Stays accessible throughout entire lesson
+- Uses existing design tokens (glass effect, surface colors)
+
+**Content Structure**:
+Each `KeyConcept` includes:
+- `term`: Concept name (e.g., "Variable")
+- `definition`: Plain-language explanation
+- `syntax`: Optional syntax pattern
+- `example`: Code example with explanation
+- `whyItMatters`: Real-world context and importance
+
+**Status**: Implemented for lessons 01-04. Remaining lessons need key concepts added.
 
 ### Practice Mode Architecture
 ```

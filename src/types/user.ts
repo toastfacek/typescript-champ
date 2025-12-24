@@ -36,6 +36,7 @@ export interface LessonProgress {
   completedAt?: Date
   xpEarned: number
   attempts: number
+  hasEarnedXP?: boolean  // Tracks if XP was already awarded (prevents double XP on redo)
 }
 
 // Step-level attempt

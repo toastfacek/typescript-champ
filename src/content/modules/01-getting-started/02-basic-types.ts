@@ -11,6 +11,52 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['01-hello-typescript'],
   tags: ['basics', 'types'],
+  keyConcepts: [
+    {
+      id: 'quotes',
+      term: 'Quotes (Single, Double, Backticks)',
+      definition: 'In TypeScript, you can wrap text in three types of quotes. Single quotes (\'), double quotes ("), and backticks (`). Single and double quotes work the same way, but backticks allow special features like embedding variables.',
+      syntax: `let single: string = 'text';\nlet double: string = "text";\nlet backticks: string = \`text\`;`,
+      example: {
+        code: `let name = "Alice";\nlet greeting = 'Hello';\nlet message = \`Hello, \${name}!\`;`,
+        explanation: 'Single and double quotes create regular strings. Backticks allow you to use ${} to insert variables directly into the text.',
+      },
+      whyItMatters: 'Understanding quotes helps you work with text effectively. Backticks are especially powerful for creating dynamic strings with embedded values.',
+    },
+    {
+      id: 'template-literals',
+      term: 'Template Literals',
+      definition: 'Template literals use backticks (`) and allow you to embed variables and expressions directly into strings using ${}. This makes it easy to combine text with values.',
+      syntax: 'let message = `Text ${variable} more text`;',
+      example: {
+        code: 'let name = "Alice";\nlet greeting = `Hello, ${name}!`;\n// greeting is now "Hello, Alice!"',
+        explanation: 'The ${name} part gets replaced with the value of the name variable. This is much cleaner than using + to combine strings.',
+      },
+      whyItMatters: 'Template literals make it easy to create dynamic strings - like personalized messages, formatted output, or combining multiple pieces of data. They\'re cleaner and more readable than string concatenation.',
+    },
+    {
+      id: 'operators',
+      term: 'Operators',
+      definition: 'Operators are symbols that perform operations on values. Common operators include + (addition), - (subtraction), * (multiplication), / (division), and = (assignment).',
+      syntax: 'let result = value1 + value2;',
+      example: {
+        code: 'let sum = 10 + 5;      // 15\nlet product = 4 * 3;   // 12\nlet quotient = 20 / 4; // 5',
+        explanation: 'Operators let you perform calculations. The + adds numbers, * multiplies, and / divides.',
+      },
+      whyItMatters: 'Operators are the building blocks of all calculations in programming. You\'ll use them constantly for math, comparisons, and combining values.',
+    },
+    {
+      id: 'comparison-operators',
+      term: 'Comparison Operators',
+      definition: 'Comparison operators compare two values and return a boolean (true or false). Common ones are: > (greater than), < (less than), >= (greater than or equal), <= (less than or equal), === (equal), !== (not equal).',
+      syntax: 'let result: boolean = value1 >= value2;',
+      example: {
+        code: 'let age = 18;\nlet isAdult = age >= 18;  // true\nlet score = 85;\nlet passed = score >= 70;  // true',
+        explanation: 'Comparisons check relationships between values. age >= 18 checks if age is 18 or more, returning true or false.',
+      },
+      whyItMatters: 'Comparisons let your code make decisions - "if the score is high enough, pass the test" or "if the user is old enough, show this content". They\'re essential for program logic.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

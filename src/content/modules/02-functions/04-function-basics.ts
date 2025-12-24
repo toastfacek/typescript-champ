@@ -11,6 +11,63 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['03-type-inference'],
   tags: ['functions', 'basics'],
+  keyConcepts: [
+    {
+      id: 'function',
+      term: 'Function',
+      definition: 'A function is a reusable block of code that performs a specific task. Instead of writing the same code multiple times, you write it once in a function and call it whenever you need it.',
+      syntax: 'function functionName() { /* code */ }',
+      example: {
+        code: 'function greet() {\n  return "Hello!";\n}\n\nlet message = greet();  // Calls the function',
+        explanation: 'The function is defined with `function greet()`. When you call `greet()`, it runs the code inside and returns "Hello!".',
+      },
+      whyItMatters: 'Functions let you organize your code into logical pieces, avoid repetition, and make your code easier to understand and maintain. They\'re one of the most important concepts in programming.',
+    },
+    {
+      id: 'parameter',
+      term: 'Parameter',
+      definition: 'A parameter is a variable that a function accepts as input. When you call the function, you provide values (arguments) for these parameters. Parameters let functions work with different data.',
+      syntax: 'function name(parameter: type) { /* code */ }',
+      example: {
+        code: 'function greet(name: string) {\n  return "Hello, " + name + "!";\n}\n\ngreet("Alice");  // "Hello, Alice!"\ngreet("Bob");    // "Hello, Bob!"',
+        explanation: 'The `name` parameter lets the function work with any name. When you call `greet("Alice")`, the function uses "Alice" as the value for `name`.',
+      },
+      whyItMatters: 'Parameters make functions flexible and reusable. Instead of hardcoding values, functions can work with any data you pass in, making your code more powerful and versatile.',
+    },
+    {
+      id: 'return-type',
+      term: 'Return Type',
+      definition: 'The return type tells TypeScript what type of value a function will give back when it finishes. It\'s written after the parameters with a colon: `function name(): returnType`.',
+      syntax: 'function name(): returnType { return value; }',
+      example: {
+        code: 'function add(a: number, b: number): number {\n  return a + b;\n}\n\nlet result = add(5, 3);  // result is a number',
+        explanation: 'The `: number` after the parameters means this function returns a number. TypeScript will check that you actually return a number, and that callers know what type to expect.',
+      },
+      whyItMatters: 'Return types make it clear what a function produces, help catch errors (like forgetting to return a value), and give you better autocomplete when using the function\'s result.',
+    },
+    {
+      id: 'return-value',
+      term: 'Return Value',
+      definition: 'The return value is what a function gives back when it finishes. You use the `return` keyword followed by the value you want to send back. Functions can return any type: strings, numbers, booleans, or nothing at all.',
+      syntax: 'return value;',
+      example: {
+        code: 'function getGreeting(): string {\n  return "Hello, World!";\n}\n\nlet message = getGreeting();  // message is "Hello, World!"',
+        explanation: 'The `return` statement sends the value back to whoever called the function. The caller can then use that value.',
+      },
+      whyItMatters: 'Return values let functions produce results that other parts of your code can use. Without return values, functions would only be able to do things internally without sharing results.',
+    },
+    {
+      id: 'void',
+      term: 'void',
+      definition: '`void` is a special return type that means "this function doesn\'t return any value". Use it for functions that perform actions (like logging or updating) but don\'t produce a result to use.',
+      syntax: 'function name(): void { /* no return */ }',
+      example: {
+        code: 'function logMessage(msg: string): void {\n  console.log(msg);\n  // No return statement needed\n}\n\nlogMessage("Hello");  // Just performs the action',
+        explanation: 'This function logs a message but doesn\'t return anything. The `void` type makes it clear that callers shouldn\'t expect a return value.',
+      },
+      whyItMatters: 'Using `void` makes it explicit that a function performs an action but doesn\'t produce a value. This prevents confusion and helps TypeScript catch errors if someone tries to use a non-existent return value.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

@@ -11,6 +11,30 @@ export const lesson: Lesson = {
   xpReward: 50,
   prerequisites: ['02-basic-types'],
   tags: ['basics', 'types', 'inference'],
+  keyConcepts: [
+    {
+      id: 'type-inference',
+      term: 'Type Inference',
+      definition: 'Type inference is TypeScript\'s ability to automatically figure out what type a variable should be based on the value you assign to it. When you write `let name = "Alice"`, TypeScript knows it\'s a string without you saying so.',
+      syntax: 'let variable = value;  // TypeScript infers the type',
+      example: {
+        code: 'let message = "Hello";  // TypeScript infers: string\nlet count = 42;        // TypeScript infers: number\nlet isReady = true;    // TypeScript infers: boolean',
+        explanation: 'TypeScript looks at the value and automatically determines the type. "Hello" is clearly text, so it\'s a string. 42 is clearly a number.',
+      },
+      whyItMatters: 'Type inference makes your code cleaner and faster to write. You don\'t need to type `: string` every time when TypeScript can figure it out. But you can still add types explicitly when needed for clarity or safety.',
+    },
+    {
+      id: 'const-vs-let',
+      term: 'const vs let',
+      definition: '`const` creates a variable that cannot be reassigned (its value stays the same). `let` creates a variable that can be changed later. Use `const` when the value won\'t change, and `let` when it might.',
+      syntax: 'const name = "Alice";  // Cannot change\nlet count = 0;        // Can change',
+      example: {
+        code: 'const pi = 3.14;  // This will never change\npi = 3.15;  // Error! Cannot reassign const\n\nlet score = 0;  // This can change\nscore = 100;   // This works!',
+        explanation: '`const` is for values that stay the same (like constants, configuration, or values that shouldn\'t change). `let` is for values that might change (like counters, user input, or game state).',
+      },
+      whyItMatters: 'Using `const` by default helps prevent bugs - if you accidentally try to change something that shouldn\'t change, TypeScript will catch it. It also makes your code clearer about what can and can\'t change.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

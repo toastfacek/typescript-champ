@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom'
-import { Card, Badge, ProgressBar } from '@/components/ui'
+import { Link, useNavigate } from 'react-router-dom'
+import { Card, Badge, ProgressBar, Button } from '@/components/ui'
 import { useStore } from '@/store'
 import { curriculum, lessons } from '@/content/curriculum'
 
 export function CurriculumPage() {
+  const navigate = useNavigate()
   const lessonProgress = useStore((state) => state.lessonProgress)
+  const redoLesson = useStore((state) => state.redoLesson)
 
   const getLessonStatus = (lessonId: string) => {
     const lp = lessonProgress[lessonId]
@@ -19,6 +21,20 @@ export function CurriculumPage() {
       (id) => getLessonStatus(id) === 'completed'
     ).length
     return completed / module.lessons.length
+  }
+
+  const handleRedoLesson = (e: React.MouseEvent, lessonId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const confirmed = window.confirm(
+      'Redo this lesson? Your progress will be reset and you won\'t earn XP again.'
+    )
+    
+    if (confirmed) {
+      redoLesson(lessonId)
+      navigate(`/lesson/${lessonId}`)
+    }
   }
 
   return (
@@ -83,94 +99,121 @@ export function CurriculumPage() {
                   const isLocked = false // Could add prerequisite logic here
 
                   return (
-                    <Link
-                      key={lessonId}
-                      to={isLocked ? '#' : `/lesson/${lessonId}`}
-                      className={isLocked ? 'cursor-not-allowed' : ''}
-                    >
-                      <Card
-                        hover={!isLocked}
-                        className={`relative ${
-                          isLocked ? 'opacity-50' : ''
-                        } ${
-                          status === 'completed'
-                            ? 'border-success-500/30 bg-success-500/10'
-                            : status === 'in-progress'
-                            ? 'border-accent-500/30 bg-accent-500/10'
-                            : ''
-                        }`}
-                        padding="sm"
+                    <div key={lessonId} className="relative group">
+                      <Link
+                        to={isLocked ? '#' : `/lesson/${lessonId}`}
+                        className={isLocked ? 'cursor-not-allowed' : ''}
                       >
-                        <div className="flex items-center gap-4">
-                          {/* Status Icon */}
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              status === 'completed'
-                                ? 'bg-success-500 text-white'
-                                : status === 'in-progress'
-                                ? 'bg-accent-500 text-surface-900'
-                                : 'bg-surface-700 text-surface-500'
-                            }`}
-                          >
-                            {status === 'completed' ? (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                              </svg>
-                            ) : status === 'in-progress' ? (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                              </svg>
-                            ) : (
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              </svg>
-                            )}
-                          </div>
+                        <Card
+                          hover={!isLocked}
+                          className={`relative ${
+                            isLocked ? 'opacity-50' : ''
+                          } ${
+                            status === 'completed'
+                              ? 'border-success-500/30 bg-success-500/10'
+                              : status === 'in-progress'
+                              ? 'border-accent-500/30 bg-accent-500/10'
+                              : ''
+                          }`}
+                          padding="sm"
+                        >
+                          <div className="flex items-center gap-4">
+                            {/* Status Icon */}
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                status === 'completed'
+                                  ? 'bg-success-500 text-white'
+                                  : status === 'in-progress'
+                                  ? 'bg-accent-500 text-surface-900'
+                                  : 'bg-surface-700 text-surface-500'
+                              }`}
+                            >
+                              {status === 'completed' ? (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              ) : status === 'in-progress' ? (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                </svg>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                              )}
+                            </div>
 
-                          {/* Lesson Info */}
-                          <div className="flex-1">
-                            <h3 className="font-medium text-surface-100">
-                              {lesson.title}
-                            </h3>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-surface-500">
-                                {lesson.estimatedMinutes} min
-                              </span>
-                              <Badge
-                                variant={
-                                  lesson.difficulty === 'beginner'
-                                    ? 'success'
-                                    : lesson.difficulty === 'intermediate'
-                                    ? 'warning'
-                                    : 'danger'
-                                }
-                                size="sm"
+                            {/* Lesson Info */}
+                            <div className="flex-1">
+                              <h3 className="font-medium text-surface-100">
+                                {lesson.title}
+                              </h3>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-surface-500">
+                                  {lesson.estimatedMinutes} min
+                                </span>
+                                <Badge
+                                  variant={
+                                    lesson.difficulty === 'beginner'
+                                      ? 'success'
+                                      : lesson.difficulty === 'intermediate'
+                                      ? 'warning'
+                                      : 'danger'
+                                  }
+                                  size="sm"
+                                >
+                                  {lesson.difficulty}
+                                </Badge>
+                                <span className="text-xs text-gold-400 font-medium">
+                                  +{lesson.xpReward} XP
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2">
+                              {status === 'completed' && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => handleRedoLesson(e, lessonId)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                  title="Redo this lesson"
+                                >
+                                  <svg
+                                    className="w-4 h-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                    />
+                                  </svg>
+                                </Button>
+                              )}
+                              {/* Arrow */}
+                              <svg
+                                className="w-5 h-5 text-surface-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                               >
-                                {lesson.difficulty}
-                              </Badge>
-                              <span className="text-xs text-gold-400 font-medium">
-                                +{lesson.xpReward} XP
-                              </span>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
                             </div>
                           </div>
-
-                          {/* Arrow */}
-                          <svg
-                            className="w-5 h-5 text-surface-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </div>
-                      </Card>
-                    </Link>
+                        </Card>
+                      </Link>
+                    </div>
                   )
                 })}
               </div>

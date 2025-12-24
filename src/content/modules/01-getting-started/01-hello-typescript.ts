@@ -11,6 +11,74 @@ export const lesson: Lesson = {
   xpReward: 50,
   prerequisites: [],
   tags: ['basics', 'introduction'],
+  keyConcepts: [
+    {
+      id: 'variable',
+      term: 'Variable',
+      definition: 'A named container that stores a value. Think of it like a labeled box where you can put data. Variables let you save information and use it later in your code.',
+      syntax: 'let variableName = value;',
+      example: {
+        code: 'let score = 100;',
+        explanation: 'Creates a variable called "score" and stores the number 100 in it. You can use "score" anywhere in your code to refer to this value.',
+      },
+      whyItMatters: 'Variables let you save and reuse values throughout your program instead of typing them repeatedly. They make your code easier to read and modify.',
+    },
+    {
+      id: 'let-keyword',
+      term: 'let Keyword',
+      definition: 'The `let` keyword is used to declare (create) a new variable. It tells TypeScript "I want to create a new container with this name".',
+      syntax: 'let variableName = value;',
+      example: {
+        code: 'let name = "Alice";',
+        explanation: 'The `let` keyword creates a new variable called "name" and assigns it the value "Alice".',
+      },
+      whyItMatters: 'Using `let` is the standard way to create variables in modern JavaScript and TypeScript. It makes your code clear and prevents accidental errors.',
+    },
+    {
+      id: 'type-annotation',
+      term: 'Type Annotation',
+      definition: 'The ": type" part after a variable name that tells TypeScript what kind of data the variable holds. It\'s like a label on a box that says what can go inside.',
+      syntax: 'let name: string = "value";',
+      example: {
+        code: 'let age: number = 25;',
+        explanation: 'The ": number" tells TypeScript this variable will only hold numbers. If you try to put text in it, TypeScript will show an error.',
+      },
+      whyItMatters: 'Type annotations catch mistakes before your code runs - like trying to do math with text or calling a function with the wrong type of data. They make your code safer and easier to understand.',
+    },
+    {
+      id: 'string',
+      term: 'String',
+      definition: 'A string is a type of data that represents text. It can contain letters, numbers, spaces, and symbols. Strings are always wrapped in quotes (single, double, or backticks).',
+      syntax: 'let text: string = "your text here";',
+      example: {
+        code: 'let greeting: string = "Hello, World!";',
+        explanation: 'Creates a string variable containing the text "Hello, World!". The quotes tell TypeScript this is text, not code.',
+      },
+      whyItMatters: 'Strings are used everywhere in programming - for displaying messages, storing user input, file names, and more. Understanding strings is essential for any programming task.',
+    },
+    {
+      id: 'number',
+      term: 'Number',
+      definition: 'A number is a type of data that represents numeric values. It can be a whole number (like 42) or a decimal (like 3.14), positive or negative.',
+      syntax: 'let count: number = 42;',
+      example: {
+        code: 'let price: number = 19.99;\nlet quantity: number = 5;',
+        explanation: 'Creates number variables. Notice numbers don\'t have quotes - that\'s how TypeScript knows they\'re numbers, not text.',
+      },
+      whyItMatters: 'Numbers are used for calculations, counting, measurements, and any situation where you need to do math. They\'re fundamental to almost every program.',
+    },
+    {
+      id: 'boolean',
+      term: 'Boolean',
+      definition: 'A boolean is a type that can only be `true` or `false`. It represents yes/no, on/off, or any situation with exactly two possible states.',
+      syntax: 'let isActive: boolean = true;',
+      example: {
+        code: 'let isLoggedIn: boolean = true;\nlet hasPermission: boolean = false;',
+        explanation: 'Booleans are perfect for flags and conditions. They help your code make decisions like "if the user is logged in, show this button".',
+      },
+      whyItMatters: 'Booleans are essential for controlling program flow - making decisions, checking conditions, and determining what your code should do next.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

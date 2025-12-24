@@ -8,6 +8,7 @@ import { CodeExerciseStep } from './CodeExerciseStep'
 import { FillInBlankStep } from './FillInBlankStep'
 import { QuizStep } from './QuizStep'
 import { LessonComplete } from './LessonComplete'
+import { KeyConceptsPanel } from './KeyConceptsPanel'
 
 interface LessonPlayerProps {
   lesson: Lesson
@@ -144,6 +145,11 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
 
   return (
     <div className="min-h-screen">
+      {/* Key Concepts Panel */}
+      {lesson.keyConcepts && lesson.keyConcepts.length > 0 && (
+        <KeyConceptsPanel concepts={lesson.keyConcepts} />
+      )}
+
       {/* Header */}
       <div className="sticky top-0 z-40 glass-strong border-b border-surface-700/50">
         <div className="max-w-4xl mx-auto px-4 py-3">

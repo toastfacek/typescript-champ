@@ -54,6 +54,12 @@ npm run typecheck    # TypeScript check without building
 
 The `LessonPlayer` component renders steps via discriminated union pattern - each step type has its own component (InstructionStep, CodeExerciseStep, etc.).
 
+- **Key Concepts Glossary**: Expandable glossary panel for foundational concepts:
+  - Floating panel in bottom-right corner (`KeyConceptsPanel.tsx`)
+  - Each lesson can define `keyConcepts` array with terms, definitions, syntax, examples, and "why it matters" context
+  - Helps beginners understand prerequisite knowledge without disrupting lesson flow
+  - Currently implemented for lessons 01-04; remaining lessons need key concepts added
+
 **TypeScript Execution**: User code runs in-browser via `lib/typescript-runner.ts`:
 1. Code compiled using TypeScript compiler in a Web Worker (`typescript-worker-singleton.ts`)
 2. Compiled JS executed via `new Function()`
@@ -78,6 +84,22 @@ API runs separately from frontend. Server binds to `0.0.0.0` for Railway deploym
 ```typescript
 // Lesson step discriminated union (src/types/lesson.ts)
 type LessonStep = InstructionStep | CodeExerciseStep | FillInBlankStep | QuizStep
+
+// Key concept for glossary panel (src/types/lesson.ts)
+interface KeyConcept {
+  id: string
+  term: string
+  definition: string
+  syntax?: string
+  example?: { code: string; explanation: string }
+  whyItMatters?: string
+}
+
+// Lesson interface includes optional keyConcepts
+interface Lesson {
+  // ... other fields
+  keyConcepts?: KeyConcept[]
+}
 
 // Practice topics (src/types/practice.ts)
 type PracticeTopic = 'basic-types' | 'functions' | 'objects' | 'arrays' | ...
