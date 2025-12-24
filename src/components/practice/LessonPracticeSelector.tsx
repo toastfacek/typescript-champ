@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, Button } from '@/components/ui'
 import { useStore } from '@/store'
@@ -21,24 +22,28 @@ export function LessonPracticeSelector() {
   const progress = useStore((state) => state.progress)
   const lessonProgress = useStore((state) => state.lessonProgress)
 
-  // Get all completed lessons
-  const completedLessons = progress?.lessonsCompleted
-    .map((lessonId) => {
-      const lesson = lessons[lessonId]
-      const lp = lessonProgress[lessonId]
-      if (!lesson || !lp || lp.status !== 'completed') return null
+  // Get all completed lessons - memoized to prevent infinite loops
+  const completedLessons = useMemo(() => {
+    if (!progress?.lessonsCompleted) return []
+    
+    return progress.lessonsCompleted
+      .map((lessonId) => {
+        const lesson = lessons[lessonId]
+        const lp = lessonProgress[lessonId]
+        if (!lesson || !lp || lp.status !== 'completed') return null
 
-      return {
-        lesson,
-        completedAt: lp.completedAt ? new Date(lp.completedAt) : null,
-      }
-    })
-    .filter((item): item is NonNullable<typeof item> => item !== null)
-    .sort((a, b) => {
-      // Sort by completion date, most recent first
-      if (!a.completedAt || !b.completedAt) return 0
-      return b.completedAt.getTime() - a.completedAt.getTime()
-    })
+        return {
+          lesson,
+          completedAt: lp.completedAt ? new Date(lp.completedAt) : null,
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .sort((a, b) => {
+        // Sort by completion date, most recent first
+        if (!a.completedAt || !b.completedAt) return 0
+        return b.completedAt.getTime() - a.completedAt.getTime()
+      })
+  }, [progress?.lessonsCompleted, lessonProgress])
 
   const handlePractice = (lessonId: string) => {
     navigate(`/practice/focused/${lessonId}`)

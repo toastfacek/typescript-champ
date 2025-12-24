@@ -358,7 +358,7 @@ export const usePracticeStore = create<PracticeState>()(
           }
 
           const session: FocusedPracticeSession = {
-            id: `focused-${Date.now()}`,
+            id: crypto.randomUUID(),
             conceptId: lesson.id,
             conceptName: lesson.title,
             lessonId: lesson.id,
