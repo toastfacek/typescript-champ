@@ -205,6 +205,50 @@ export interface Database {
           updated_at?: string
         }
       }
+      focused_practice_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          lesson_id: string
+          lesson_title: string
+          session_data: Json
+          current_step_index: number
+          completed_steps: string[]
+          status: string
+          started_at: string
+          completed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lesson_id: string
+          lesson_title: string
+          session_data: Json
+          current_step_index?: number
+          completed_steps?: string[]
+          status?: string
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lesson_id?: string
+          lesson_title?: string
+          session_data?: Json
+          current_step_index?: number
+          completed_steps?: string[]
+          status?: string
+          started_at?: string
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

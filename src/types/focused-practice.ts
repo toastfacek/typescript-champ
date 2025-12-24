@@ -54,3 +54,15 @@ export interface GenerateFocusedPracticeResponse {
   }
 }
 
+export interface StoredFocusedSession {
+  id: string
+  lessonId: string
+  lessonTitle: string
+  miniLesson: FocusedPracticeMiniLesson
+  currentStepIndex: number
+  completedSteps: string[]
+  status: 'in_progress' | 'completed'
+  startedAt: string  // ISO string
+  completedAt?: string
+}
+

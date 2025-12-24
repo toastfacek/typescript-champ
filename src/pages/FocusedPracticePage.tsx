@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { LessonStep } from '@/types'
 import { usePracticeStore } from '@/store/practice-store'
@@ -7,12 +7,14 @@ import { InstructionStep } from '@/components/lesson/InstructionStep'
 import { CodeExerciseStep } from '@/components/lesson/CodeExerciseStep'
 import { FillInBlankStep } from '@/components/lesson/FillInBlankStep'
 import { QuizStep } from '@/components/lesson/QuizStep'
+import { SessionHistoryPanel } from '@/components/practice/SessionHistoryPanel'
 import { lessons } from '@/content/curriculum'
 import type { CodeExerciseStep as CodeExerciseStepType, FillInBlankStep as FillInBlankStepType, QuizStep as QuizStepType } from '@/types'
 
 export function FocusedPracticePage() {
   const navigate = useNavigate()
   const { lessonId } = useParams<{ lessonId: string }>()
+  const [showHistory, setShowHistory] = useState(false)
 
   const currentFocusedSession = usePracticeStore((s) => s.currentFocusedSession)
   const focusedMiniLesson = usePracticeStore((s) => s.focusedMiniLesson)
@@ -20,9 +22,20 @@ export function FocusedPracticePage() {
   const focusedCompletedSteps = usePracticeStore((s) => s.focusedCompletedSteps)
   const isGeneratingFocused = usePracticeStore((s) => s.isGeneratingFocused)
   const focusedGenerationError = usePracticeStore((s) => s.focusedGenerationError)
+  const sessionHistory = usePracticeStore((s) => lessonId ? (s.sessionHistory[lessonId] || []) : [])
   const startFocusedSession = usePracticeStore((s) => s.startFocusedSession)
   const endFocusedSession = usePracticeStore((s) => s.endFocusedSession)
   const completeFocusedStep = usePracticeStore((s) => s.completeFocusedStep)
+  const loadSessionHistory = usePracticeStore((s) => s.loadSessionHistory)
+  const resumeSession = usePracticeStore((s) => s.resumeSession)
+  const generateNewFocusedSession = usePracticeStore((s) => s.generateNewFocusedSession)
+
+  // Load session history on mount
+  useEffect(() => {
+    if (lessonId) {
+      loadSessionHistory(lessonId)
+    }
+  }, [lessonId, loadSessionHistory])
 
   // Start session if lessonId is provided and no session exists
   useEffect(() => {
@@ -32,9 +45,15 @@ export function FocusedPracticePage() {
         navigate('/practice')
         return
       }
+      // Check if there's a session in history for this lesson
+      const historyForLesson = sessionHistory
+      if (historyForLesson.length > 0) {
+        // Don't auto-generate, let user choose to resume or generate new
+        return
+      }
       startFocusedSession(lesson)
     }
-  }, [lessonId, currentFocusedSession, focusedMiniLesson, isGeneratingFocused, startFocusedSession, navigate])
+  }, [lessonId, currentFocusedSession, focusedMiniLesson, isGeneratingFocused, startFocusedSession, navigate, sessionHistory])
 
   // Redirect if no lessonId
   useEffect(() => {
@@ -76,6 +95,19 @@ export function FocusedPracticePage() {
     endFocusedSession()
     navigate('/curriculum')
   }, [endFocusedSession, navigate])
+
+  const handleResumeSession = useCallback(async (sessionId: string) => {
+    await resumeSession(sessionId)
+    setShowHistory(false)
+  }, [resumeSession])
+
+  const handleGenerateNew = useCallback(async () => {
+    if (!lessonId) return
+    const lesson = lessons[lessonId]
+    if (!lesson) return
+    await generateNewFocusedSession(lesson)
+    setShowHistory(false)
+  }, [lessonId, generateNewFocusedSession])
 
   // Loading state
   if (isGeneratingFocused) {
@@ -124,8 +156,42 @@ export function FocusedPracticePage() {
     )
   }
 
-  // No session or lesson
+  // No session or lesson - show options to resume or generate new
   if (!currentFocusedSession || !focusedMiniLesson) {
+    // If there's history, show options
+    if (sessionHistory.length > 0) {
+      return (
+        <div className="min-h-screen">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <Card variant="glass" padding="lg">
+              <div className="flex flex-col items-center justify-center py-12">
+                <h2 className="text-2xl font-heading font-semibold text-surface-100 mb-4">
+                  Focused Practice: {lessons[lessonId || '']?.title || 'Loading...'}
+                </h2>
+                <p className="text-surface-400 mb-6">Choose a session to resume or start a new one</p>
+                <div className="flex gap-4">
+                  <Button onClick={() => setShowHistory(true)}>
+                    View Session History
+                  </Button>
+                  <Button variant="outline" onClick={handleGenerateNew}>
+                    Generate New Lesson
+                  </Button>
+                </div>
+              </div>
+            </Card>
+            {showHistory && lessonId && (
+              <div className="mt-6 flex justify-center">
+                <SessionHistoryPanel
+                  lessonId={lessonId}
+                  onResume={handleResumeSession}
+                  onClose={() => setShowHistory(false)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
     return null
   }
 
@@ -183,18 +249,36 @@ export function FocusedPracticePage() {
       <div className="sticky top-0 z-40 glass-strong border-b border-surface-700/50">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-3">
-            <Button variant="ghost" size="sm" onClick={handleExit}>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Exit
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={handleExit}>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Exit
+              </Button>
+              {sessionHistory.length > 0 && (
+                <Button variant="ghost" size="sm" onClick={() => setShowHistory(!showHistory)}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  History
+                </Button>
+              )}
+            </div>
             <span className="text-sm font-medium text-surface-200">
               Focused Practice: {focusedMiniLesson?.lessonTitle || currentFocusedSession?.conceptName || 'Loading...'}
             </span>
-            <span className="text-sm text-surface-500 font-mono">
-              {focusedCurrentStepIndex + 1} / {totalSteps}
-            </span>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={handleGenerateNew} title="Generate a new lesson">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New
+              </Button>
+              <span className="text-sm text-surface-500 font-mono">
+                {focusedCurrentStepIndex + 1} / {totalSteps}
+              </span>
+            </div>
           </div>
           <ProgressBar progress={progress} size="sm" color="accent" />
         </div>
@@ -202,6 +286,15 @@ export function FocusedPracticePage() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
+        {showHistory && lessonId && (
+          <div className="mb-6 flex justify-end">
+            <SessionHistoryPanel
+              lessonId={lessonId}
+              onResume={handleResumeSession}
+              onClose={() => setShowHistory(false)}
+            />
+          </div>
+        )}
         <Card variant="glass" className="mb-6">
           {currentStep && renderStep(currentStep)}
         </Card>

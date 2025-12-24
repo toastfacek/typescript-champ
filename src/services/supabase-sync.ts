@@ -1,6 +1,7 @@
 import { supabase, isDemoMode } from '@/lib/supabase'
 import type { User, UserProgress, LessonProgress, UserSettings } from '@/types'
 import type { PracticeStats } from '@/types/practice'
+import type { StoredFocusedSession, FocusedPracticeMiniLesson } from '@/types/focused-practice'
 
 // Profile methods
 export async function getProfile(userId: string): Promise<User | null> {
@@ -364,4 +365,92 @@ export async function loadAllDataFromSupabase(userId: string): Promise<{
     settings,
     practiceStats,
   }
+}
+
+// Focused practice session methods
+export async function saveFocusedPracticeSession(
+  userId: string,
+  session: StoredFocusedSession
+): Promise<boolean> {
+  if (isDemoMode || userId === 'demo-user') return false
+
+  const sessionData: any = {
+    id: session.id,
+    user_id: userId,
+    lesson_id: session.lessonId,
+    lesson_title: session.lessonTitle,
+    session_data: session.miniLesson as any,
+    current_step_index: session.currentStepIndex,
+    completed_steps: session.completedSteps,
+    status: session.status,
+    started_at: session.startedAt,
+    completed_at: session.completedAt || null,
+  }
+
+  const { error } = await supabase
+    .from('focused_practice_sessions')
+    .upsert(sessionData, { onConflict: 'id' })
+
+  if (error) {
+    console.error('Error saving focused practice session:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function getFocusedPracticeSessions(
+  userId: string,
+  lessonId?: string
+): Promise<StoredFocusedSession[]> {
+  if (isDemoMode) return []
+
+  let query = supabase
+    .from('focused_practice_sessions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('started_at', { ascending: false })
+
+  if (lessonId) {
+    query = query.eq('lesson_id', lessonId)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Error fetching focused practice sessions:', error)
+    return []
+  }
+
+  return (data as any[]).map(row => ({
+    id: row.id,
+    lessonId: row.lesson_id,
+    lessonTitle: row.lesson_title,
+    miniLesson: row.session_data as FocusedPracticeMiniLesson,
+    currentStepIndex: row.current_step_index,
+    completedSteps: row.completed_steps || [],
+    status: row.status as 'in_progress' | 'completed',
+    startedAt: row.started_at,
+    completedAt: row.completed_at || undefined,
+  }))
+}
+
+export async function deleteFocusedPracticeSession(
+  userId: string,
+  sessionId: string
+): Promise<boolean> {
+  if (isDemoMode || userId === 'demo-user') return false
+
+  const { error } = await supabase
+    .from('focused_practice_sessions')
+    .delete()
+    .eq('id', sessionId)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error deleting focused practice session:', error)
+    return false
+  }
+
+  return true
 }

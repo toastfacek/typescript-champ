@@ -85,8 +85,8 @@ Return a JSON object with this exact structure:
       "type": "code-exercise",
       "title": "Exercise title",
       "instructions": "Clear instructions",
-      "starterCode": "// Starter code",
-      "solutionCode": "// Solution",
+      "starterCode": "// TypeScript skeleton with TODO comments where student writes code\\n// Should compile but NOT pass tests",
+      "solutionCode": "// Complete working solution that passes all tests",
       "testCases": [
         {
           "id": "test-1",
@@ -155,6 +155,10 @@ REQUIREMENTS:
 7. The instruction should reference the concept name and provide practical context
 8. estimatedMinutes should reflect total time (instruction + exercises)
 9. For quiz exercises: EXACTLY 4 options, EXACTLY 1 correct answer (isCorrect: true)
+10. starterCode must be valid TypeScript that compiles (with incomplete logic)
+11. solutionCode must pass ALL testCases
+12. testCases must FAIL with starterCode
+13. starterCode should have TODO comments showing where to write code
 
 Make this feel like a focused, cohesive mini-lesson that deepens understanding of "${lessonContext.lessonTitle}". Provide explanations that go beyond what was covered in the original lesson, especially for concepts that learners often find confusing.`
 }

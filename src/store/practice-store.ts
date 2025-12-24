@@ -11,11 +11,12 @@ import type {
 import type {
   FocusedPracticeSession,
   FocusedPracticeMiniLesson,
-  ConceptProgress
+  ConceptProgress,
+  StoredFocusedSession
 } from '@/types/focused-practice'
 import type { Lesson } from '@/types/lesson'
 import { generateExercise as apiGenerateExercise, generateExerciseBatch, generateFocusedPractice } from '@/services/api-client'
-import { syncPracticeStats } from '@/services/supabase-sync'
+import { syncPracticeStats, saveFocusedPracticeSession, getFocusedPracticeSessions, deleteFocusedPracticeSession } from '@/services/supabase-sync'
 import { useStore } from './index'
 
 interface PracticeState {
@@ -37,6 +38,9 @@ interface PracticeState {
   // Stats (persisted)
   practiceStats: Record<PracticeTopic, PracticeStats>
   focusedPracticeStats: Record<string, ConceptProgress>
+  
+  // Session history (persisted)
+  sessionHistory: Record<string, StoredFocusedSession[]> // keyed by lessonId
 
   // Actions
   startSession: (
@@ -57,6 +61,10 @@ interface PracticeState {
   completeFocusedStep: (stepId: string) => void
   setFocusedCurrentStepIndex: (index: number) => void
   getConceptProgress: (conceptId: string) => ConceptProgress | null
+  loadSessionHistory: (lessonId: string) => Promise<void>
+  resumeSession: (sessionId: string) => Promise<void>
+  generateNewFocusedSession: (lesson: Lesson) => Promise<void>
+  saveCurrentSession: () => Promise<void>
 }
 
 const defaultStats = (topic: PracticeTopic): PracticeStats => ({
@@ -107,6 +115,7 @@ export const usePracticeStore = create<PracticeState>()(
       isGeneratingFocused: false,
       focusedGenerationError: null,
       focusedPracticeStats: {},
+      sessionHistory: {},
 
       // Actions
       startSession: (topic, difficulty, exerciseType) => {
@@ -317,6 +326,14 @@ export const usePracticeStore = create<PracticeState>()(
 
       // Focused practice actions
       startFocusedSession: async (lesson) => {
+        const { currentFocusedSession, focusedMiniLesson } = get()
+        
+        // Check if there's already a session for this lesson
+        if (currentFocusedSession?.lessonId === lesson.id && focusedMiniLesson) {
+          // Session already exists, don't regenerate
+          return
+        }
+
         set({
           isGeneratingFocused: true,
           focusedGenerationError: null,
@@ -356,6 +373,12 @@ export const usePracticeStore = create<PracticeState>()(
             isGeneratingFocused: false,
             focusedCurrentStepIndex: 0
           })
+
+          // Auto-save to Supabase if logged in
+          const userId = useStore.getState().user?.id
+          if (userId) {
+            get().saveCurrentSession().catch(err => console.error('Auto-save error:', err))
+          }
         } catch (error) {
           set({
             isGeneratingFocused: false,
@@ -364,10 +387,41 @@ export const usePracticeStore = create<PracticeState>()(
         }
       },
 
-      endFocusedSession: () => {
-        const { currentFocusedSession, focusedPracticeStats } = get()
+      endFocusedSession: async () => {
+        const { currentFocusedSession, focusedPracticeStats, focusedMiniLesson, focusedCompletedSteps, focusedCurrentStepIndex } = get()
         
-        if (currentFocusedSession) {
+        if (currentFocusedSession && focusedMiniLesson) {
+          // Save session to history before clearing
+          const storedSession: StoredFocusedSession = {
+            id: currentFocusedSession.id,
+            lessonId: currentFocusedSession.lessonId || '',
+            lessonTitle: currentFocusedSession.conceptName,
+            miniLesson: focusedMiniLesson,
+            currentStepIndex: focusedCurrentStepIndex,
+            completedSteps: focusedCompletedSteps,
+            status: focusedCompletedSteps.length === focusedMiniLesson.steps.length ? 'completed' : 'in_progress',
+            startedAt: currentFocusedSession.startedAt.toISOString(),
+            completedAt: new Date().toISOString()
+          }
+
+          // Add to local history
+          const lessonId = currentFocusedSession.lessonId || ''
+          const currentHistory = get().sessionHistory[lessonId] || []
+          const updatedHistory = [storedSession, ...currentHistory.filter(s => s.id !== storedSession.id)]
+          
+          set({
+            sessionHistory: {
+              ...get().sessionHistory,
+              [lessonId]: updatedHistory
+            }
+          })
+
+          // Save to Supabase if logged in
+          const userId = useStore.getState().user?.id
+          if (userId) {
+            await saveFocusedPracticeSession(userId, storedSession)
+          }
+
           // Update concept progress
           const conceptId = currentFocusedSession.conceptId
           const currentProgress = focusedPracticeStats[conceptId] || {
@@ -408,7 +462,7 @@ export const usePracticeStore = create<PracticeState>()(
         }, 100)
       },
 
-      completeFocusedStep: (stepId) => {
+      completeFocusedStep: async (stepId) => {
         const { currentFocusedSession, focusedCompletedSteps } = get()
         if (!currentFocusedSession) return
 
@@ -426,6 +480,12 @@ export const usePracticeStore = create<PracticeState>()(
           currentFocusedSession: updatedSession,
           focusedCompletedSteps: newCompleted
         })
+
+        // Auto-save to Supabase if logged in
+        const userId = useStore.getState().user?.id
+        if (userId) {
+          get().saveCurrentSession().catch(err => console.error('Auto-save error:', err))
+        }
       },
 
       setFocusedCurrentStepIndex: (index) => {
@@ -435,14 +495,137 @@ export const usePracticeStore = create<PracticeState>()(
       getConceptProgress: (conceptId) => {
         const { focusedPracticeStats } = get()
         return focusedPracticeStats[conceptId] || null
+      },
+
+      loadSessionHistory: async (lessonId) => {
+        const userId = useStore.getState().user?.id
+        if (!userId) return
+
+        try {
+          const sessions = await getFocusedPracticeSessions(userId, lessonId)
+          set({
+            sessionHistory: {
+              ...get().sessionHistory,
+              [lessonId]: sessions
+            }
+          })
+        } catch (error) {
+          console.error('Error loading session history:', error)
+        }
+      },
+
+      resumeSession: async (sessionId) => {
+        const { sessionHistory } = get()
+        
+        // Find the session in history
+        for (const lessonId in sessionHistory) {
+          const session = sessionHistory[lessonId].find(s => s.id === sessionId)
+          if (session) {
+            // Convert stored session back to active session
+            const activeSession: FocusedPracticeSession = {
+              id: session.id,
+              conceptId: session.lessonId,
+              conceptName: session.lessonTitle,
+              lessonId: session.lessonId,
+              startedAt: new Date(session.startedAt),
+              stepsCompleted: session.completedSteps.length,
+              totalSteps: session.miniLesson.steps.length
+            }
+
+            set({
+              currentFocusedSession: activeSession,
+              focusedMiniLesson: session.miniLesson,
+              focusedCurrentStepIndex: session.currentStepIndex,
+              focusedCompletedSteps: session.completedSteps
+            })
+            return
+          }
+        }
+      },
+
+      generateNewFocusedSession: async (lesson) => {
+        // Save current session first if it exists
+        const { currentFocusedSession, focusedMiniLesson } = get()
+        if (currentFocusedSession && focusedMiniLesson) {
+          await get().saveCurrentSession()
+        }
+
+        // Clear current session and generate new one
+        set({
+          currentFocusedSession: null,
+          focusedMiniLesson: null,
+          focusedCurrentStepIndex: 0,
+          focusedCompletedSteps: []
+        })
+
+        // Generate new session
+        await get().startFocusedSession(lesson)
+      },
+
+      saveCurrentSession: async () => {
+        const { currentFocusedSession, focusedMiniLesson, focusedCurrentStepIndex, focusedCompletedSteps } = get()
+        const userId = useStore.getState().user?.id
+        
+        if (!currentFocusedSession || !focusedMiniLesson || !userId) return
+
+        const storedSession: StoredFocusedSession = {
+          id: currentFocusedSession.id,
+          lessonId: currentFocusedSession.lessonId || '',
+          lessonTitle: currentFocusedSession.conceptName,
+          miniLesson: focusedMiniLesson,
+          currentStepIndex: focusedCurrentStepIndex,
+          completedSteps: focusedCompletedSteps,
+          status: focusedCompletedSteps.length === focusedMiniLesson.steps.length ? 'completed' : 'in_progress',
+          startedAt: currentFocusedSession.startedAt.toISOString(),
+          completedAt: currentFocusedSession.endedAt?.toISOString()
+        }
+
+        // Update local history
+        const lessonId = currentFocusedSession.lessonId || ''
+        const currentHistory = get().sessionHistory[lessonId] || []
+        const existingIndex = currentHistory.findIndex(s => s.id === storedSession.id)
+        const updatedHistory = existingIndex >= 0
+          ? [...currentHistory.slice(0, existingIndex), storedSession, ...currentHistory.slice(existingIndex + 1)]
+          : [storedSession, ...currentHistory]
+
+        set({
+          sessionHistory: {
+            ...get().sessionHistory,
+            [lessonId]: updatedHistory
+          }
+        })
+
+        // Save to Supabase
+        await saveFocusedPracticeSession(userId, storedSession)
       }
     }),
     {
       name: 'typescript-champ-practice',
       partialize: (state) => ({
         practiceStats: state.practiceStats,
-        focusedPracticeStats: state.focusedPracticeStats
-      })
+        focusedPracticeStats: state.focusedPracticeStats,
+        currentFocusedSession: state.currentFocusedSession ? {
+          ...state.currentFocusedSession,
+          startedAt: state.currentFocusedSession.startedAt.toISOString(),
+          endedAt: state.currentFocusedSession.endedAt?.toISOString()
+        } : null,
+        focusedMiniLesson: state.focusedMiniLesson,
+        focusedCurrentStepIndex: state.focusedCurrentStepIndex,
+        focusedCompletedSteps: state.focusedCompletedSteps,
+        sessionHistory: state.sessionHistory
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Convert ISO strings back to Date objects
+        if (state?.currentFocusedSession) {
+          const session = state.currentFocusedSession as any
+          if (typeof session.startedAt === 'string') {
+            session.startedAt = new Date(session.startedAt)
+          }
+          if (session.endedAt && typeof session.endedAt === 'string') {
+            session.endedAt = new Date(session.endedAt)
+          }
+        }
+      }
     }
   )
 )
