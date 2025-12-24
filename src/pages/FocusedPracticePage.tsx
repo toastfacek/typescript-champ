@@ -131,12 +131,12 @@ export function FocusedPracticePage() {
 
   const currentStep = focusedMiniLesson.steps[focusedCurrentStepIndex]
   const totalSteps = focusedMiniLesson.steps.length
-  const progress = focusedCompletedSteps.size / totalSteps
-  const isStepComplete = currentStep ? focusedCompletedSteps.has(currentStep.id) : false
+  const progress = focusedCompletedSteps.length / totalSteps
+  const isStepComplete = currentStep ? focusedCompletedSteps.includes(currentStep.id) : false
   const canProceed = currentStep?.type === 'instruction' || isStepComplete
 
   const renderStep = (step: LessonStep) => {
-    const stepIsComplete = focusedCompletedSteps.has(step.id)
+    const stepIsComplete = focusedCompletedSteps.includes(step.id)
 
     switch (step.type) {
       case 'instruction':

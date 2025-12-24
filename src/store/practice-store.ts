@@ -30,7 +30,7 @@ interface PracticeState {
   currentFocusedSession: FocusedPracticeSession | null
   focusedMiniLesson: FocusedPracticeMiniLesson | null
   focusedCurrentStepIndex: number
-  focusedCompletedSteps: Set<string>
+  focusedCompletedSteps: string[]
   isGeneratingFocused: boolean
   focusedGenerationError: string | null
 
@@ -103,7 +103,7 @@ export const usePracticeStore = create<PracticeState>()(
       currentFocusedSession: null,
       focusedMiniLesson: null,
       focusedCurrentStepIndex: 0,
-      focusedCompletedSteps: new Set<string>(),
+      focusedCompletedSteps: [],
       isGeneratingFocused: false,
       focusedGenerationError: null,
       focusedPracticeStats: {},
@@ -321,7 +321,7 @@ export const usePracticeStore = create<PracticeState>()(
           isGeneratingFocused: true,
           focusedGenerationError: null,
           focusedCurrentStepIndex: 0,
-          focusedCompletedSteps: new Set<string>()
+          focusedCompletedSteps: []
         })
 
         try {
@@ -403,7 +403,7 @@ export const usePracticeStore = create<PracticeState>()(
             currentFocusedSession: null,
             focusedMiniLesson: null,
             focusedCurrentStepIndex: 0,
-            focusedCompletedSteps: new Set<string>()
+            focusedCompletedSteps: []
           })
         }, 100)
       },
@@ -412,12 +412,14 @@ export const usePracticeStore = create<PracticeState>()(
         const { currentFocusedSession, focusedCompletedSteps } = get()
         if (!currentFocusedSession) return
 
-        const newCompleted = new Set(focusedCompletedSteps)
-        newCompleted.add(stepId)
+        // Only add if not already completed
+        if (focusedCompletedSteps.includes(stepId)) return
+
+        const newCompleted = [...focusedCompletedSteps, stepId]
 
         const updatedSession: FocusedPracticeSession = {
           ...currentFocusedSession,
-          stepsCompleted: newCompleted.size
+          stepsCompleted: newCompleted.length
         }
 
         set({
