@@ -16,7 +16,7 @@ import type {
 } from '@/types/focused-practice'
 import type { Lesson } from '@/types/lesson'
 import { generateExercise as apiGenerateExercise, generateExerciseBatch, generateFocusedPractice } from '@/services/api-client'
-import { syncPracticeStats, saveFocusedPracticeSession, getFocusedPracticeSessions, deleteFocusedPracticeSession } from '@/services/supabase-sync'
+import { syncPracticeStats, saveFocusedPracticeSession, getFocusedPracticeSessions } from '@/services/supabase-sync'
 import { useStore } from './index'
 
 interface PracticeState {

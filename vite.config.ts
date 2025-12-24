@@ -10,6 +10,6 @@ export default defineConfig({
     },
   },
   preview: {
-    allowedHosts: ['frontend-production-3593.up.railway.app'],
+    allowedHosts: process.env.VITE_ALLOWED_HOST ? [process.env.VITE_ALLOWED_HOST] : [],
   },
 })

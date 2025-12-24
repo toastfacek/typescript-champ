@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { Button, Card, Badge } from '@/components/ui'
 import { usePracticeStore } from '@/store/practice-store'
 import type { StoredFocusedSession } from '@/types/focused-practice'
