@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { useStore } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
+import { useTheme } from '@/hooks/useTheme'
 import { isDemoMode } from '@/lib/supabase'
 
 export default function App() {
@@ -14,6 +15,9 @@ export default function App() {
   const setUser = useStore((state) => state.setUser)
   const progress = useStore((state) => state.progress)
   const user = useStore((state) => state.user)
+  
+  // Initialize theme on mount
+  useTheme()
 
   // Initialize demo progress if not authenticated and none exists
   useEffect(() => {

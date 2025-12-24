@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { XPCounter, StreakBadge } from '@/components/gamification'
+import { ThemeToggle } from '@/components/ui'
 import { useStore } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
 import { clsx } from 'clsx'
@@ -59,8 +60,10 @@ export function Header() {
 
           {/* User Stats / Auth */}
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {progress && (
               <div className="hidden sm:flex items-center gap-3">
+                <div className="w-px h-6 bg-surface-700" />
                 <StreakBadge size="sm" />
                 <div className="w-px h-6 bg-surface-700" />
                 <XPCounter size="sm" showLevel={false} />

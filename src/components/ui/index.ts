@@ -8,3 +8,4 @@ export { Modal, ModalHeader, ModalTitle, ModalCloseButton, ModalBody, ModalFoote
 export { Select } from './Select'
 export { Tabs, TabsList, TabsTab, TabsPanel } from './Tabs'
 export { Toggle } from './Toggle'
+export { ThemeToggle } from './ThemeToggle'

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ============================================
-   CSS Variables - Dark Theme
+   CSS Variables - Dark Theme (Default)
    ============================================ */
 :root {
   --font-heading: 'Outfit', system-ui, sans-serif;
@@ -35,10 +35,260 @@
 }
 
 /* ============================================
+   CSS Variables - Light Theme
+   ============================================ */
+[data-theme="light"] {
+  /* Core colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-elevated: #ffffff;
+  
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  /* Accents (same colors, work in both themes) */
+  --accent: #06b6d4;
+  --accent-dim: #0891b2;
+  --gold: #f59e0b;
+  --success: #16a34a;
+  --danger: #e11d48;
+  
+  /* Borders */
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-default: rgba(15, 23, 42, 0.12);
+  --border-bright: rgba(15, 23, 42, 0.2);
+}
+
+/* ============================================
+   Light Mode Tailwind Class Overrides
+   ============================================ */
+[data-theme="light"] {
+  /* Text color overrides - ensure dark text on light backgrounds */
+  /* surface-50-100 are very light, need dark text in light mode */
+}
+
+/* Override light text colors to dark in light mode */
+[data-theme="light"] .text-surface-50,
+[data-theme="light"] .text-surface-100,
+[data-theme="light"] .text-surface-200,
+[data-theme="light"] .text-surface-300 {
+  color: #0f172a !important; /* surface-900 for contrast */
+}
+
+[data-theme="light"] .text-surface-400 {
+  color: #475569 !important; /* surface-600 for contrast */
+}
+
+[data-theme="light"] .text-surface-500 {
+  color: #64748b !important; /* surface-500 */
+}
+
+[data-theme="light"] .text-surface-600 {
+  color: #475569 !important; /* surface-600 - already good contrast */
+}
+
+/* Background overrides - use light backgrounds */
+[data-theme="light"] .bg-surface-800,
+[data-theme="light"] .bg-surface-900,
+[data-theme="light"] .bg-surface-950 {
+  background-color: #f8fafc !important; /* surface-50 for light backgrounds */
+}
+
+[data-theme="light"] .bg-surface-700 {
+  background-color: #f1f5f9 !important; /* surface-100 */
+}
+
+[data-theme="light"] .bg-surface-600 {
+  background-color: #e2e8f0 !important; /* surface-200 */
+}
+
+/* Border overrides */
+[data-theme="light"] .border-surface-600,
+[data-theme="light"] .border-surface-700,
+[data-theme="light"] .border-surface-800 {
+  border-color: #cbd5e1 !important; /* surface-300 for visible borders */
+}
+
+/* Hover states */
+[data-theme="light"] .hover\:text-surface-200:hover,
+[data-theme="light"] .hover\:text-surface-300:hover {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .hover\:bg-surface-700\/50:hover {
+  background-color: rgba(226, 232, 240, 0.5) !important; /* surface-200 with opacity */
+}
+
+[data-theme="light"] .hover\:bg-surface-800:hover {
+  background-color: #e2e8f0 !important; /* surface-200 */
+}
+
+/* Success/success color overrides for better contrast in light mode */
+/* Using attribute selectors to target Tailwind opacity classes */
+[data-theme="light"] [class*="bg-success-500/15"] {
+  background-color: rgba(22, 163, 74, 0.25) !important; /* More opaque */
+}
+
+[data-theme="light"] .text-success-400,
+[data-theme="light"] [class*="text-success-400"] {
+  color: #15803d !important; /* success-700 - much darker for readability */
+}
+
+[data-theme="light"] [class*="border-success-500/25"] {
+  border-color: rgba(22, 163, 74, 0.5) !important; /* More visible border */
+}
+
+[data-theme="light"] [class*="bg-success-500/10"] {
+  background-color: rgba(22, 163, 74, 0.2) !important; /* More visible */
+}
+
+[data-theme="light"] [class*="border-success-500/30"] {
+  border-color: rgba(22, 163, 74, 0.55) !important; /* More visible */
+}
+
+/* Success colored elements in curriculum */
+[data-theme="light"] .bg-success-500 {
+  background-color: #16a34a !important; /* success-600 - slightly darker */
+}
+
+[data-theme="light"] .border-success-500\/30 {
+  border-color: rgba(22, 163, 74, 0.5) !important;
+}
+
+/* Additional success color utilities for better contrast */
+[data-theme="light"] .bg-success-500\/10 {
+  background-color: rgba(22, 163, 74, 0.18) !important; /* More visible than 10% */
+}
+
+/* Override success-400 text color to darker green in light mode */
+[data-theme="light"] .text-success-400,
+[data-theme="light"] span.text-success-400 {
+  color: #15803d !important; /* success-700 - much better contrast */
+}
+
+/* Success badge specific improvements - targeting badge component */
+[data-theme="light"] [class*="bg-success-500/15"][class*="text-success-400"] {
+  background-color: rgba(22, 163, 74, 0.25) !important;
+  color: #15803d !important; /* success-700 */
+  border-color: rgba(22, 163, 74, 0.5) !important;
+  font-weight: 600 !important;
+}
+
+/* Button overrides for light mode */
+[data-theme="light"] .btn-ghost {
+  color: #475569 !important; /* surface-600 */
+}
+
+[data-theme="light"] .btn-ghost:hover {
+  color: #0f172a !important; /* surface-900 */
+  background-color: #f1f5f9 !important; /* surface-100 */
+}
+
+[data-theme="light"] .btn-outline {
+  border-color: #cbd5e1 !important; /* surface-300 */
+  color: #475569 !important; /* surface-600 */
+}
+
+[data-theme="light"] .btn-outline:hover {
+  color: #06b6d4 !important; /* accent-500 */
+  background-color: rgba(6, 182, 212, 0.1) !important;
+}
+
+/* Card overrides */
+[data-theme="light"] .card {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(203, 213, 225, 0.5) !important; /* surface-300 */
+}
+
+[data-theme="light"] .card-hover:hover {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(6, 182, 212, 0.3) !important;
+}
+
+/* Input overrides */
+[data-theme="light"] .input {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important; /* surface-300 */
+  color: #0f172a !important; /* surface-900 */
+}
+
+[data-theme="light"] .input::placeholder {
+  color: #94a3b8 !important; /* surface-400 */
+}
+
+/* Badge overrides */
+[data-theme="light"] .badge-accent {
+  background-color: rgba(6, 182, 212, 0.15) !important;
+  color: #0891b2 !important; /* accent-600 */
+  border-color: rgba(6, 182, 212, 0.3) !important;
+}
+
+[data-theme="light"] .badge-gold {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #d97706 !important; /* gold-600 */
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+[data-theme="light"] .badge-success {
+  background-color: rgba(22, 163, 74, 0.2) !important;
+  color: #15803d !important; /* success-700 - darker for better contrast */
+  border-color: rgba(22, 163, 74, 0.4) !important;
+  font-weight: 600 !important; /* Slightly bolder for readability */
+}
+
+/* Progress bar overrides */
+[data-theme="light"] .progress-bar {
+  background-color: #e2e8f0 !important; /* surface-200 */
+}
+
+/* Test result styles */
+[data-theme="light"] .test-pass {
+  background-color: rgba(22, 163, 74, 0.05) !important;
+  border-color: rgba(22, 163, 74, 0.2) !important;
+}
+
+[data-theme="light"] .test-fail {
+  background-color: rgba(225, 29, 72, 0.05) !important;
+  border-color: rgba(225, 29, 72, 0.2) !important;
+}
+
+/* Navigation and header specific overrides */
+[data-theme="light"] .bg-surface-800\/50 {
+  background-color: rgba(241, 245, 249, 0.8) !important; /* surface-100 with opacity */
+}
+
+[data-theme="light"] .bg-surface-700\/50 {
+  background-color: rgba(226, 232, 240, 0.5) !important; /* surface-200 with opacity */
+}
+
+/* Divider/separator lines */
+[data-theme="light"] .bg-surface-700 {
+  background-color: #cbd5e1 !important; /* surface-300 for visibility */
+}
+
+/* Focus ring offsets */
+[data-theme="light"] .focus\:ring-offset-surface-900:focus {
+  --tw-ring-offset-color: #ffffff !important;
+}
+
+/* Theme toggle specific overrides */
+[data-theme="light"] .text-surface-400 {
+  color: #64748b !important; /* surface-500 for better visibility */
+}
+
+[data-theme="light"] .hover\:text-surface-200:hover {
+  color: #0f172a !important; /* surface-900 on hover */
+}
+
+/* ============================================
    Base Styles
    ============================================ */
 html {
   scroll-behavior: smooth;
+  transition: color-scheme 0.3s ease;
 }
 
 body {
@@ -47,6 +297,7 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Subtle background pattern */
@@ -62,12 +313,24 @@ body::before {
     radial-gradient(ellipse 60% 40% at 100% 100%, rgba(251, 191, 36, 0.08), transparent);
   pointer-events: none;
   z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="light"] body::before {
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6, 182, 212, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(251, 191, 36, 0.04), transparent);
 }
 
 /* Selection */
 ::selection {
   background: rgba(34, 211, 238, 0.3);
   color: #fff;
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(6, 182, 212, 0.2);
+  color: #0f172a;
 }
 
 /* ============================================
@@ -90,6 +353,18 @@ body::before {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.3);
 }
 
 /* ============================================
@@ -143,6 +418,16 @@ p {
   border: 1px solid var(--border-default);
 }
 
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-subtle);
+}
+
+[data-theme="light"] .glass-strong {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-default);
+}
+
 /* ============================================
    Gradient Borders
    ============================================ */
@@ -192,6 +477,7 @@ p {
   font-size: 14px !important;
   background: var(--bg-primary) !important;
   border-radius: 0.75rem;
+  transition: background-color 0.3s ease;
 }
 
 .cm-editor .cm-content {
@@ -206,14 +492,23 @@ p {
   background: var(--bg-primary) !important;
   border-right: 1px solid var(--border-subtle) !important;
   color: var(--text-muted) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .cm-editor .cm-activeLineGutter {
   background: rgba(34, 211, 238, 0.1) !important;
 }
 
+[data-theme="light"] .cm-editor .cm-activeLineGutter {
+  background: rgba(6, 182, 212, 0.1) !important;
+}
+
 .cm-editor .cm-activeLine {
   background: rgba(34, 211, 238, 0.05) !important;
+}
+
+[data-theme="light"] .cm-editor .cm-activeLine {
+  background: rgba(6, 182, 212, 0.05) !important;
 }
 
 .cm-editor.cm-focused {
