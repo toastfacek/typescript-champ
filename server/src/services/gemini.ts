@@ -1,10 +1,17 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenAI, type GenerateContentConfig } from '@google/genai'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-})
+// Model constant for easy updates
+// See: https://ai.google.dev/gemini-api/docs/models#gemini-3-flash
+const GEMINI_MODEL = 'gemini-3-flash-preview'
 
-export interface ClaudeCompletionOptions {
+const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY
+if (!apiKey) {
+  throw new Error('GOOGLE_API_KEY or GEMINI_API_KEY environment variable is required')
+}
+
+const genAI = new GoogleGenAI({ apiKey })
+
+export interface GeminiCompletionOptions {
   systemPrompt?: string
   temperature?: number
   maxTokens?: number
@@ -12,29 +19,35 @@ export interface ClaudeCompletionOptions {
 
 export async function complete(
   prompt: string,
-  options: ClaudeCompletionOptions = {}
+  options: GeminiCompletionOptions = {}
 ): Promise<string> {
   const { systemPrompt, temperature = 0.7, maxTokens = 4096 } = options
 
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: maxTokens,
+  const config: GenerateContentConfig = {
     temperature,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: prompt }]
-  })
-
-  const textBlock = response.content.find(block => block.type === 'text')
-  if (!textBlock || textBlock.type !== 'text') {
-    throw new Error('No text response from Claude')
+    maxOutputTokens: maxTokens
   }
 
-  return textBlock.text
+  if (systemPrompt) {
+    config.systemInstruction = systemPrompt
+  }
+
+  const response = await genAI.models.generateContent({
+    model: GEMINI_MODEL,
+    contents: prompt,
+    config
+  })
+
+  if (!response.text) {
+    throw new Error('No text response from Gemini')
+  }
+
+  return response.text
 }
 
 export async function completeWithJSON<T>(
   prompt: string,
-  options: ClaudeCompletionOptions = {}
+  options: GeminiCompletionOptions = {}
 ): Promise<T> {
   const response = await complete(prompt, {
     ...options,
@@ -61,6 +74,7 @@ IMPORTANT: Respond with valid JSON only. No markdown, no code fences, no explana
     return JSON.parse(jsonStr) as T
   } catch (e) {
     console.error('Failed to parse JSON response:', jsonStr.slice(0, 200))
-    throw new Error('Invalid JSON response from Claude')
+    throw new Error('Invalid JSON response from Gemini')
   }
 }
+

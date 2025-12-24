@@ -13,7 +13,7 @@ Like Duolingo, but for coding — with real depth. Each session is designed for 
 - **Editor:** CodeMirror 6
 - **State:** Zustand (with localStorage persistence)
 - **Backend:** Supabase (auth, database, edge functions)
-- **AI:** Claude API for contextual hints
+- **AI:** Gemini API for contextual hints
 
 ## Current Status
 

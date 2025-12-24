@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { z } from 'zod'
-import { completeWithJSON } from '../services/claude.js'
+import { completeWithJSON } from '../services/gemini.js'
 import {
   GOAL_ANALYSIS_SYSTEM_PROMPT,
   buildGoalAnalysisPrompt,
