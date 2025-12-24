@@ -47,6 +47,11 @@ let greeting: string = \`Hello, \${name}!\`;
         language: 'typescript',
         highlight: [7],
       },
+      concept: {
+        id: 'template-literals',
+        name: 'Template Literals',
+        description: 'Using backticks and ${} syntax to create strings with embedded expressions'
+      },
     },
     {
       id: 'step-3-exercise-strings',
@@ -88,6 +93,11 @@ let fullGreeting: string = \`Hello, \${firstName}!\`;`,
         'Backticks look like this: `',
         'Inside backticks, use ${variableName} to insert a variable',
       ],
+      concept: {
+        id: 'template-literals',
+        name: 'Template Literals',
+        description: 'Using backticks and ${} syntax to create strings with embedded expressions'
+      },
     },
     {
       id: 'step-4-numbers',
@@ -148,6 +158,11 @@ let total: number = price * quantity;`,
         'Use * for multiplication',
         'You can use other variables in calculations',
       ],
+      concept: {
+        id: 'number-operations',
+        name: 'Number Operations',
+        description: 'Performing arithmetic operations with number types'
+      },
     },
     {
       id: 'step-6-booleans',
@@ -210,6 +225,11 @@ let excellent: boolean = score >= 90;`,
         'Comparisons return true or false automatically',
         '75 is >= 60 but not >= 90',
       ],
+      concept: {
+        id: 'comparison-operators',
+        name: 'Comparison Operators',
+        description: 'Using >=, <=, >, <, ===, !== to compare values and create boolean results'
+      },
     },
     {
       id: 'step-8-quiz',

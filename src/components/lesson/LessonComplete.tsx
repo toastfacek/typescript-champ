@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { Lesson } from '@/types'
 import { Button, Card } from '@/components/ui'
 import { XPCounter } from '@/components/gamification'
+import { ConceptCard } from './ConceptCard'
 import confetti from 'canvas-confetti'
 
 interface LessonCompleteProps {
@@ -14,6 +15,17 @@ export function LessonComplete({ lesson, hintsUsed, onContinue }: LessonComplete
   const bonusMultiplier = hintsUsed === 0 ? 1.5 : 1
   const xpEarned = Math.round(lesson.xpReward * bonusMultiplier)
   const isPerfect = hintsUsed === 0
+
+  // Extract unique concepts from lesson steps
+  const concepts = useMemo(() => {
+    const conceptMap = new Map<string, { id: string; name: string; description: string }>()
+    lesson.steps.forEach(step => {
+      if (step.concept && !conceptMap.has(step.concept.id)) {
+        conceptMap.set(step.concept.id, step.concept)
+      }
+    })
+    return Array.from(conceptMap.values())
+  }, [lesson.steps])
 
   // Celebration confetti
   useEffect(() => {
@@ -115,6 +127,27 @@ export function LessonComplete({ lesson, hintsUsed, onContinue }: LessonComplete
         <div className="flex justify-center mb-8">
           <XPCounter size="lg" showLevel={true} />
         </div>
+
+        {/* Focused Practice Concepts */}
+        {concepts.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-heading font-semibold text-surface-100 mb-3 text-center">
+              Want more practice?
+            </h2>
+            <p className="text-sm text-surface-400 mb-4 text-center">
+              Dive deeper into the concepts you just learned
+            </p>
+            <div className="grid grid-cols-1 gap-3">
+              {concepts.map((concept) => (
+                <ConceptCard
+                  key={concept.id}
+                  concept={concept}
+                  lessonId={lesson.id}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Continue Button */}
         <Button variant="primary" size="lg" onClick={onContinue} className="w-full" glow>

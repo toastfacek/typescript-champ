@@ -23,6 +23,11 @@ export type LessonStep =
 interface BaseStep {
   id: string
   order: number
+  concept?: {
+    id: string           // e.g., "template-literals"
+    name: string         // e.g., "Template Literals"
+    description: string  // Brief description for AI context
+  }
 }
 
 // Tutorial/explanation content

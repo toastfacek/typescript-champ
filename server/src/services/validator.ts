@@ -205,3 +205,82 @@ export function validateQuiz(exercise: unknown): ValidationResult {
     warnings
   }
 }
+
+export function validateFocusedPracticeMiniLesson(miniLesson: unknown): ValidationResult {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  if (!miniLesson || typeof miniLesson !== 'object') {
+    return {
+      valid: false,
+      errors: ['Mini-lesson must be an object'],
+      warnings: []
+    }
+  }
+
+  const data = miniLesson as any
+
+  // Validate instruction
+  if (!data.instruction || typeof data.instruction !== 'object') {
+    errors.push('Mini-lesson must have an instruction object')
+  } else {
+    if (!data.instruction.title || typeof data.instruction.title !== 'string') {
+      errors.push('Instruction must have a title')
+    }
+    if (!data.instruction.content || typeof data.instruction.content !== 'string') {
+      errors.push('Instruction must have content')
+    }
+    if (data.instruction.codeExample) {
+      const code = data.instruction.codeExample.code || ''
+      for (const pattern of DANGEROUS_PATTERNS) {
+        if (pattern.test(code)) {
+          errors.push(`Security: Instruction code example contains forbidden pattern: ${pattern.source}`)
+        }
+      }
+    }
+  }
+
+  // Validate exercises array
+  if (!Array.isArray(data.exercises) || data.exercises.length < 2 || data.exercises.length > 3) {
+    errors.push('Mini-lesson must have 2-3 exercises')
+  } else {
+    let hasCodeExercise = false
+    for (let i = 0; i < data.exercises.length; i++) {
+      const exercise = data.exercises[i]
+      if (!exercise.type || !['code-exercise', 'fill-in-blank', 'quiz'].includes(exercise.type)) {
+        errors.push(`Exercise ${i + 1} must have a valid type`)
+        continue
+      }
+
+      if (exercise.type === 'code-exercise') {
+        hasCodeExercise = true
+        const result = validateCodeExercise(exercise)
+        errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
+        warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
+      } else if (exercise.type === 'fill-in-blank') {
+        const result = validateFillBlank(exercise)
+        errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
+        warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
+      } else if (exercise.type === 'quiz') {
+        const result = validateQuiz(exercise)
+        errors.push(...result.errors.map(e => `Exercise ${i + 1}: ${e}`))
+        warnings.push(...result.warnings.map(w => `Exercise ${i + 1}: ${w}`))
+      }
+    }
+
+    if (!hasCodeExercise) {
+      warnings.push('Mini-lesson should include at least one code-exercise')
+    }
+  }
+
+  // Validate estimatedMinutes
+  if (typeof data.estimatedMinutes !== 'number' || data.estimatedMinutes < 1) {
+    warnings.push('estimatedMinutes should be a positive number')
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  }
+}

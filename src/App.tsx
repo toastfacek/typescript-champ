@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { Header } from '@/components/navigation'
-import { HomePage, CurriculumPage, ProfilePage, LessonPage, PracticePage, PracticeSessionPage, AuthPage } from '@/pages'
+import { HomePage, CurriculumPage, ProfilePage, LessonPage, PracticePage, PracticeSessionPage, FocusedPracticePage, AuthPage } from '@/pages'
 import { useEffect } from 'react'
 import { useStore } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
@@ -74,6 +74,7 @@ export default function App() {
           <Route path="/curriculum" element={<CurriculumPage />} />
           <Route path="/practice" element={<PracticePage />} />
           <Route path="/practice/session" element={<PracticeSessionPage />} />
+          <Route path="/practice/focused/:conceptId" element={<FocusedPracticePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/lesson/:lessonId" element={<LessonPage />} />
           <Route path="/auth" element={<AuthPage />} />

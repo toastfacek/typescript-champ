@@ -6,6 +6,7 @@ import type {
   ThemeContext
 } from '@/types/practice'
 import type { GoalAnalysisResponse, GoalExample } from '@/types/learning-path'
+import type { GenerateFocusedPracticeRequest, GenerateFocusedPracticeResponse } from '@/types/focused-practice'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -88,6 +89,15 @@ export async function generateExerciseBatch(params: {
   return fetchJson<BatchGenerateResponse>('/api/exercise/generate-batch', {
     method: 'POST',
     body: JSON.stringify({ count: 5, ...params })
+  })
+}
+
+// Focused Practice API
+
+export async function generateFocusedPractice(params: GenerateFocusedPracticeRequest): Promise<GenerateFocusedPracticeResponse> {
+  return fetchJson<GenerateFocusedPracticeResponse>('/api/exercise/generate-focused', {
+    method: 'POST',
+    body: JSON.stringify(params)
   })
 }
 

@@ -1,3 +1,4 @@
 export * from './lesson'
 export * from './user'
 export * from './gamification'
+export * from './focused-practice'

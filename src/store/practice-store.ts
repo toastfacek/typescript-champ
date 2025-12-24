@@ -8,7 +8,13 @@ import type {
   PracticeStats,
   MasteryLevel
 } from '@/types/practice'
-import { generateExercise as apiGenerateExercise, generateExerciseBatch } from '@/services/api-client'
+import type {
+  FocusedPracticeSession,
+  FocusedPracticeMiniLesson,
+  ConceptProgress,
+  Concept
+} from '@/types/focused-practice'
+import { generateExercise as apiGenerateExercise, generateExerciseBatch, generateFocusedPractice } from '@/services/api-client'
 import { syncPracticeStats } from '@/services/supabase-sync'
 import { useStore } from './index'
 
@@ -20,8 +26,17 @@ interface PracticeState {
   isGenerating: boolean
   generationError: string | null
 
+  // Focused practice session
+  currentFocusedSession: FocusedPracticeSession | null
+  focusedMiniLesson: FocusedPracticeMiniLesson | null
+  focusedCurrentStepIndex: number
+  focusedCompletedSteps: Set<string>
+  isGeneratingFocused: boolean
+  focusedGenerationError: string | null
+
   // Stats (persisted)
   practiceStats: Record<PracticeTopic, PracticeStats>
+  focusedPracticeStats: Record<string, ConceptProgress>
 
   // Actions
   startSession: (
@@ -35,6 +50,13 @@ interface PracticeState {
   completeExercise: (success: boolean, timeSeconds: number) => void
   getStats: (topic: PracticeTopic) => PracticeStats
   resetStats: () => void
+
+  // Focused practice actions
+  startFocusedSession: (concept: Concept, lessonId: string | null, difficulty?: 'easy' | 'medium' | 'hard') => Promise<void>
+  endFocusedSession: () => void
+  completeFocusedStep: (stepId: string) => void
+  setFocusedCurrentStepIndex: (index: number) => void
+  getConceptProgress: (conceptId: string) => ConceptProgress | null
 }
 
 const defaultStats = (topic: PracticeTopic): PracticeStats => ({
@@ -76,6 +98,15 @@ export const usePracticeStore = create<PracticeState>()(
       isGenerating: false,
       generationError: null,
       practiceStats: {} as Record<PracticeTopic, PracticeStats>,
+      
+      // Focused practice state
+      currentFocusedSession: null,
+      focusedMiniLesson: null,
+      focusedCurrentStepIndex: 0,
+      focusedCompletedSteps: new Set<string>(),
+      isGeneratingFocused: false,
+      focusedGenerationError: null,
+      focusedPracticeStats: {},
 
       // Actions
       startSession: (topic, difficulty, exerciseType) => {
@@ -282,12 +313,132 @@ export const usePracticeStore = create<PracticeState>()(
 
       resetStats: () => {
         set({ practiceStats: {} as Record<PracticeTopic, PracticeStats> })
+      },
+
+      // Focused practice actions
+      startFocusedSession: async (concept, lessonId, difficulty = 'medium') => {
+        set({
+          isGeneratingFocused: true,
+          focusedGenerationError: null,
+          focusedCurrentStepIndex: 0,
+          focusedCompletedSteps: new Set<string>()
+        })
+
+        try {
+          const response = await generateFocusedPractice({
+            concept,
+            difficulty,
+            lessonContext: lessonId ? {
+              lessonId,
+              lessonTitle: 'Lesson', // Could be enhanced to fetch actual title
+              relatedConcepts: []
+            } : undefined
+          })
+
+          if (!response.success || !response.miniLesson) {
+            throw new Error(response.error || 'Failed to generate focused practice')
+          }
+
+          const session: FocusedPracticeSession = {
+            id: `focused-${Date.now()}`,
+            conceptId: concept.id,
+            conceptName: concept.name,
+            lessonId,
+            startedAt: new Date(),
+            stepsCompleted: 0,
+            totalSteps: response.miniLesson.steps.length
+          }
+
+          set({
+            currentFocusedSession: session,
+            focusedMiniLesson: response.miniLesson,
+            isGeneratingFocused: false,
+            focusedCurrentStepIndex: 0
+          })
+        } catch (error) {
+          set({
+            isGeneratingFocused: false,
+            focusedGenerationError: error instanceof Error ? error.message : 'Unknown error'
+          })
+        }
+      },
+
+      endFocusedSession: () => {
+        const { currentFocusedSession, focusedPracticeStats } = get()
+        
+        if (currentFocusedSession) {
+          // Update concept progress
+          const conceptId = currentFocusedSession.conceptId
+          const currentProgress = focusedPracticeStats[conceptId] || {
+            conceptId,
+            conceptName: currentFocusedSession.conceptName,
+            sessionsCompleted: 0,
+            totalExercisesCompleted: 0,
+            lastPracticed: null,
+            masteryLevel: 'learning' as const
+          }
+
+          const newProgress: ConceptProgress = {
+            ...currentProgress,
+            sessionsCompleted: currentProgress.sessionsCompleted + 1,
+            totalExercisesCompleted: currentProgress.totalExercisesCompleted + currentFocusedSession.stepsCompleted,
+            lastPracticed: new Date().toISOString(),
+            masteryLevel: currentProgress.totalExercisesCompleted + currentFocusedSession.stepsCompleted >= 5
+              ? 'practicing' as const
+              : currentProgress.masteryLevel
+          }
+
+          set({
+            focusedPracticeStats: {
+              ...focusedPracticeStats,
+              [conceptId]: newProgress
+            }
+          })
+        }
+
+        // Clear session after brief delay
+        setTimeout(() => {
+          set({
+            currentFocusedSession: null,
+            focusedMiniLesson: null,
+            focusedCurrentStepIndex: 0,
+            focusedCompletedSteps: new Set<string>()
+          })
+        }, 100)
+      },
+
+      completeFocusedStep: (stepId) => {
+        const { currentFocusedSession, focusedCompletedSteps } = get()
+        if (!currentFocusedSession) return
+
+        const newCompleted = new Set(focusedCompletedSteps)
+        newCompleted.add(stepId)
+
+        const updatedSession: FocusedPracticeSession = {
+          ...currentFocusedSession,
+          stepsCompleted: newCompleted.size
+        }
+
+        set({
+          currentFocusedSession: updatedSession,
+          focusedCompletedSteps: newCompleted
+        })
+      },
+
+      setFocusedCurrentStepIndex: (index) => {
+        set({ focusedCurrentStepIndex: index })
+      },
+
+      getConceptProgress: (conceptId) => {
+        const { focusedPracticeStats } = get()
+        return focusedPracticeStats[conceptId] || null
       }
     }),
     {
       name: 'typescript-champ-practice',
       partialize: (state) => ({
-        practiceStats: state.practiceStats
+        practiceStats: state.practiceStats,
+        focusedPracticeStats: state.focusedPracticeStats
       })
     }
   )

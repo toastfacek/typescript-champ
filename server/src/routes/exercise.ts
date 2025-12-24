@@ -4,7 +4,8 @@ import { completeWithJSON } from '../services/claude.js'
 import {
   validateCodeExercise,
   validateFillBlank,
-  validateQuiz
+  validateQuiz,
+  validateFocusedPracticeMiniLesson
 } from '../services/validator.js'
 import {
   CODE_EXERCISE_SYSTEM_PROMPT,
@@ -18,6 +19,10 @@ import {
   QUIZ_SYSTEM_PROMPT,
   buildQuizPrompt
 } from '../prompts/quiz.js'
+import {
+  FOCUSED_PRACTICE_SYSTEM_PROMPT,
+  buildFocusedPracticePrompt
+} from '../prompts/focused-practice.js'
 
 export const exerciseRouter = Router()
 
@@ -343,6 +348,140 @@ async function generateSingleExercise(
     generatedAt: new Date().toISOString()
   }
 }
+
+// Generate focused practice mini-lesson
+const GenerateFocusedPracticeSchema = z.object({
+  concept: z.object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    description: z.string().min(1)
+  }),
+  difficulty: z.enum(['easy', 'medium', 'hard']),
+  lessonContext: z.object({
+    lessonId: z.string(),
+    lessonTitle: z.string(),
+    relatedConcepts: z.array(z.string()).optional()
+  }).optional()
+})
+
+exerciseRouter.post('/generate-focused', async (req, res) => {
+  try {
+    const parseResult = GenerateFocusedPracticeSchema.safeParse(req.body)
+    if (!parseResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid request',
+        details: parseResult.error.errors
+      })
+    }
+
+    const { concept, difficulty, lessonContext } = parseResult.data
+
+    // Build prompt
+    const userPrompt = buildFocusedPracticePrompt(concept, difficulty, lessonContext)
+
+    // Generate mini-lesson from Claude
+    const startTime = Date.now()
+    const generated = await completeWithJSON(userPrompt, {
+      systemPrompt: FOCUSED_PRACTICE_SYSTEM_PROMPT,
+      temperature: 0.8
+    })
+    const generationTimeMs = Date.now() - startTime
+
+    // Validate generated content
+    const validation = validateFocusedPracticeMiniLesson(generated)
+
+    if (!validation.valid) {
+      console.error('Generated mini-lesson failed validation:', validation.errors)
+      return res.status(422).json({
+        success: false,
+        error: 'Generated mini-lesson failed validation',
+        validationErrors: validation.errors
+      })
+    }
+
+    const data = generated as any
+
+    // Build instruction step
+    const instructionStep = {
+      id: `instruction-${Date.now()}`,
+      order: 1,
+      type: 'instruction' as const,
+      title: data.instruction.title,
+      content: data.instruction.content,
+      codeExample: data.instruction.codeExample
+    }
+
+    // Build exercise steps
+    const exerciseSteps = data.exercises.map((exercise: any, index: number) => {
+      const stepId = `exercise-${Date.now()}-${index}`
+      const order = index + 2
+
+      if (exercise.type === 'code-exercise') {
+        return {
+          id: stepId,
+          order,
+          type: 'code-exercise' as const,
+          title: exercise.title,
+          instructions: exercise.instructions,
+          starterCode: exercise.starterCode,
+          solutionCode: exercise.solutionCode,
+          testCases: exercise.testCases,
+          hints: exercise.hints
+        }
+      } else if (exercise.type === 'fill-in-blank') {
+        return {
+          id: stepId,
+          order,
+          type: 'fill-in-blank' as const,
+          title: exercise.title,
+          instructions: exercise.instructions,
+          codeTemplate: exercise.codeTemplate,
+          blanks: exercise.blanks,
+          hints: exercise.hints
+        }
+      } else if (exercise.type === 'quiz') {
+        return {
+          id: stepId,
+          order,
+          type: 'quiz' as const,
+          title: exercise.title,
+          question: exercise.question,
+          codeContext: exercise.codeContext,
+          options: exercise.options,
+          explanation: exercise.explanation
+        }
+      }
+      return null
+    }).filter(Boolean)
+
+    // Combine all steps
+    const allSteps = [instructionStep, ...exerciseSteps]
+
+    res.json({
+      success: true,
+      miniLesson: {
+        concept,
+        steps: allSteps,
+        estimatedMinutes: data.estimatedMinutes || 10
+      },
+      validation: {
+        valid: true,
+        warnings: validation.warnings
+      },
+      metadata: {
+        generationTimeMs,
+        modelUsed: 'claude-sonnet-4-20250514'
+      }
+    })
+  } catch (error) {
+    console.error('Focused practice generation error:', error)
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+})
 
 // Get available topics
 exerciseRouter.get('/topics', (req, res) => {
