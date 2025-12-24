@@ -50,6 +50,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
+        data-card-variant={variant}
         className={clsx(
           'rounded-2xl border',
           variantStyles[variant],

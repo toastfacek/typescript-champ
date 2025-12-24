@@ -83,7 +83,26 @@
 }
 
 [data-theme="light"] .text-surface-500 {
-  color: #64748b !important; /* surface-500 */
+  color: #475569 !important; /* surface-600 for better contrast */
+}
+
+/* Stats card text overrides for better readability in light mode */
+[data-theme="light"] [data-card-variant="gradient"] .text-surface-500 {
+  color: #475569 !important; /* surface-600 - darker for better contrast */
+}
+
+[data-theme="light"] [data-card-variant="gradient"] .text-surface-100 {
+  color: #0f172a !important; /* surface-900 - dark text on light background */
+}
+
+/* Gold text colors for better contrast in light mode on light cards */
+[data-theme="light"] [data-card-variant="gradient"] .text-gold-400 {
+  color: #d97706 !important; /* gold-600 - darker gold for better contrast */
+}
+
+/* Progress bar backgrounds in light mode on gradient cards */
+[data-theme="light"] [data-card-variant="gradient"] .bg-surface-700 {
+  background-color: #e2e8f0 !important; /* surface-200 - light gray for progress track */
 }
 
 [data-theme="light"] .text-surface-600 {
@@ -205,6 +224,17 @@
 
 [data-theme="light"] .card-hover:hover {
   background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(6, 182, 212, 0.3) !important;
+}
+
+/* Gradient variant card overrides for light mode */
+[data-theme="light"] [data-card-variant="gradient"] {
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95)) !important;
+  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 with more opacity */
+}
+
+[data-theme="light"] [data-card-variant="gradient"]:hover {
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 1), rgba(248, 250, 252, 1)) !important;
   border-color: rgba(6, 182, 212, 0.3) !important;
 }
 
