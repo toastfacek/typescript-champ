@@ -362,22 +362,12 @@ const GenerateFocusedPracticeSchema = z.object({
 })
 
 exerciseRouter.post('/generate-focused', async (req, res) => {
-  // #region agent log
-  const fs = require('fs')
-  const logPath = '/Users/jesselee/Projects/typescript-champ/.cursor/debug.log'
-  try {
-    fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:entry',message:'Request received',data:{body:req.body},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A-B'})+'\n')
-  } catch {}
-  // #endregion
+  console.log('[DEBUG] generate-focused: Request received', JSON.stringify(req.body))
 
   try {
     const parseResult = GenerateFocusedPracticeSchema.safeParse(req.body)
     if (!parseResult.success) {
-      // #region agent log
-      try {
-        fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:parse-error',message:'Request validation failed',data:{errors:parseResult.error.errors},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A'})+'\n')
-      } catch {}
-      // #endregion
+      console.log('[DEBUG] generate-focused: Request validation failed', parseResult.error.errors)
       return res.status(400).json({
         success: false,
         error: 'Invalid request',
@@ -398,29 +388,26 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
     })
     const generationTimeMs = Date.now() - startTime
 
-    // #region agent log
-    try {
-      const generatedAny = generated as any
-      fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:generated',message:'AI generated content received',data:{hasInstruction:!!generatedAny?.instruction,exercisesCount:Array.isArray(generatedAny?.exercises)?generatedAny.exercises.length:0,generatedKeys:Object.keys(generatedAny||{})},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
-    } catch {}
-    // #endregion
+    const generatedAny = generated as any
+    console.log('[DEBUG] generate-focused: AI generated content', {
+      hasInstruction: !!generatedAny?.instruction,
+      exercisesCount: Array.isArray(generatedAny?.exercises) ? generatedAny.exercises.length : 0,
+      generatedKeys: Object.keys(generatedAny || {})
+    })
 
     // Validate generated content
     const validation = validateFocusedPracticeMiniLesson(generated)
 
-    // #region agent log
-    try {
-      fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:validation',message:'Validation result',data:{valid:validation.valid,errors:validation.errors,warnings:validation.warnings,errorsCount:validation.errors.length},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
-    } catch {}
-    // #endregion
+    console.log('[DEBUG] generate-focused: Validation result', {
+      valid: validation.valid,
+      errorsCount: validation.errors.length,
+      errors: validation.errors,
+      warnings: validation.warnings
+    })
 
     if (!validation.valid) {
       console.error('Generated mini-lesson failed validation:', validation.errors)
-      // #region agent log
-      try {
-        fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:validation-failed',message:'Returning 422 with validation errors',data:{validationErrors:validation.errors,fullGenerated:JSON.stringify(generated).substring(0,500)},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
-      } catch {}
-      // #endregion
+      console.log('[DEBUG] generate-focused: First 500 chars of generated content:', JSON.stringify(generated).substring(0, 500))
       return res.status(422).json({
         success: false,
         error: 'Generated mini-lesson failed validation',
