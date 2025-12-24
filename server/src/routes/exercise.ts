@@ -400,8 +400,7 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
 
     // #region agent log
     try {
-      const generatedAny = generated as any
-      fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:generated',message:'AI generated content received',data:{hasInstruction:!!generatedAny?.instruction,exercisesCount:Array.isArray(generatedAny?.exercises)?generatedAny.exercises.length:0,generatedKeys:Object.keys(generatedAny||{})},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
+      fs.appendFileSync(logPath, JSON.stringify({location:'exercise.ts:generate-focused:generated',message:'AI generated content received',data:{hasInstruction:!!generated?.instruction,exercisesCount:Array.isArray(generated?.exercises)?generated.exercises.length:0,generatedKeys:Object.keys(generated||{})},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})+'\n')
     } catch {}
     // #endregion
 
