@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Card, ProgressBar } from '@/components/ui'
 import { XPCounter, StreakBadge, ContributionGrid } from '@/components/gamification'
@@ -15,7 +15,13 @@ export function HomePage() {
   const progress = useStore((state: AppState) => state.progress)
   const lessonProgress = useStore((state: AppState) => state.lessonProgress)
   const activityHistory = useStore((state: AppState) => state.activityHistory)
+  const backfillActivityHistory = useStore((state: AppState) => state.backfillActivityHistory)
   const recapCache = useRecapStore((state) => state.getValidCache())
+
+  // Backfill activity history from existing lesson completions on mount
+  useEffect(() => {
+    backfillActivityHistory()
+  }, [backfillActivityHistory])
 
   const completedCount = progress?.lessonsCompleted.length || 0
   const totalLessons = curriculum.modules.reduce(
@@ -55,7 +61,7 @@ export function HomePage() {
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
+      <section className="relative pt-20 pb-8 px-4 overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
@@ -135,7 +141,7 @@ export function HomePage() {
       </section>
 
       {/* Contribution Grid */}
-      <section className="py-8 px-4">
+      <section className="pt-4 pb-8 px-4">
         <div className="max-w-4xl mx-auto">
           <Card padding="lg">
             <ContributionGrid activityHistory={activityHistory} />

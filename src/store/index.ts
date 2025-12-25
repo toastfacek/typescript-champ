@@ -27,6 +27,7 @@ export interface AppState {
   redoLesson: (lessonId: string) => void
   recordActivity: () => void
   getActivityForDate: (date: string) => number
+  backfillActivityHistory: () => void
   setLoading: (loading: boolean) => void
   toggleSidebar: () => void
   reset: () => void
@@ -143,6 +144,37 @@ export const useStore = create<AppState>()(
       getActivityForDate: (date: string): number => {
         return useStore.getState().activityHistory[date] || 0
       },
+
+      backfillActivityHistory: () =>
+        set((state) => {
+          // Only backfill if activityHistory is empty or very sparse
+          const hasActivity = Object.keys(state.activityHistory).length > 0
+          if (hasActivity) return state
+
+          const newActivityHistory: ActivityHistory = { ...state.activityHistory }
+
+          // Backfill from lesson progress completedAt dates
+          for (const [, lessonProgress] of Object.entries(state.lessonProgress)) {
+            if (lessonProgress.status === 'completed' && lessonProgress.completedAt) {
+              const completedDate = new Date(lessonProgress.completedAt)
+              const dateStr = completedDate.toISOString().split('T')[0]
+              newActivityHistory[dateStr] = (newActivityHistory[dateStr] || 0) + 1
+            }
+          }
+
+          // Sync to Supabase if user is logged in
+          const userId = state.user?.id
+          if (userId && Object.keys(newActivityHistory).length > 0) {
+            // Sync all backfilled dates
+            for (const [date, count] of Object.entries(newActivityHistory)) {
+              syncDailyActivity(userId, date, count).catch(err =>
+                console.error('Sync error:', err)
+              )
+            }
+          }
+
+          return { activityHistory: newActivityHistory }
+        }),
 
       completeLesson: (lessonId: string, xpEarned: number) =>
         set((state) => {
