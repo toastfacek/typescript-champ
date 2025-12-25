@@ -1,5 +1,5 @@
 import type { LessonProgress } from '@/types'
-import type { PracticeStats, MasteryLevel } from '@/types/practice'
+import type { PracticeStats } from '@/types/practice'
 import type { ConceptProgress } from '@/types/focused-practice'
 import type { ChallengeScore } from '@/types/recap'
 import { lessons } from '@/content/curriculum'
@@ -21,7 +21,7 @@ export function calculateChallengeScore(
     return null
   }
 
-  const lesson = lessons.find(l => l.id === lessonId)
+  const lesson = lessons[lessonId]
   if (!lesson) {
     return null
   }
@@ -39,12 +39,12 @@ export function calculateChallengeScore(
   const attemptMultiplier = 1 + (attempts - 1) * 0.3
 
   // Difficulty weight: beginner=1.0, intermediate=1.2, advanced=1.5
-  const difficultyWeights = {
+  const difficultyWeights: Record<string, number> = {
     beginner: 1.0,
     intermediate: 1.2,
     advanced: 1.5
   }
-  const difficultyWeight = difficultyWeights[lesson.difficulty]
+  const difficultyWeight = difficultyWeights[lesson.difficulty] || 1.0
 
   // Mastery boost: check if concept needs more practice
   let masteryBoost = 1.0
@@ -55,7 +55,7 @@ export function calculateChallengeScore(
     const lessonTags = lesson.tags || []
     for (const [topic, stats] of Object.entries(practiceStats)) {
       // Check if any lesson tag matches the topic
-      if (lessonTags.some(tag => tag.toLowerCase().includes(topic.toLowerCase()) || 
+      if (lessonTags.some((tag: string) => tag.toLowerCase().includes(topic.toLowerCase()) || 
                                 topic.toLowerCase().includes(tag.toLowerCase()))) {
         if (stats.masteryLevel === 'learning' || stats.masteryLevel === 'practicing') {
           masteryBoost = 1.3

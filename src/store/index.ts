@@ -189,13 +189,8 @@ export const useStore = create<AppState>()(
               const { calculateChallengeScore } = await import('@/lib/challenge-scorer')
               const { lessons } = await import('@/content/curriculum')
               
-              const lesson = lessons.find(l => l.id === lessonId)
+              const lesson = lessons[lessonId]
               if (!lesson) return
-
-              const updatedLessonProgress = {
-                ...state.lessonProgress,
-                [lessonId]: newLessonProgress,
-              }
 
               const challengeScore = calculateChallengeScore(
                 lessonId,

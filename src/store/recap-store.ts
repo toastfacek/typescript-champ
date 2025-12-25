@@ -3,9 +3,7 @@ import { persist } from 'zustand/middleware'
 import type { RecapCache, GenerateRecapRequest } from '@/types/recap'
 import type { Lesson } from '@/types/lesson'
 import { generateRecap } from '@/services/api-client'
-import { findMostChallengingLesson } from '@/lib/challenge-scorer'
 import { useStore } from './index'
-import { usePracticeStore } from './practice-store'
 
 interface RecapState {
   cache: RecapCache | null
@@ -90,7 +88,7 @@ export const useRecapStore = create<RecapState>()(
         try {
           // Find the lesson object
           const { lessons } = await import('@/content/curriculum')
-          const lessonObj = lessons.find(l => l.id === cache.lessonId)
+          const lessonObj = lessons[cache.lessonId]
           if (!lessonObj) return
 
           const request: GenerateRecapRequest = {

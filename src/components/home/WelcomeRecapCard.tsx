@@ -5,9 +5,7 @@ import { CodeExerciseStep } from '@/components/lesson/CodeExerciseStep'
 import { FillInBlankStep } from '@/components/lesson/FillInBlankStep'
 import { QuizStep } from '@/components/lesson/QuizStep'
 import type { RecapCache } from '@/types/recap'
-import type { PracticeExercise } from '@/types/practice'
 import { useRecapStore } from '@/store/recap-store'
-import { useStore } from '@/store'
 import { curriculum } from '@/content/curriculum'
 import { lessons } from '@/content/curriculum'
 
@@ -19,7 +17,6 @@ export function WelcomeRecapCard({ cache }: WelcomeRecapCardProps) {
   const [isCompleted, setIsCompleted] = useState(false)
   const [showNextLesson, setShowNextLesson] = useState(false)
   const completeRecap = useRecapStore((state) => state.completeRecap)
-  const lessonProgress = useStore((state) => state.lessonProgress)
 
   const exercise = cache.exercise
   const step = exercise.step
@@ -58,8 +55,8 @@ export function WelcomeRecapCard({ cache }: WelcomeRecapCardProps) {
   }
 
   const nextLessonId = findNextLesson(cache.lessonId)
-  const nextLesson = nextLessonId ? lessons.find(l => l.id === nextLessonId) : null
-  const lesson = lessons.find(l => l.id === cache.lessonId)
+  const nextLesson = nextLessonId ? lessons[nextLessonId] : null
+  const lesson = lessons[cache.lessonId]
 
   return (
     <Card padding="lg" className="mb-8">

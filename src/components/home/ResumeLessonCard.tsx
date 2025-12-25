@@ -10,7 +10,7 @@ interface ResumeLessonCardProps {
 }
 
 export function ResumeLessonCard({ lessonId, progress }: ResumeLessonCardProps) {
-  const lesson = lessons.find(l => l.id === lessonId)
+  const lesson = lessons[lessonId]
   if (!lesson) return null
 
   // Find which module this lesson belongs to
