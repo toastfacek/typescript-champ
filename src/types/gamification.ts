@@ -87,4 +87,4 @@ export interface DailyActivity {
 
 export type ActivityHistory = Record<string, number> // date string -> activity count
 
-export type ContributionViewMode = '1week' | '1month' | '3months' | '6months' | '12months'
+export type ContributionViewMode = '1week' | '1month' | '1quarter' | '12months'

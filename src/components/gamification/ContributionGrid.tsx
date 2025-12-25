@@ -76,12 +76,8 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
         start.setMonth(start.getMonth() - 1)
         start.setDate(1)
         break
-      case '3months':
+      case '1quarter':
         start.setMonth(start.getMonth() - 3)
-        start.setDate(1)
-        break
-      case '6months':
-        start.setMonth(start.getMonth() - 6)
         start.setDate(1)
         break
       case '12months':
@@ -149,9 +145,27 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
   const weeksData = useMemo(() => {
     if (variant === 'compact') return []
     
+    const today = new Date()
+    today.setHours(23, 59, 59, 999)
+    
     const weeks: GridDay[][] = []
     for (let i = 0; i < gridData.length; i += 7) {
-      weeks.push(gridData.slice(i, i + 7))
+      const week = gridData.slice(i, i + 7)
+      
+      // Ensure week always has 7 days - pad with future days if needed
+      while (week.length < 7) {
+        const lastDay = week[week.length - 1]?.date
+        if (lastDay) {
+          const nextDay = new Date(lastDay)
+          nextDay.setDate(nextDay.getDate() + 1)
+          // Mark as future day (date > today)
+          week.push({ date: nextDay, count: 0, intensity: 'none' })
+        } else {
+          break
+        }
+      }
+      
+      weeks.push(week)
     }
     // Reverse so newest week is at top
     return weeks.reverse()
@@ -265,7 +279,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
       {/* View Mode Toggle */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-surface-100">Learning Activity</h3>
-        <div className="flex gap-1 bg-surface-800 rounded-lg p-1 flex-wrap">
+        <div className="flex gap-1 bg-surface-800 rounded-lg p-1">
           <button
             onClick={() => setViewMode('1week')}
             className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
@@ -287,24 +301,14 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
             1M
           </button>
           <button
-            onClick={() => setViewMode('3months')}
+            onClick={() => setViewMode('1quarter')}
             className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-              viewMode === '3months'
+              viewMode === '1quarter'
                 ? 'bg-accent-500 text-surface-900'
                 : 'text-surface-400 hover:text-surface-200'
             }`}
           >
-            3M
-          </button>
-          <button
-            onClick={() => setViewMode('6months')}
-            className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
-              viewMode === '6months'
-                ? 'bg-accent-500 text-surface-900'
-                : 'text-surface-400 hover:text-surface-200'
-            }`}
-          >
-            6M
+            1Q
           </button>
           <button
             onClick={() => setViewMode('12months')}
@@ -350,8 +354,23 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
                   {/* Days in Week */}
                   <div className="flex gap-1 flex-1">
                     {week.map((day, dayIndex) => {
+                      const today = new Date()
+                      today.setHours(23, 59, 59, 999)
+                      const isFuture = day.date > today
                       const isInRange = day.date >= startDate && day.date <= endDate
+                      
                       if (!isInRange) {
+                        return (
+                          <div
+                            key={`${weekIndex}-${dayIndex}`}
+                            className="flex-1 aspect-square rounded"
+                            style={{ backgroundColor: 'transparent' }}
+                          />
+                        )
+                      }
+
+                      // Future days in current week - render as transparent
+                      if (isFuture) {
                         return (
                           <div
                             key={`${weekIndex}-${dayIndex}`}
