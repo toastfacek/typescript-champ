@@ -12,6 +12,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>
+  signInWithGoogle: () => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
 }
 
@@ -178,6 +179,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  async function signInWithGoogle() {
+    try {
+      const { error } = await authHelpers.signInWithGoogle()
+      if (error) {
+        return { error }
+      }
+      return { error: null }
+    } catch (error) {
+      return { error: error as Error }
+    }
+  }
+
   async function signOut() {
     await authHelpers.signOut()
 
@@ -202,6 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signIn,
     signInWithMagicLink,
+    signInWithGoogle,
     signOut,
   }
 
