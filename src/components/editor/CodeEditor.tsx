@@ -9,10 +9,6 @@ import { useTypeScriptWorker } from '@/lib/useTypeScriptWorker'
 import { DiagnosticCategory } from '@/lib/typescript-worker-singleton'
 import { useTheme } from '@/hooks/useTheme'
 
-// #region agent log
-fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CodeEditor.tsx:12',message:'CodeEditor module evaluated successfully (CodeMirror loaded)',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H1-H2'})}).catch(()=>{});
-// #endregion
-
 export interface CodeEditorProps {
   code: string
   onChange: (code: string) => void

@@ -82,6 +82,14 @@ export function CodeExerciseStep({
         return
       }
 
+      // If code ran successfully but has no output, show a success message
+      if (outputLogs.length === 0) {
+        outputLogs.push({
+          type: 'success',
+          content: 'Code executed successfully! (No output to display)',
+        })
+      }
+
       setOutput(outputLogs)
     } catch (err) {
       setOutput([{
@@ -91,7 +99,7 @@ export function CodeExerciseStep({
     }
 
     setIsRunning(false)
-  }, [code])
+  }, [code, isPython])
 
   // Run test assertions
   const runTests = useCallback(async () => {
