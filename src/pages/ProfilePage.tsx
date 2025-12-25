@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Card, ProgressBar, Badge, Button } from '@/components/ui'
-import { XPCounter, StreakBadge } from '@/components/gamification'
+import { XPCounter, StreakBadge, ContributionGrid } from '@/components/gamification'
 import { useStore } from '@/store'
 import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
@@ -13,6 +13,7 @@ export function ProfilePage() {
   const user = useStore((state: AppState) => state.user)
   const progress = useStore((state: AppState) => state.progress)
   const lessonProgress = useStore((state: AppState) => state.lessonProgress)
+  const activityHistory = useStore((state: AppState) => state.activityHistory)
 
   async function handleSignOut() {
     await signOut()
@@ -151,6 +152,11 @@ export function ProfilePage() {
             color="accent"
           />
         </div>
+      </Card>
+
+      {/* Learning Activity */}
+      <Card className="mb-8">
+        <ContributionGrid activityHistory={activityHistory} />
       </Card>
 
       {/* Achievements Preview */}

@@ -12,7 +12,7 @@ interface GridDay {
 }
 
 export function ContributionGrid({ activityHistory }: ContributionGridProps) {
-  const [viewMode, setViewMode] = useState<ContributionViewMode>('3months')
+  const [viewMode, setViewMode] = useState<ContributionViewMode>('1month')
   const [hoveredDay, setHoveredDay] = useState<GridDay | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
@@ -22,22 +22,30 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
     const end = new Date()
     end.setHours(23, 59, 59, 999)
     
-    let monthsBack: number
+    let start = new Date(end)
+    
     switch (viewMode) {
+      case '1week':
+        start.setDate(start.getDate() - 7)
+        break
+      case '1month':
+        start.setMonth(start.getMonth() - 1)
+        start.setDate(1)
+        break
       case '3months':
-        monthsBack = 3
+        start.setMonth(start.getMonth() - 3)
+        start.setDate(1)
         break
       case '6months':
-        monthsBack = 6
+        start.setMonth(start.getMonth() - 6)
+        start.setDate(1)
         break
       case '12months':
-        monthsBack = 12
+        start.setMonth(start.getMonth() - 12)
+        start.setDate(1)
         break
     }
-
-    const start = new Date(end)
-    start.setMonth(start.getMonth() - monthsBack)
-    start.setDate(1) // Start of month
+    
     start.setHours(0, 0, 0, 0)
 
     // Calculate number of weeks
@@ -157,10 +165,30 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
       {/* View Mode Toggle */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-surface-100">Your Learning Activity</h3>
-        <div className="flex gap-1 bg-surface-800 rounded-lg p-1">
+        <div className="flex gap-1 bg-surface-800 rounded-lg p-1 flex-wrap">
+          <button
+            onClick={() => setViewMode('1week')}
+            className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+              viewMode === '1week'
+                ? 'bg-accent-500 text-surface-900'
+                : 'text-surface-400 hover:text-surface-200'
+            }`}
+          >
+            1 week
+          </button>
+          <button
+            onClick={() => setViewMode('1month')}
+            className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
+              viewMode === '1month'
+                ? 'bg-accent-500 text-surface-900'
+                : 'text-surface-400 hover:text-surface-200'
+            }`}
+          >
+            1 month
+          </button>
           <button
             onClick={() => setViewMode('3months')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+            className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
               viewMode === '3months'
                 ? 'bg-accent-500 text-surface-900'
                 : 'text-surface-400 hover:text-surface-200'
@@ -170,7 +198,7 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
           </button>
           <button
             onClick={() => setViewMode('6months')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+            className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
               viewMode === '6months'
                 ? 'bg-accent-500 text-surface-900'
                 : 'text-surface-400 hover:text-surface-200'
@@ -180,7 +208,7 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
           </button>
           <button
             onClick={() => setViewMode('12months')}
-            className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+            className={`px-2 py-1.5 text-xs font-medium rounded transition-colors ${
               viewMode === '12months'
                 ? 'bg-accent-500 text-surface-900'
                 : 'text-surface-400 hover:text-surface-200'
