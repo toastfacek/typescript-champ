@@ -45,7 +45,7 @@ export function KeyConceptsPanel({ concepts }: KeyConceptsPanelProps) {
             />
           </svg>
           <span className="font-medium">Key Concepts</span>
-          <span className="px-2 py-0.5 bg-accent-500/20 text-accent-300 rounded-md text-xs font-semibold">
+          <span className="px-2 py-0.5 bg-accent-500/10 border border-accent-500/20 text-accent-400 rounded-lg text-xs font-semibold">
             {concepts.length}
           </span>
         </button>
@@ -62,7 +62,7 @@ export function KeyConceptsPanel({ concepts }: KeyConceptsPanelProps) {
                 />
               </svg>
               <h3 className="font-semibold text-surface-100">Key Concepts</h3>
-              <span className="px-2 py-0.5 bg-accent-500/20 text-accent-300 rounded-md text-xs font-semibold">
+              <span className="px-2 py-0.5 bg-accent-500/10 border border-accent-500/20 text-accent-400 rounded-lg text-xs font-semibold">
                 {concepts.length}
               </span>
             </div>

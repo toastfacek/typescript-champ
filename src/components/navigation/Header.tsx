@@ -47,7 +47,7 @@ export function Header() {
                     className={clsx(
                       'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200',
                       isActive
-                        ? 'bg-accent-500/20 text-accent-400'
+                        ? 'bg-accent-500/10 border border-accent-500/20 text-accent-400'
                         : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
                     )}
                   >
