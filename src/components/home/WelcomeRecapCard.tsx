@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState, Suspense, lazy } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, Button } from '@/components/ui'
-import { CodeExerciseStep } from '@/components/lesson/CodeExerciseStep'
-import { FillInBlankStep } from '@/components/lesson/FillInBlankStep'
-import { QuizStep } from '@/components/lesson/QuizStep'
 import type { RecapCache } from '@/types/recap'
 import { useRecapStore } from '@/store/recap-store'
 import { curriculum } from '@/content/curriculum'
 import { lessons } from '@/content/curriculum'
+
+// Lazy load step components to avoid bundling CodeMirror on homepage
+const CodeExerciseStep = lazy(() => import('@/components/lesson/CodeExerciseStep').then(m => ({ default: m.CodeExerciseStep })))
+const FillInBlankStep = lazy(() => import('@/components/lesson/FillInBlankStep').then(m => ({ default: m.FillInBlankStep })))
+const QuizStep = lazy(() => import('@/components/lesson/QuizStep').then(m => ({ default: m.QuizStep })))
 
 interface WelcomeRecapCardProps {
   cache: RecapCache
@@ -82,30 +84,42 @@ export function WelcomeRecapCard({ cache }: WelcomeRecapCardProps) {
         {/* Exercise */}
         {!isCompleted ? (
           <div className="border-t border-surface-700 pt-6">
-            {step.type === 'code-exercise' && (
-              <CodeExerciseStep
-                step={step}
-                lesson={lesson}
-                isComplete={false}
-                onComplete={handleComplete}
-                onHintUsed={handleHintUsed}
-              />
-            )}
-            {step.type === 'fill-in-blank' && (
-              <FillInBlankStep
-                step={step}
-                isComplete={false}
-                onComplete={handleComplete}
-                onHintUsed={handleHintUsed}
-              />
-            )}
-            {step.type === 'quiz' && (
-              <QuizStep
-                step={step}
-                isComplete={false}
-                onComplete={handleComplete}
-              />
-            )}
+            <Suspense fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="relative inline-block">
+                    <div className="w-8 h-8 border-4 border-surface-700 rounded-full" />
+                    <div className="absolute top-0 left-0 w-8 h-8 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+                  </div>
+                  <p className="mt-2 text-sm text-surface-500">Loading exercise...</p>
+                </div>
+              </div>
+            }>
+              {step.type === 'code-exercise' && (
+                <CodeExerciseStep
+                  step={step}
+                  lesson={lesson}
+                  isComplete={false}
+                  onComplete={handleComplete}
+                  onHintUsed={handleHintUsed}
+                />
+              )}
+              {step.type === 'fill-in-blank' && (
+                <FillInBlankStep
+                  step={step}
+                  isComplete={false}
+                  onComplete={handleComplete}
+                  onHintUsed={handleHintUsed}
+                />
+              )}
+              {step.type === 'quiz' && (
+                <QuizStep
+                  step={step}
+                  isComplete={false}
+                  onComplete={handleComplete}
+                />
+              )}
+            </Suspense>
           </div>
         ) : (
           <div className="border-t border-surface-700 pt-6">
