@@ -794,7 +794,36 @@ body::before {
   opacity: 1;
 }
 
-/* Selection */
+/* Selection - Enable text selection globally */
+* {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* But disable selection on buttons and interactive elements */
+button, a, input, textarea, select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable selection for text inputs and textareas */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Selection highlight styles */
 ::selection {
   background: rgba(34, 211, 238, 0.3);
   color: #fff;
