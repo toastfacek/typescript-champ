@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { CodeExerciseStep as CodeExerciseStepType, Lesson } from '@/types'
 import { Button } from '@/components/ui'
 import { LazyCodeEditor, OutputPanel } from '@/components/editor'
@@ -42,6 +42,15 @@ export function CodeExerciseStep({
 
   const language = lesson?.language || 'typescript'
   const isPython = language === 'python'
+
+  // Reset code when step changes (e.g., new exercise in practice mode)
+  useEffect(() => {
+    setCode(step.starterCode)
+    setOutput([])
+    setTestResults([])
+    setCurrentHintIndex(-1)
+    setShowSolution(false)
+  }, [step.id, step.starterCode])
 
   // Execute code and show console output (no tests)
   const executeCode = useCallback(async () => {
