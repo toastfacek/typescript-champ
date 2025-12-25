@@ -482,6 +482,279 @@
 }
 
 /* ============================================
+   KeyConceptsPanel Light Mode Overrides
+   ============================================ */
+
+/* Floating button (collapsed state) - KeyConceptsPanel */
+[data-theme="light"] .fixed.bottom-6.right-6 button.bg-surface-900\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(203, 213, 225, 0.6) !important;
+  color: #0f172a !important; /* surface-900 - dark text */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .fixed.bottom-6.right-6 button.bg-surface-900\/90:hover {
+  background-color: rgba(255, 255, 255, 1) !important;
+  border-color: rgba(6, 182, 212, 0.5) !important;
+  box-shadow: 0 10px 15px -3px rgba(6, 182, 212, 0.15), 0 4px 6px -2px rgba(6, 182, 212, 0.1) !important;
+}
+
+[data-theme="light"] .fixed.bottom-6.right-6 button.bg-surface-900\/90 .text-surface-200 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* KeyConceptsPanel text colors - more specific targeting */
+[data-theme="light"] [data-card-variant="glass"] h3.text-surface-100,
+[data-theme="light"] [data-card-variant="glass"] .text-surface-100 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+[data-theme="light"] [data-card-variant="glass"] .text-surface-200 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+[data-theme="light"] [data-card-variant="glass"] .text-surface-300 {
+  color: #334155 !important; /* surface-700 - darker for readability */
+}
+
+[data-theme="light"] [data-card-variant="glass"] .text-surface-400 {
+  color: #475569 !important; /* surface-600 - good contrast */
+}
+
+[data-theme="light"] [data-card-variant="glass"] .text-surface-500 {
+  color: #64748b !important; /* surface-500 - muted but readable */
+}
+
+/* KeyConceptsPanel concept items */
+[data-theme="light"] [data-card-variant="glass"] .bg-surface-900\/30 {
+  background-color: rgba(248, 250, 252, 0.8) !important; /* surface-50 with opacity */
+  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 */
+}
+
+[data-theme="light"] [data-card-variant="glass"] .bg-surface-900\/30:hover {
+  background-color: rgba(241, 245, 249, 0.9) !important; /* surface-100 */
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+[data-theme="light"] [data-card-variant="glass"] .hover\:bg-surface-800\/50:hover {
+  background-color: rgba(241, 245, 249, 0.6) !important; /* surface-100 with opacity */
+}
+
+/* KeyConceptsPanel code blocks */
+[data-theme="light"] [data-card-variant="glass"] .bg-surface-900\/80,
+[data-theme="light"] [data-card-variant="glass"] .bg-surface-900 {
+  background-color: rgba(248, 250, 252, 0.95) !important; /* surface-50 */
+  border-color: rgba(203, 213, 225, 0.7) !important; /* surface-300 */
+}
+
+[data-theme="light"] [data-card-variant="glass"] .bg-surface-800\/80 {
+  background-color: rgba(241, 245, 249, 0.9) !important; /* surface-100 */
+  border-color: rgba(203, 213, 225, 0.6) !important;
+}
+
+[data-theme="light"] [data-card-variant="glass"] code.text-accent-300 {
+  color: #0891b2 !important; /* accent-600 - darker for readability */
+}
+
+[data-theme="light"] [data-card-variant="glass"] code.text-surface-200 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* KeyConceptsPanel borders */
+[data-theme="light"] [data-card-variant="glass"] .border-surface-700\/50 {
+  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 */
+}
+
+/* KeyConceptsPanel close button */
+[data-theme="light"] [data-card-variant="glass"] button:has(svg[viewBox="0 0 24 24"]):has(path[d*="M6 18L18 6"]) {
+  color: #475569 !important; /* surface-600 */
+}
+
+[data-theme="light"] [data-card-variant="glass"] button:has(svg[viewBox="0 0 24 24"]):has(path[d*="M6 18L18 6"]):hover {
+  color: #0f172a !important; /* surface-900 */
+  background-color: rgba(241, 245, 249, 0.8) !important; /* surface-100 */
+}
+
+/* KeyConceptsPanel badge */
+[data-theme="light"] [data-card-variant="glass"] .bg-accent-500\/20 {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(34, 211, 238, 0.12)) !important;
+  border-color: rgba(6, 182, 212, 0.35) !important;
+}
+
+[data-theme="light"] [data-card-variant="glass"] .text-accent-300 {
+  color: #0891b2 !important; /* accent-600 - darker for contrast */
+}
+
+/* KeyConceptsPanel "Why it matters" section */
+[data-theme="light"] [data-card-variant="glass"] .bg-accent-500\/10 {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(34, 211, 238, 0.08)) !important;
+  border-color: rgba(6, 182, 212, 0.3) !important;
+}
+
+[data-theme="light"] [data-card-variant="glass"] .text-accent-400 {
+  color: #0891b2 !important; /* accent-600 - darker for contrast */
+}
+
+/* ============================================
+   Lesson Components Light Mode Overrides
+   ============================================ */
+
+/* Code blocks in lessons */
+[data-theme="light"] pre.bg-surface-900,
+[data-theme="light"] .bg-surface-900:has(code) {
+  background-color: rgba(248, 250, 252, 0.95) !important; /* surface-50 */
+  border-color: rgba(203, 213, 225, 0.7) !important; /* surface-300 */
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+[data-theme="light"] pre.bg-surface-900 code,
+[data-theme="light"] .bg-surface-900 code {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+[data-theme="light"] pre.text-surface-200,
+[data-theme="light"] .text-surface-200:has(code) {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* Instruction step code blocks */
+[data-theme="light"] .bg-surface-900.text-surface-200 {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.7) !important;
+  color: #0f172a !important;
+}
+
+/* Code exercise instructions box */
+[data-theme="light"] .bg-surface-800\/50 {
+  background-color: rgba(248, 250, 252, 0.8) !important; /* surface-50 */
+  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 */
+}
+
+[data-theme="light"] .bg-surface-800\/50 .text-surface-300 {
+  color: #334155 !important; /* surface-700 - darker for readability */
+}
+
+/* Code editor header (TypeScript/Python label) */
+[data-theme="light"] .bg-surface-800\/80 {
+  background-color: rgba(241, 245, 249, 0.9) !important; /* surface-100 */
+  border-color: rgba(203, 213, 225, 0.6) !important;
+}
+
+[data-theme="light"] .bg-surface-800\/80 .text-surface-500 {
+  color: #64748b !important; /* surface-500 - readable */
+}
+
+/* Lesson complete page */
+[data-theme="light"] .min-h-screen.bg-surface-900 {
+  background-color: var(--bg-primary) !important; /* Use theme primary */
+}
+
+[data-theme="light"] .bg-surface-800\/50:has(.text-3xl) {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(203, 213, 225, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+[data-theme="light"] .bg-surface-800\/50 .text-accent-300,
+[data-theme="light"] .bg-surface-800\/50 .text-primary-300 {
+  color: #0891b2 !important; /* accent-600 - darker for contrast */
+}
+
+/* Fill in blank and quiz code context */
+[data-theme="light"] .bg-surface-900:has(pre) {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.7) !important;
+}
+
+[data-theme="light"] .bg-surface-900:has(pre) pre {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* Quiz/FillInBlank option buttons */
+[data-theme="light"] .bg-surface-800\/50.text-surface-200,
+[data-theme="light"] .bg-surface-800\/30.text-surface-200 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(203, 213, 225, 0.6) !important;
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+[data-theme="light"] .bg-surface-800\/50.text-surface-200:hover,
+[data-theme="light"] .bg-surface-800\/30.text-surface-200:hover,
+[data-theme="light"] .hover\:bg-surface-800\/50:hover {
+  background-color: rgba(241, 245, 249, 0.95) !important; /* surface-100 */
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+/* Syntax code blocks in KeyConcepts */
+[data-theme="light"] .bg-surface-900\/80:has(code.text-accent-300) {
+  background-color: rgba(236, 254, 255, 0.4) !important; /* accent-50 with opacity */
+  border-color: rgba(6, 182, 212, 0.3) !important;
+}
+
+[data-theme="light"] .bg-surface-900\/80 code.text-accent-300 {
+  color: #0891b2 !important; /* accent-600 - darker for readability */
+}
+
+/* ============================================
+   OutputPanel Light Mode Overrides
+   ============================================ */
+
+/* OutputPanel container - target by rounded-xl and border combination */
+[data-theme="light"] .bg-surface-900.rounded-xl.border {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.7) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* OutputPanel header */
+[data-theme="light"] .bg-surface-800\/50.border-b {
+  background-color: rgba(248, 250, 252, 0.9) !important; /* surface-50 */
+  border-color: rgba(203, 213, 225, 0.6) !important;
+}
+
+[data-theme="light"] .bg-surface-800\/50 .text-surface-400,
+[data-theme="light"] .bg-surface-800\/50 .text-surface-500 {
+  color: #64748b !important; /* surface-500 - readable */
+}
+
+/* OutputPanel content area text colors */
+[data-theme="light"] .bg-surface-900.rounded-xl .text-surface-600 {
+  color: #94a3b8 !important; /* surface-400 - lighter for placeholder */
+}
+
+[data-theme="light"] .bg-surface-900.rounded-xl .text-surface-300 {
+  color: #334155 !important; /* surface-700 - darker for readability */
+}
+
+/* OutputPanel log colors - ensure good contrast */
+[data-theme="light"] .bg-surface-900.rounded-xl .text-danger-400 {
+  color: #e11d48 !important; /* danger-600 - darker for contrast */
+}
+
+[data-theme="light"] .bg-surface-900.rounded-xl .text-success-400 {
+  color: #16a34a !important; /* success-600 - darker for contrast */
+}
+
+[data-theme="light"] .bg-surface-900.rounded-xl .text-accent-400 {
+  color: #0891b2 !important; /* accent-600 - darker for contrast */
+}
+
+[data-theme="light"] .bg-surface-900.rounded-xl .text-danger-500 {
+  color: #e11d48 !important; /* danger-600 */
+}
+
+[data-theme="light"] .bg-surface-900.rounded-xl .text-success-500 {
+  color: #16a34a !important; /* success-600 */
+}
+
+[data-theme="light"] .bg-surface-900.rounded-xl .text-accent-500 {
+  color: #0891b2 !important; /* accent-600 */
+}
+
+/* ============================================
    Base Styles
    ============================================ */
 html {
