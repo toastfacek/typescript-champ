@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { CodeExerciseStep as CodeExerciseStepType, Lesson } from '@/types'
 import { Button } from '@/components/ui'
-import { CodeEditor, OutputPanel } from '@/components/editor'
+import { LazyCodeEditor, OutputPanel } from '@/components/editor'
 import { runTypeScriptCode, runWithTests } from '@/lib/typescript-runner'
 import { runPythonCode, runWithTests as runPythonWithTests } from '@/lib/python-runner'
 
@@ -223,7 +223,7 @@ export function CodeExerciseStep({
 
       {/* Code Editor */}
       <div className="mb-4 rounded-xl overflow-hidden border border-surface-700/50">
-        <CodeEditor
+        <LazyCodeEditor
           code={code}
           onChange={setCode}
           height="200px"
