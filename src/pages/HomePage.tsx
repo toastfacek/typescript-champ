@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Card, ProgressBar } from '@/components/ui'
-import { XPCounter, StreakBadge } from '@/components/gamification'
+import { XPCounter, StreakBadge, ContributionGrid } from '@/components/gamification'
 import { ResumeLessonCard } from '@/components/home/ResumeLessonCard'
 import { useStore } from '@/store'
 import { useRecapStore } from '@/store/recap-store'
@@ -13,6 +13,7 @@ const WelcomeRecapCard = lazy(() => import('@/components/home/WelcomeRecapCard')
 export function HomePage() {
   const progress = useStore((state) => state.progress)
   const lessonProgress = useStore((state) => state.lessonProgress)
+  const activityHistory = useStore((state) => state.activityHistory)
   const recapCache = useRecapStore((state) => state.getValidCache())
 
   const completedCount = progress?.lessonsCompleted.length || 0
@@ -129,6 +130,15 @@ export function HomePage() {
               progress={inProgressLesson.progress}
             />
           ) : null}
+        </div>
+      </section>
+
+      {/* Contribution Grid */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card padding="lg">
+            <ContributionGrid activityHistory={activityHistory} />
+          </Card>
         </div>
       </section>
 

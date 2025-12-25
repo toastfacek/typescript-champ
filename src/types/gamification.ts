@@ -78,3 +78,13 @@ export function getProgressToNextLevel(totalXP: number): number {
   const progress = (totalXP - currentThreshold) / (nextThreshold - currentThreshold)
   return Math.min(Math.max(progress, 0), 1)
 }
+
+// Daily activity tracking for contribution grid
+export interface DailyActivity {
+  date: string // YYYY-MM-DD format
+  count: number // Number of activities on this day
+}
+
+export type ActivityHistory = Record<string, number> // date string -> activity count
+
+export type ContributionViewMode = '3months' | '6months' | '12months'

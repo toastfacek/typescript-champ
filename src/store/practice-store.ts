@@ -300,6 +300,8 @@ export const usePracticeStore = create<PracticeState>()(
         if (success) {
           const xpAmount = difficulty === 'easy' ? 15 : difficulty === 'medium' ? 30 : 50
           useStore.getState().addXP(xpAmount)
+          // Record activity for exercise completion
+          useStore.getState().recordActivity()
         }
 
         // Update session
