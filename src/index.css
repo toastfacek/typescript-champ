@@ -368,6 +368,68 @@
   border-color: rgba(6, 182, 212, 0.4) !important; /* accent border on hover */
 }
 
+/* SelectionItem component - better contrast in light mode */
+/* Base state - unselected items */
+[data-theme="light"] button[data-selection-item][data-selected="false"] {
+  background-color: rgba(248, 250, 252, 0.8) !important; /* surface-50 with opacity */
+  border-color: rgba(203, 213, 225, 0.6) !important; /* surface-300 border */
+  color: #0f172a !important; /* surface-900 - dark text for contrast */
+}
+
+/* Selected state - accent/default variant */
+[data-theme="light"] button[data-selection-item="accent"][data-selected="true"],
+[data-theme="light"] button[data-selection-item="default"][data-selected="true"] {
+  background-color: rgba(6, 182, 212, 0.15) !important; /* More visible background */
+  border-color: #06b6d4 !important; /* accent-500 border */
+  color: #0891b2 !important; /* accent-600 - darker for better contrast */
+}
+
+/* Selected state - success variant */
+[data-theme="light"] button[data-selection-item="success"][data-selected="true"] {
+  background-color: rgba(22, 163, 74, 0.15) !important; /* More visible background */
+  border-color: #16a34a !important; /* success-600 border */
+  color: #15803d !important; /* success-700 - darker for better contrast */
+}
+
+/* Selected state - warning variant */
+[data-theme="light"] button[data-selection-item="warning"][data-selected="true"] {
+  background-color: rgba(245, 158, 11, 0.15) !important; /* More visible background */
+  border-color: #f59e0b !important; /* warning-500 border */
+  color: #d97706 !important; /* warning-600 - darker for better contrast */
+}
+
+/* Selected state - danger variant */
+[data-theme="light"] button[data-selection-item="danger"][data-selected="true"] {
+  background-color: rgba(225, 29, 72, 0.15) !important; /* More visible background */
+  border-color: #e11d48 !important; /* danger-600 border */
+  color: #be123c !important; /* danger-700 - darker for better contrast */
+}
+
+/* Gold variant selected state */
+[data-theme="light"] button[data-selection-item="gold"][data-selected="true"] {
+  background-color: rgba(245, 158, 11, 0.15) !important; /* More visible background */
+  border-color: #f59e0b !important; /* gold-500 border */
+  color: #d97706 !important; /* gold-600 - darker for better contrast */
+}
+
+/* Improve description text contrast in light mode - target opacity classes within SelectionItem */
+[data-theme="light"] button[data-selection-item] .opacity-75 {
+  opacity: 0.85 !important; /* Less opacity for better readability */
+  color: #475569 !important; /* surface-600 - darker text for unselected */
+}
+
+/* Description text in selected items should use the button's color but with slightly reduced opacity */
+[data-theme="light"] button[data-selection-item][data-selected="true"] .opacity-75 {
+  opacity: 0.9 !important; /* Slightly less opacity but still readable */
+  color: inherit; /* Inherit the darker color from parent button */
+}
+
+/* Hover states for SelectionItem in light mode */
+[data-theme="light"] button[data-selection-item][data-selected="false"]:hover {
+  background-color: rgba(226, 232, 240, 0.6) !important; /* surface-200 with opacity */
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+
 /* ============================================
    Base Styles
    ============================================ */

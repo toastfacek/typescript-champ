@@ -153,6 +153,8 @@ export function SelectionItem({
       type="button"
       onClick={handleClick}
       disabled={disabled}
+      data-selection-item={variant}
+      data-selected={isSelected}
       className={clsx(
         'relative rounded-xl border-2 p-4 text-left transition-all duration-200',
         'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-900',
