@@ -26,9 +26,10 @@ npm run typecheck    # TypeScript check without building
 
 ### Frontend (src/)
 
-**State Management**: Two Zustand stores with localStorage persistence:
+**State Management**: Three Zustand stores with localStorage persistence:
 - `store/index.ts` - Main app state: user progress, XP, streaks, lesson completion
 - `store/practice-store.ts` - Practice mode: sessions, AI-generated exercises, mastery tracking
+- `store/recap-store.ts` - Welcome recap: cached recap exercises, pre-generation on lesson completion
 
 **Lesson System**: Modular curriculum structure for scalability:
 - **Lesson Files**: Each lesson in its own file (`src/content/modules/[module-name]/[lesson-id].ts`)
@@ -75,17 +76,36 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
 
 **Path Aliases**: `@/` maps to `src/` (configured in vite.config.ts and tsconfig.json)
 
+**Welcome Recap Feature**: Pre-generated recap card on home page:
+- **Location**: `components/home/WelcomeRecapCard.tsx` and `ResumeLessonCard.tsx`
+- **Trigger**: Automatically generates recap exercise when user completes a lesson (if challenge score is highest)
+- **Challenge Scoring**: `lib/challenge-scorer.ts` calculates scores based on recency, attempts, difficulty, and mastery level
+- **Cache**: Stored in `recap-store.ts` with 7-day TTL, regenerates for same concept after completion
+- **Fallback**: Shows `ResumeLessonCard` if no cache exists but user has in-progress lesson
+- **LLM Optimization**: Zero LLM calls on home page load - exercises pre-generated during lesson completion
+
 ### Backend (server/)
 
 Express API server for AI-powered exercise generation:
-- `routes/exercise.ts` - Single (`/generate`) and batch (`/generate-batch`) exercise generation
+- `routes/exercise.ts` - Single (`/generate`), batch (`/generate-batch`), focused practice (`/generate-focused`), and recap (`/generate-recap`) exercise generation
 - `routes/goal.ts` - Learning goal analysis
 - `services/gemini.ts` - Gemini API client (uses `gemini-3-flash-preview`)
-- `prompts/` - Structured prompts for different exercise types
+- `prompts/` - Structured prompts for different exercise types:
+  - `code-exercise.ts` - Full code exercises with tests
+  - `fill-blank.ts` - Fill-in-the-blank exercises
+  - `quiz.ts` - Multiple choice questions
+  - `focused-practice.ts` - Mini-lessons for focused practice
+  - `recap-exercise.ts` - Quick recap exercises (2-3 min, simpler than full practice)
 
 API runs separately from frontend. Server binds to `0.0.0.0` for Railway deployment.
 
 **Batch Generation**: Generates 5 exercises in parallel (3 concurrent max) for instant loading. Frontend maintains a queue and auto-refills when < 2 exercises remain.
+
+**Recap Generation**: Single exercise endpoint (`/generate-recap`) optimized for quick refreshers:
+- Pre-generated during lesson completion (zero LLM calls on home page)
+- Varies exercise type based on `timesCompleted` to keep content fresh
+- Simpler than full practice exercises (2-3 minutes to complete)
+- Awards 5-10 XP on completion
 
 ## Key Types
 
@@ -116,6 +136,23 @@ type PracticeTopic = 'basics' | 'types' | 'functions' | 'objects' | 'arrays' |
   'input-output' | 'operators' | 'control-flow' | 'data-structures'  // Python
 
 // XP level calculation uses thresholds: [0, 100, 250, 500, 850, 1300, ...]
+
+// Recap cache (src/types/recap.ts)
+interface RecapCache {
+  lessonId: string
+  lessonTitle: string
+  lessonLanguage: 'typescript' | 'python'
+  recapContent: string        // Static - from lesson keyConcepts/description
+  exercise: PracticeExercise  // Pre-generated
+  generatedAt: string         // ISO date
+  challengeScore: number      // Used to determine if this replaces existing cache
+  timesCompleted: number      // Track recaps done for this concept
+  isRegenerating: boolean     // True while fetching next exercise
+}
+
+// Challenge scoring (src/lib/challenge-scorer.ts)
+// Score = (1 / daysSinceCompletion) * attemptMultiplier * difficultyWeight * masteryBoost
+// Higher score = more challenging/recent, prioritized for recap
 ```
 
 ## Environment Variables

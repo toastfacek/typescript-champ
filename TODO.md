@@ -48,7 +48,11 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
   - Express server with CORS (`server/src/index.ts`)
   - Gemini API wrapper (`server/src/services/gemini.ts`)
   - Exercise validation with security checks (`server/src/services/validator.ts`)
-  - Exercise generation endpoint (`server/src/routes/exercise.ts`)
+  - Exercise generation endpoints (`server/src/routes/exercise.ts`):
+    - `/generate` - Single exercise
+    - `/generate-batch` - Batch generation (5 exercises)
+    - `/generate-focused` - Focused practice mini-lessons
+    - `/generate-recap` - Quick recap exercises
   - Goal analysis endpoint (`server/src/routes/goal.ts`)
   - Prompt templates for all exercise types (`server/src/prompts/`)
 
@@ -167,6 +171,50 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ---
 
 ## New Features Implemented
+
+### Welcome Recap Feature (Dec 2025)
+
+**Purpose**: Show a pre-generated recap card on the home page with a bite-sized exercise from the user's most challenging recent lesson, helping reinforce concepts and providing a quick practice opportunity.
+
+**Architecture**:
+```
+src/
+├── types/
+│   └── recap.ts                      # RecapCache, GenerateRecapRequest, ChallengeScore
+├── lib/
+│   └── challenge-scorer.ts          # Challenge scoring algorithm
+├── store/
+│   └── recap-store.ts                # Recap cache state with pre-generation
+├── components/home/
+│   ├── WelcomeRecapCard.tsx          # Recap card with exercise
+│   └── ResumeLessonCard.tsx           # Fallback for in-progress lessons
+└── pages/
+    └── HomePage.tsx                   # Integrates recap/resume cards
+
+server/
+└── src/
+    ├── routes/
+    │   └── exercise.ts               # POST /api/exercise/generate-recap
+    └── prompts/
+        └── recap-exercise.ts          # Quick recap exercise prompt
+```
+
+**Features**:
+- **Zero LLM calls on home page load**: Exercises pre-generated during lesson completion
+- **Challenge scoring**: Prioritizes recent, difficult, or retried lessons (recency × attempts × difficulty × mastery boost)
+- **Regeneration**: After completing a recap, automatically generates a new exercise for the same concept
+- **Fallback**: Shows ResumeLessonCard if no cache exists but user has in-progress lesson
+- **7-day TTL**: Cache expires after 7 days
+- **Bonus XP**: Awards 5-10 XP for completing recap exercises
+
+**Flow**:
+1. User completes a lesson → challenge score calculated
+2. If score > current cache score → background API call generates recap exercise
+3. Home page loads → shows WelcomeRecapCard if valid cache exists
+4. User completes recap → awards XP, triggers regeneration for same concept
+5. Next visit → shows fresh exercise on same topic
+
+**Status**: ✅ Complete and integrated
 
 ### Key Concepts Glossary Panel (Dec 2024)
 

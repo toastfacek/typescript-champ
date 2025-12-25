@@ -7,6 +7,7 @@ import type {
 } from '@/types/practice'
 import type { GoalAnalysisResponse, GoalExample } from '@/types/learning-path'
 import type { GenerateFocusedPracticeRequest, GenerateFocusedPracticeResponse } from '@/types/focused-practice'
+import type { GenerateRecapRequest, GenerateRecapResponse } from '@/types/recap'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -98,6 +99,15 @@ export async function generateExerciseBatch(params: {
 
 export async function generateFocusedPractice(params: GenerateFocusedPracticeRequest): Promise<GenerateFocusedPracticeResponse> {
   return fetchJson<GenerateFocusedPracticeResponse>('/api/exercise/generate-focused', {
+    method: 'POST',
+    body: JSON.stringify(params)
+  })
+}
+
+// Recap API
+
+export async function generateRecap(params: GenerateRecapRequest): Promise<GenerateRecapResponse> {
+  return fetchJson<GenerateRecapResponse>('/api/exercise/generate-recap', {
     method: 'POST',
     body: JSON.stringify(params)
   })

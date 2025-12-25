@@ -10,6 +10,8 @@ Build your coding habit through interactive, gamified lessons. Learn TypeScript,
 - 📚 **Structured Curriculum**: Step-by-step lessons with code exercises, quizzes, and fill-in-the-blank challenges
 - 💻 **In-Browser Execution**: Write and run code directly in your browser
 - 📖 **Key Concepts Glossary**: Expandable glossary panel for foundational concepts
+- 🔄 **Welcome Recap**: Pre-generated recap exercises on home page from your most challenging recent lessons
+- ⚡ **Zero-Load LLM Calls**: Recap exercises pre-generated during lesson completion for instant home page loading
 
 ## Getting Started
 
@@ -65,6 +67,7 @@ npm run typecheck
 ├── src/
 │   ├── components/        # React components
 │   │   ├── editor/        # Code editor components
+│   │   ├── home/         # Home page components (WelcomeRecapCard, ResumeLessonCard)
 │   │   ├── lesson/        # Lesson step components
 │   │   ├── practice/      # Practice mode components
 │   │   └── ui/           # Reusable UI components
@@ -73,17 +76,22 @@ npm run typecheck
 │   │       ├── 01-getting-started/    # TypeScript modules
 │   │       └── python-01-basics/      # Python modules
 │   ├── lib/              # Core utilities
+│   │   ├── challenge-scorer.ts      # Challenge scoring for recap feature
 │   │   ├── typescript-runner.ts      # TypeScript execution
 │   │   ├── python-runner.ts          # Python execution (Pyodide)
 │   │   └── pyodide-loader.ts         # Pyodide initialization
 │   ├── store/            # Zustand state management
+│   │   ├── index.ts                  # Main app state
+│   │   ├── practice-store.ts         # Practice mode state
+│   │   └── recap-store.ts           # Welcome recap cache state
 │   ├── pages/            # Page components
 │   └── types/            # TypeScript type definitions
 ├── server/               # Express API server
 │   ├── src/
 │   │   ├── routes/       # API routes
+│   │   │   └── exercise.ts  # Exercise generation endpoints (generate, generate-batch, generate-focused, generate-recap)
 │   │   ├── services/    # Business logic
-│   │   └── prompts/     # AI prompts
+│   │   └── prompts/     # AI prompts (code-exercise, fill-blank, quiz, focused-practice, recap-exercise)
 └── public/               # Static assets
 ```
 

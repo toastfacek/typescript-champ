@@ -181,6 +181,42 @@ export const useStore = create<AppState>()(
           syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
           syncLessonProgress(newLessonProgress).catch(err => console.error('Sync error:', err))
 
+          // Trigger recap generation in background (fire-and-forget)
+          setTimeout(async () => {
+            try {
+              const { useRecapStore } = await import('./recap-store')
+              const { usePracticeStore } = await import('./practice-store')
+              const { calculateChallengeScore } = await import('@/lib/challenge-scorer')
+              const { lessons } = await import('@/content/curriculum')
+              
+              const lesson = lessons.find(l => l.id === lessonId)
+              if (!lesson) return
+
+              const updatedLessonProgress = {
+                ...state.lessonProgress,
+                [lessonId]: newLessonProgress,
+              }
+
+              const challengeScore = calculateChallengeScore(
+                lessonId,
+                newLessonProgress,
+                usePracticeStore.getState().practiceStats,
+                usePracticeStore.getState().focusedPracticeStats
+              )
+
+              if (challengeScore) {
+                const currentCache = useRecapStore.getState().cache
+                // Only generate if this lesson has a higher score than current cache
+                if (!currentCache || challengeScore.score > currentCache.challengeScore) {
+                  await useRecapStore.getState().generateRecapForLesson(lesson, challengeScore.score)
+                }
+              }
+            } catch (error) {
+              console.error('Failed to trigger recap generation:', error)
+              // Silently fail
+            }
+          }, 0)
+
           return {
             progress: newProgress,
             lessonProgress: {
