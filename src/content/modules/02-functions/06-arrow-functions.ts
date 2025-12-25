@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 50,
   prerequisites: ['05-parameters-defaults'],
   tags: ['functions', 'arrow-functions', 'es6'],
+  keyConcepts: [
+    {
+      id: 'arrow-functions',
+      term: 'Arrow Functions',
+      definition: 'Arrow functions are a shorter, more concise way to write functions in TypeScript and JavaScript. They use the `=>` symbol (an arrow) instead of the `function` keyword. Arrow functions are especially useful for short, simple functions.',
+      syntax: 'const name = (param: type): returnType => expression;',
+      example: {
+        code: '// Regular function\nfunction add(a: number, b: number): number {\n  return a + b;\n}\n\n// Arrow function\nconst add = (a: number, b: number): number => a + b;',
+        explanation: 'Both functions do the same thing, but the arrow function is shorter. The `=>` replaces `function` and `return` when you have a single expression.',
+      },
+      whyItMatters: 'Arrow functions make code more concise and readable, especially for simple operations. They\'re widely used in modern JavaScript and TypeScript codebases.',
+    },
+    {
+      id: 'this-binding',
+      term: 'this Binding',
+      definition: 'Arrow functions handle `this` differently than regular functions. In arrow functions, `this` is "bound" to the surrounding context where the arrow function was created, rather than changing based on how it\'s called. This makes arrow functions predictable and avoids common `this` confusion.',
+      syntax: 'const method = () => { /* this refers to outer context */ }',
+      example: {
+        code: 'class Counter {\n  count = 0;\n  \n  // Arrow function: this always refers to Counter instance\n  increment = () => {\n    this.count++;\n  }\n}',
+        explanation: 'In arrow functions, `this` refers to the `Counter` instance, not the calling context. This makes it safe to pass `increment` around without losing the reference to `this`.',
+      },
+      whyItMatters: 'Arrow functions solve a common problem where `this` changes unexpectedly. They\'re especially useful in callbacks and class methods where you want `this` to stay consistent.',
+    },
+    {
+      id: 'implicit-returns',
+      term: 'Implicit Returns',
+      definition: 'When an arrow function has a single expression (no braces `{}`), it automatically returns that expression without needing the `return` keyword. This is called an "implicit return" - the return happens automatically.',
+      syntax: 'const name = (param: type): returnType => expression;',
+      example: {
+        code: '// Explicit return (with braces)\nconst double = (n: number): number => {\n  return n * 2;\n};\n\n// Implicit return (no braces)\nconst double = (n: number): number => n * 2;',
+        explanation: 'Both functions return `n * 2`, but the second one doesn\'t need `return` or braces. The expression after `=>` is automatically returned.',
+      },
+      whyItMatters: 'Implicit returns make arrow functions even more concise. They\'re perfect for simple transformations and make code easier to read when you have short, single-purpose functions.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

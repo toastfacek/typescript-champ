@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 70,
   prerequisites: ['06-arrow-functions'],
   tags: ['functions', 'types', 'callbacks'],
+  keyConcepts: [
+    {
+      id: 'function-types',
+      term: 'Function Types',
+      definition: 'Function types describe the shape of a function - what parameters it accepts and what it returns. You can use function types to type variables that hold functions, or to specify what kind of function a parameter should be.',
+      syntax: '(param1: type1, param2: type2) => returnType',
+      example: {
+        code: '// A variable that can hold any function matching this type\nlet operation: (a: number, b: number) => number;\n\noperation = (a, b) => a + b;  // Addition\noperation = (a, b) => a * b;  // Multiplication\noperation = (a, b) => a - b;  // Subtraction',
+        explanation: 'The type `(a: number, b: number) => number` means "a function that takes two numbers and returns a number". Any function matching this pattern can be assigned to `operation`.',
+      },
+      whyItMatters: 'Function types let you work with functions as values safely. They ensure that functions you pass around or store match the expected signature, preventing runtime errors.',
+    },
+    {
+      id: 'type-aliases',
+      term: 'Type Aliases',
+      definition: 'Type aliases let you create a custom name for a type. Instead of repeating a complex type like `(a: number, b: number) => number` everywhere, you can create a shorter alias like `MathOperation` and use that instead.',
+      syntax: 'type AliasName = existingType;',
+      example: {
+        code: '// Create a type alias\ntype MathOperation = (a: number, b: number) => number;\n\n// Now use it\nlet add: MathOperation = (a, b) => a + b;\nlet multiply: MathOperation = (a, b) => a * b;',
+        explanation: 'Instead of writing `(a: number, b: number) => number` multiple times, we create `MathOperation` once and reuse it. This makes code more readable and maintainable.',
+      },
+      whyItMatters: 'Type aliases make complex types reusable and easier to understand. They\'re especially useful for function types, which can get long and repetitive.',
+    },
+    {
+      id: 'higher-order-functions',
+      term: 'Higher-Order Functions',
+      definition: 'A higher-order function is a function that either takes another function as a parameter, returns a function, or both. Functions that accept callbacks (like `map`, `filter`, `forEach`) are higher-order functions.',
+      syntax: 'function higherOrder(callback: (param: type) => returnType) { /* code */ }',
+      example: {
+        code: '// A higher-order function that takes a callback\nfunction processNumbers(\n  numbers: number[],\n  operation: (n: number) => number\n): number[] {\n  return numbers.map(operation);\n}\n\nprocessNumbers([1, 2, 3], n => n * 2);  // [2, 4, 6]',
+        explanation: '`processNumbers` is a higher-order function because it takes `operation` (a function) as a parameter. It uses that function to transform each number in the array.',
+      },
+      whyItMatters: 'Higher-order functions make code more flexible and reusable. They let you write generic functions that can work with different behaviors, reducing code duplication.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

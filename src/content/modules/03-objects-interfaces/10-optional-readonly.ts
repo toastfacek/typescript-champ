@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['09-interfaces'],
   tags: ['interfaces', 'optional', 'readonly'],
+  keyConcepts: [
+    {
+      id: 'optional-properties',
+      term: 'Optional Properties',
+      definition: 'Optional properties are properties that might not exist on an object. They\'re marked with a `?` after the property name. When you access an optional property, TypeScript knows it might be `undefined`, so you need to check for it.',
+      syntax: 'interface Name { property?: type; }',
+      example: {
+        code: 'interface User {\n  name: string;\n  email?: string;  // Optional - might not exist\n}\n\nlet user1: User = { name: "Alice" };           // Valid - email not required\nlet user2: User = { name: "Bob", email: "bob@example.com" };  // Also valid',
+        explanation: 'The `email` property is optional (marked with `?`). You can create a `User` with or without an email. If you don\'t provide it, it will be `undefined`.',
+      },
+      whyItMatters: 'Optional properties model real-world data where some information might be missing. They make your types more flexible and realistic, matching how data actually works.',
+    },
+    {
+      id: 'readonly-properties',
+      term: 'Readonly Properties',
+      definition: 'Readonly properties can be set when an object is created, but cannot be changed afterward. They\'re marked with the `readonly` keyword. This prevents accidental modifications and makes your code safer.',
+      syntax: 'interface Name { readonly property: type; }',
+      example: {
+        code: 'interface Config {\n  readonly apiUrl: string;\n  readonly version: string;\n}\n\nlet config: Config = { apiUrl: "https://api.example.com", version: "1.0" };\nconfig.apiUrl = "new-url";  // Error: cannot assign to readonly property',
+        explanation: 'The `readonly` keyword makes these properties immutable. Once set, they cannot be changed. This is useful for configuration values that should remain constant.',
+      },
+      whyItMatters: 'Readonly properties prevent bugs from accidental modifications. They\'re especially useful for configuration objects, IDs, and other values that should never change after creation.',
+    },
+    {
+      id: 'partial-readonly-utilities',
+      term: 'Partial/Readonly Utilities',
+      definition: 'TypeScript provides utility types like `Partial<T>` and `Readonly<T>` that transform existing types. `Partial<T>` makes all properties optional, and `Readonly<T>` makes all properties readonly. These are powerful tools for creating variations of types.',
+      syntax: 'Partial<Type> | Readonly<Type>',
+      example: {
+        code: 'interface User {\n  name: string;\n  age: number;\n}\n\n// Partial makes all properties optional\ntype PartialUser = Partial<User>;  // { name?: string; age?: number; }\n\n// Readonly makes all properties readonly\ntype ReadonlyUser = Readonly<User>;  // { readonly name: string; readonly age: number; }',
+        explanation: '`Partial<User>` creates a type where all properties are optional. `Readonly<User>` creates a type where all properties are readonly. These utilities save you from rewriting types manually.',
+      },
+      whyItMatters: 'Utility types let you create type variations without duplicating code. They\'re essential for building flexible APIs and handling different scenarios with the same base type.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

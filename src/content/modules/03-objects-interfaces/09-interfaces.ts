@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 70,
   prerequisites: ['08-object-types'],
   tags: ['interfaces', 'types', 'objects'],
+  keyConcepts: [
+    {
+      id: 'interfaces',
+      term: 'Interfaces',
+      definition: 'An interface is a reusable blueprint for object types. Instead of writing the same object type over and over, you define it once with an interface and reuse it. Interfaces make your code more maintainable and easier to understand.',
+      syntax: 'interface Name { property: type; }',
+      example: {
+        code: '// Define once\ninterface User {\n  name: string;\n  age: number;\n}\n\n// Use everywhere\nlet user1: User = { name: "Alice", age: 30 };\nlet user2: User = { name: "Bob", age: 25 };',
+        explanation: 'The `User` interface defines what a user object should look like. Now you can use `User` as a type anywhere, and TypeScript will ensure objects match this structure.',
+      },
+      whyItMatters: 'Interfaces eliminate repetition and create a single source of truth for object shapes. When you need to change a structure, you only update it in one place.',
+    },
+    {
+      id: 'interface-extension',
+      term: 'Interface Extension',
+      definition: 'Interfaces can extend (inherit from) other interfaces. This means one interface can include all properties from another interface, plus add its own. Extension lets you build complex types from simpler ones.',
+      syntax: 'interface Child extends Parent { newProperty: type; }',
+      example: {
+        code: 'interface Animal {\n  name: string;\n  age: number;\n}\n\n// Dog extends Animal, so it has name, age, AND breed\ninterface Dog extends Animal {\n  breed: string;\n}\n\nlet myDog: Dog = {\n  name: "Buddy",\n  age: 3,\n  breed: "Golden Retriever"\n};',
+        explanation: '`Dog` extends `Animal`, so it automatically has `name` and `age` properties, plus it adds `breed`. This is like saying "a Dog is an Animal with an additional breed property".',
+      },
+      whyItMatters: 'Interface extension promotes code reuse and models real-world relationships. It lets you build complex types incrementally, making your type system more organized and maintainable.',
+    },
+    {
+      id: 'interface-vs-type',
+      term: 'Interface vs Type',
+      definition: 'Both interfaces and type aliases can describe object shapes, but they have differences. Interfaces are better for object shapes and can be extended/merged. Type aliases are more flexible and can represent unions, intersections, and other complex types. For simple object shapes, either works, but interfaces are more common.',
+      syntax: 'interface I { } vs type T = { }',
+      example: {
+        code: '// Interface - good for objects\ninterface User {\n  name: string;\n}\n\n// Type alias - more flexible\ntype ID = string | number;\ntype Status = "active" | "inactive";',
+        explanation: 'Interfaces are ideal for object shapes. Type aliases are better for unions, intersections, and other complex types. Both can describe objects, but interfaces are preferred for that use case.',
+      },
+      whyItMatters: 'Understanding when to use interfaces vs types helps you write idiomatic TypeScript. Interfaces are the standard choice for object shapes, while types are better for complex type operations.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

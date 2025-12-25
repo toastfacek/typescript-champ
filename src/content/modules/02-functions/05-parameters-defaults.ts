@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['04-function-basics'],
   tags: ['functions', 'parameters'],
+  keyConcepts: [
+    {
+      id: 'optional-parameters',
+      term: 'Optional Parameters',
+      definition: 'Optional parameters are function parameters that you don\'t have to provide when calling the function. They\'re marked with a `?` after the parameter name. If you don\'t pass a value, the parameter will be `undefined`.',
+      syntax: 'function name(param?: type) { /* code */ }',
+      example: {
+        code: 'function greet(name: string, title?: string): string {\n  if (title) {\n    return `Hello, ${title} ${name}!`;\n  }\n  return `Hello, ${name}!`;\n}\n\ngreet("Alice");           // "Hello, Alice!"\ngreet("Alice", "Dr");     // "Hello, Dr Alice!"',
+        explanation: 'The `title` parameter is optional. When you call `greet("Alice")`, title is undefined. When you call `greet("Alice", "Dr")`, title is "Dr".',
+      },
+      whyItMatters: 'Optional parameters make functions more flexible. You can create functions that work with or without certain information, reducing the need for multiple function versions.',
+    },
+    {
+      id: 'default-parameters',
+      term: 'Default Parameters',
+      definition: 'Default parameters have a fallback value that\'s used if you don\'t provide one when calling the function. Instead of being undefined, they automatically use the default value you specify.',
+      syntax: 'function name(param: type = defaultValue) { /* code */ }',
+      example: {
+        code: 'function greet(name: string, greeting: string = "Hello"): string {\n  return `${greeting}, ${name}!`;\n}\n\ngreet("Alice");              // "Hello, Alice!"\ngreet("Alice", "Hi");        // "Hi, Alice!"',
+        explanation: 'The `greeting` parameter defaults to "Hello". If you don\'t pass a greeting, it uses "Hello". If you do pass one, it uses your value.',
+      },
+      whyItMatters: 'Default parameters provide sensible fallbacks, making functions easier to use. They\'re perfect for common cases where most calls use the same value, but you still want flexibility.',
+    },
+    {
+      id: 'required-parameters',
+      term: 'Required Parameters',
+      definition: 'Required parameters are function parameters that must be provided when calling the function. If you don\'t pass a value, TypeScript will show an error. All parameters are required by default unless marked as optional or given a default value.',
+      syntax: 'function name(param: type) { /* code */ }',
+      example: {
+        code: 'function greet(name: string): string {\n  return `Hello, ${name}!`;\n}\n\ngreet("Alice");    // Works!\ngreet();           // Error: missing required parameter',
+        explanation: 'The `name` parameter is required. You must always provide a value when calling `greet()`. TypeScript will prevent you from calling it without a name.',
+      },
+      whyItMatters: 'Required parameters ensure that functions receive the essential information they need to work correctly. This prevents bugs and makes function requirements clear.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

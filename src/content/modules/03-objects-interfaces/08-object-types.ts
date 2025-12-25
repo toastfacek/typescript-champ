@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['07-function-types'],
   tags: ['objects', 'types'],
+  keyConcepts: [
+    {
+      id: 'object-types',
+      term: 'Object Types',
+      definition: 'Object types describe the shape of an object - what properties it has and what types those properties are. In TypeScript, you can define object types inline or with interfaces/type aliases to ensure objects match a specific structure.',
+      syntax: '{ property1: type1; property2: type2; }',
+      example: {
+        code: '// Inline object type\nlet person: { name: string; age: number };\nperson = { name: "Alice", age: 30 };  // Valid\nperson = { name: "Bob" };              // Error: missing age',
+        explanation: 'The type `{ name: string; age: number }` means "an object with a name (string) and age (number)". TypeScript ensures any object assigned to `person` has both properties with the correct types.',
+      },
+      whyItMatters: 'Object types catch errors early - like missing properties or wrong types. They make your code safer and help you understand what data structures your code expects.',
+    },
+    {
+      id: 'property-types',
+      term: 'Property Types',
+      definition: 'Each property in an object type has its own type. Properties can be strings, numbers, booleans, other objects, arrays, functions, or any other TypeScript type. The type tells TypeScript what kind of value can be stored in that property.',
+      syntax: '{ property: type; }',
+      example: {
+        code: 'let user: {\n  name: string;        // Property is a string\n  age: number;         // Property is a number\n  isActive: boolean;   // Property is a boolean\n  tags: string[];      // Property is an array of strings\n};',
+        explanation: 'Each property has a specific type. `name` must be a string, `age` must be a number, `isActive` must be a boolean, and `tags` must be an array of strings.',
+      },
+      whyItMatters: 'Property types ensure data integrity. They prevent you from accidentally assigning the wrong type of value to a property, which could cause bugs later.',
+    },
+    {
+      id: 'nested-objects',
+      term: 'Nested Objects',
+      definition: 'Objects can contain other objects as properties. This is called nesting. You can describe nested object types by putting object types inside object types, creating complex data structures.',
+      syntax: '{ outer: { inner: type; }; }',
+      example: {
+        code: 'let address: {\n  street: string;\n  city: string;\n  country: {\n    name: string;\n    code: string;\n  };\n};\n\naddress = {\n  street: "123 Main St",\n  city: "New York",\n  country: { name: "USA", code: "US" }\n};',
+        explanation: 'The `country` property is itself an object with `name` and `code` properties. This creates a nested structure where objects contain other objects.',
+      },
+      whyItMatters: 'Nested objects let you model complex, real-world data structures. They\'re essential for representing relationships between data, like a user having an address with a country.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

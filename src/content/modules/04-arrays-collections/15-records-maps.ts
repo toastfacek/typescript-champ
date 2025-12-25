@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['14-tuples'],
   tags: ['records', 'maps', 'collections'],
+  keyConcepts: [
+    {
+      id: 'record-type',
+      term: 'Record Type',
+      definition: '`Record<K, V>` is a TypeScript utility type that creates an object type with specific key and value types. It\'s a type-safe way to represent key-value pairs where all keys are of type K and all values are of type V. It\'s like saying "an object where keys are strings and values are numbers".',
+      syntax: 'Record<KeyType, ValueType>',
+      example: {
+        code: '// Record with string keys and number values\ntype Scores = Record<string, number>;\n\nlet gameScores: Scores = {\n  "Alice": 100,\n  "Bob": 85,\n  "Charlie": 92\n};\n\ngameScores["Alice"];  // 100',
+        explanation: '`Record<string, number>` means "an object where all keys are strings and all values are numbers". It provides type safety for key-value structures.',
+      },
+      whyItMatters: 'Record types provide type safety for dynamic object structures. They\'re perfect for dictionaries, lookup tables, and any situation where you need type-safe key-value pairs.',
+    },
+    {
+      id: 'map-type',
+      term: 'Map Type',
+      definition: '`Map<K, V>` is a built-in JavaScript collection that stores key-value pairs with type safety in TypeScript. Unlike objects, Maps can have any type as keys (not just strings), maintain insertion order, and have methods like `get()`, `set()`, and `has()`. TypeScript ensures keys and values match the specified types.',
+      syntax: 'Map<KeyType, ValueType>',
+      example: {
+        code: '// Create a typed Map\nlet userMap = new Map<string, number>();\n\nuserMap.set("Alice", 30);\nuserMap.set("Bob", 25);\n\nuserMap.get("Alice");  // 30\nuserMap.has("Bob");    // true',
+        explanation: '`Map<string, number>` creates a Map where keys are strings and values are numbers. The `set()` and `get()` methods are type-safe.',
+      },
+      whyItMatters: 'Maps provide a more powerful alternative to objects for key-value storage. They support any key type, maintain order, and have convenient methods, all with full type safety.',
+    },
+    {
+      id: 'object-vs-map',
+      term: 'Object vs Map',
+      definition: 'Objects and Maps both store key-value pairs, but have different strengths. Objects are simpler and work well for fixed structures. Maps are more flexible - they support any key type, maintain insertion order, have a `size` property, and are better for dynamic key-value pairs. Choose objects for structured data, Maps for dynamic collections.',
+      syntax: '{ } vs Map<K, V>',
+      example: {
+        code: '// Object: good for fixed structure\nlet user = { name: "Alice", age: 30 };\n\n// Map: good for dynamic key-value pairs\nlet data = new Map<string, any>();\ndata.set("name", "Alice");\ndata.set("age", 30);\ndata.set("city", "NYC");  // Easy to add new keys',
+        explanation: 'Objects are ideal when you know the structure ahead of time. Maps are better when you need to add/remove keys dynamically or use non-string keys.',
+      },
+      whyItMatters: 'Understanding when to use objects vs Maps helps you choose the right data structure. Objects are simpler for fixed structures, Maps are better for dynamic collections.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',
