@@ -674,17 +674,109 @@
 
 /* Quiz/FillInBlank option buttons */
 [data-theme="light"] .bg-surface-800\/50.text-surface-200,
-[data-theme="light"] .bg-surface-800\/30.text-surface-200 {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  border-color: rgba(203, 213, 225, 0.6) !important;
+[data-theme="light"] .bg-surface-800\/30.text-surface-200,
+[data-theme="light"] button.bg-surface-800\/30,
+[data-theme="light"] button.bg-surface-800\/50 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
   color: #0f172a !important; /* surface-900 - dark text */
 }
 
 [data-theme="light"] .bg-surface-800\/50.text-surface-200:hover,
 [data-theme="light"] .bg-surface-800\/30.text-surface-200:hover,
-[data-theme="light"] .hover\:bg-surface-800\/50:hover {
-  background-color: rgba(241, 245, 249, 0.95) !important; /* surface-100 */
-  border-color: rgba(6, 182, 212, 0.4) !important;
+[data-theme="light"] .hover\:bg-surface-800\/50:hover,
+[data-theme="light"] button.bg-surface-800\/30:hover,
+[data-theme="light"] button.bg-surface-800\/50:hover {
+  background-color: rgba(241, 245, 249, 0.98) !important; /* surface-100 */
+  border-color: rgba(6, 182, 212, 0.5) !important;
+}
+
+/* Quiz option buttons - selected state (accent) */
+[data-theme="light"] button.bg-accent-500\/10 {
+  background-color: rgba(6, 182, 212, 0.15) !important;
+  border-color: rgba(6, 182, 212, 0.6) !important;
+  color: #0f172a !important;
+}
+
+/* Quiz option buttons - correct state */
+[data-theme="light"] button.bg-success-500\/10 {
+  background-color: rgba(22, 163, 74, 0.2) !important;
+  border-color: rgba(22, 163, 74, 0.7) !important;
+  color: #0f172a !important;
+}
+
+/* Quiz option buttons - incorrect state */
+[data-theme="light"] button.bg-danger-500\/10 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  color: #0f172a !important;
+}
+
+/* Quiz option text colors - ensure dark text in light mode */
+[data-theme="light"] button .text-surface-200,
+[data-theme="light"] button .text-success-300,
+[data-theme="light"] button .text-danger-300 {
+  color: #0f172a !important; /* surface-900 - dark text */
+}
+
+/* Quiz correct option text - darker green for contrast */
+[data-theme="light"] button.bg-success-500\/10 .text-success-300 {
+  color: #15803d !important; /* success-700 - darker green */
+}
+
+/* Quiz incorrect option text - darker red for contrast */
+[data-theme="light"] button.bg-danger-500\/10 .text-danger-300 {
+  color: #dc2626 !important; /* danger-600 - darker red */
+}
+
+/* Quiz explanation card - better contrast */
+[data-theme="light"] .bg-success-500\/10,
+[data-theme="light"] .bg-gold-500\/10 {
+  background-color: rgba(22, 163, 74, 0.15) !important;
+  border-color: rgba(22, 163, 74, 0.5) !important;
+}
+
+[data-theme="light"] .bg-gold-500\/10 {
+  background-color: rgba(217, 119, 6, 0.15) !important;
+  border-color: rgba(217, 119, 6, 0.5) !important;
+}
+
+/* Quiz explanation text - much darker for readability */
+[data-theme="light"] .text-success-300,
+[data-theme="light"] .text-success-300\/80 {
+  color: #15803d !important; /* success-700 - much darker */
+}
+
+[data-theme="light"] .text-gold-300,
+[data-theme="light"] .text-gold-300\/80 {
+  color: #d97706 !important; /* gold-600 - darker gold */
+}
+
+[data-theme="light"] .text-gold-400 {
+  color: #d97706 !important; /* gold-600 - darker gold */
+}
+
+/* Quiz question heading - ensure dark text */
+[data-theme="light"] h3.text-surface-50 {
+  color: #0f172a !important; /* surface-900 - very dark for headings */
+  font-weight: 600 !important;
+}
+
+/* Quiz radio button borders - more visible in light mode */
+[data-theme="light"] .border-surface-600 {
+  border-color: rgba(148, 163, 184, 0.8) !important; /* surface-400 - more visible */
+}
+
+[data-theme="light"] .border-accent-500 {
+  border-color: rgba(6, 182, 212, 0.8) !important; /* accent-500 - more visible */
+}
+
+[data-theme="light"] .border-success-500 {
+  border-color: rgba(22, 163, 74, 0.8) !important; /* success-500 - more visible */
+}
+
+[data-theme="light"] .border-danger-500 {
+  border-color: rgba(239, 68, 68, 0.8) !important; /* danger-500 - more visible */
 }
 
 /* Syntax code blocks in KeyConcepts */
