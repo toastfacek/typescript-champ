@@ -1,11 +1,14 @@
+import { Suspense, lazy } from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Card, ProgressBar } from '@/components/ui'
 import { XPCounter, StreakBadge } from '@/components/gamification'
-import { WelcomeRecapCard } from '@/components/home/WelcomeRecapCard'
 import { ResumeLessonCard } from '@/components/home/ResumeLessonCard'
 import { useStore } from '@/store'
 import { useRecapStore } from '@/store/recap-store'
 import { curriculum } from '@/content/curriculum'
+
+// Lazy load WelcomeRecapCard to prevent CodeMirror from being bundled on homepage
+const WelcomeRecapCard = lazy(() => import('@/components/home/WelcomeRecapCard').then(m => ({ default: m.WelcomeRecapCard })))
 
 export function HomePage() {
   const progress = useStore((state) => state.progress)
@@ -105,7 +108,21 @@ export function HomePage() {
       <section className="py-8 px-4">
         <div className="max-w-4xl mx-auto">
           {recapCache ? (
-            <WelcomeRecapCard cache={recapCache} />
+            <Suspense fallback={
+              <Card padding="lg" className="mb-8">
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      <div className="w-8 h-8 border-4 border-surface-700 rounded-full" />
+                      <div className="absolute top-0 left-0 w-8 h-8 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+                    </div>
+                    <p className="mt-2 text-sm text-surface-500">Loading recap...</p>
+                  </div>
+                </div>
+              </Card>
+            }>
+              <WelcomeRecapCard cache={recapCache} />
+            </Suspense>
           ) : inProgressLesson ? (
             <ResumeLessonCard
               lessonId={inProgressLesson.lessonId}
