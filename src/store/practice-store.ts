@@ -296,6 +296,12 @@ export const usePracticeStore = create<PracticeState>()(
 
         updatedStats.masteryLevel = calculateMasteryLevel(updatedStats)
 
+        // Award XP for successful completion (50% of normal lesson XP)
+        if (success) {
+          const xpAmount = difficulty === 'easy' ? 15 : difficulty === 'medium' ? 30 : 50
+          useStore.getState().addXP(xpAmount)
+        }
+
         // Update session
         const updatedSession: PracticeSession = {
           ...currentSession,

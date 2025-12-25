@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 70,
   prerequisites: ['12-typed-arrays'],
   tags: ['arrays', 'methods', 'functional'],
+  keyConcepts: [
+    {
+      id: 'array-methods',
+      term: 'Array Methods',
+      definition: 'Array methods are built-in functions that operate on arrays. Methods like `map`, `filter`, `reduce`, `forEach`, and `find` let you transform, search, and manipulate arrays without writing loops. TypeScript ensures these methods are type-safe.',
+      syntax: 'array.method(callback)',
+      example: {
+        code: 'let numbers = [1, 2, 3, 4, 5];\n\n// map: transform each element\nlet doubled = numbers.map(n => n * 2);  // [2, 4, 6, 8, 10]\n\n// filter: keep only matching elements\nlet evens = numbers.filter(n => n % 2 === 0);  // [2, 4]',
+        explanation: 'Array methods take a callback function and apply it to each element. `map` transforms elements, `filter` keeps matching elements, and so on.',
+      },
+      whyItMatters: 'Array methods make code more readable and functional. They\'re the standard way to work with arrays in modern JavaScript and TypeScript, replacing manual loops.',
+    },
+    {
+      id: 'map-filter-reduce',
+      term: 'map/filter/reduce',
+      definition: '`map`, `filter`, and `reduce` are three fundamental array methods. `map` transforms each element into a new value. `filter` keeps only elements that match a condition. `reduce` combines all elements into a single value. Together, they handle most array operations.',
+      syntax: 'map(fn) | filter(fn) | reduce(fn, initial)',
+      example: {
+        code: 'let numbers = [1, 2, 3, 4];\n\n// map: transform\nlet doubled = numbers.map(n => n * 2);        // [2, 4, 6, 8]\n\n// filter: select\nlet evens = numbers.filter(n => n % 2 === 0);  // [2, 4]\n\n// reduce: combine\nlet sum = numbers.reduce((acc, n) => acc + n, 0);  // 10',
+        explanation: '`map` creates a new array with transformed values. `filter` creates a new array with only matching values. `reduce` combines all values into one result.',
+      },
+      whyItMatters: 'These three methods cover most array operations. Mastering them lets you write concise, functional code that\'s easier to understand and maintain.',
+    },
+    {
+      id: 'method-chaining',
+      term: 'Method Chaining',
+      definition: 'Method chaining is calling multiple array methods in sequence, where each method returns a new array. You can chain methods like `map().filter().map()` to perform complex transformations in a single, readable expression.',
+      syntax: 'array.method1().method2().method3()',
+      example: {
+        code: 'let numbers = [1, 2, 3, 4, 5, 6];\n\n// Chain multiple operations\nlet result = numbers\n  .filter(n => n % 2 === 0)  // [2, 4, 6]\n  .map(n => n * 2)           // [4, 8, 12]\n  .reduce((sum, n) => sum + n, 0);  // 24',
+        explanation: 'Each method returns a new array, so you can immediately call another method on it. This creates a pipeline of transformations that\'s easy to read.',
+      },
+      whyItMatters: 'Method chaining makes complex array operations readable and declarative. Instead of nested loops and temporary variables, you express the transformation as a clear sequence.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

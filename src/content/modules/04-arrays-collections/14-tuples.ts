@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 50,
   prerequisites: ['13-array-methods'],
   tags: ['tuples', 'arrays', 'types'],
+  keyConcepts: [
+    {
+      id: 'tuples',
+      term: 'Tuples',
+      definition: 'A tuple is a fixed-length array where each position has a specific type. Unlike regular arrays (which can have any length), tuples have a predetermined structure. They\'re perfect for representing structured data like coordinates, key-value pairs, or function return values.',
+      syntax: '[type1, type2, type3]',
+      example: {
+        code: '// Tuple: [x, y] coordinates\nlet point: [number, number] = [10, 20];\n\n// Tuple: [name, age, active]\nlet user: [string, number, boolean] = ["Alice", 30, true];\n\npoint[0];  // 10 (number)\npoint[1];  // 20 (number)\npoint[2];  // Error: tuple only has 2 elements',
+        explanation: 'The tuple `[number, number]` means "an array with exactly 2 numbers". Each position has a specific type, and the length is fixed.',
+      },
+      whyItMatters: 'Tuples provide structure and type safety for fixed-length data. They\'re ideal for representing pairs, coordinates, and other structured data where position matters.',
+    },
+    {
+      id: 'fixed-length-arrays',
+      term: 'Fixed-Length Arrays',
+      definition: 'Fixed-length arrays (tuples) have a predetermined number of elements. You cannot add or remove elements beyond the specified length. This is different from regular arrays, which can grow or shrink. The length is part of the type definition.',
+      syntax: '[type1, type2]  // Exactly 2 elements',
+      example: {
+        code: '// Fixed length: exactly 2 elements\nlet pair: [string, number] = ["Alice", 30];\n\npair.push("extra");  // Error: cannot add to tuple\npair.length;          // Always 2\n\n// Regular array: any length\nlet list: string[] = [];\nlist.push("item");     // OK: can grow',
+        explanation: 'Tuples have a fixed length defined in the type. You cannot modify the length by adding or removing elements. This ensures the structure stays consistent.',
+      },
+      whyItMatters: 'Fixed-length arrays enforce structure. They prevent accidentally adding or removing elements, ensuring data integrity for structured information like coordinates or key-value pairs.',
+    },
+    {
+      id: 'tuple-destructuring',
+      term: 'Tuple Destructuring',
+      definition: 'Tuple destructuring lets you extract values from a tuple into separate variables. You use array destructuring syntax `[a, b] = tuple` to unpack the tuple\'s elements. This makes it easy to work with tuple values.',
+      syntax: 'const [var1, var2] = tuple;',
+      example: {
+        code: '// Tuple\nlet point: [number, number] = [10, 20];\n\n// Destructure into separate variables\nlet [x, y] = point;\nconsole.log(x);  // 10\nconsole.log(y);  // 20\n\n// Or destructure directly\nlet [name, age] = ["Alice", 30];',
+        explanation: 'Destructuring extracts tuple values into individual variables. `[x, y] = point` assigns the first element to `x` and the second to `y`.',
+      },
+      whyItMatters: 'Destructuring makes tuples easy to work with. Instead of accessing `tuple[0]` and `tuple[1]`, you can use meaningful variable names, making code more readable.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

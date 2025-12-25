@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 60,
   prerequisites: ['11-type-vs-interface'],
   tags: ['arrays', 'types', 'collections'],
+  keyConcepts: [
+    {
+      id: 'array-types',
+      term: 'Array Types',
+      definition: 'Array types specify what kind of elements an array can contain. In TypeScript, arrays are typed - you declare what type of values the array holds, and TypeScript ensures you only add compatible values. This prevents mixing different types accidentally.',
+      syntax: 'type[] or Array<type>',
+      example: {
+        code: '// Array of numbers\nlet numbers: number[] = [1, 2, 3];\nnumbers.push(4);     // Valid\nnumbers.push("five");  // Error: cannot add string to number array',
+        explanation: 'The type `number[]` means "an array of numbers". TypeScript ensures you can only add numbers to this array, preventing type errors.',
+      },
+      whyItMatters: 'Array types catch errors early - like trying to add a string to a number array. They make your code safer and help you understand what data structures contain.',
+    },
+    {
+      id: 'array-syntax',
+      term: 'Array Syntax',
+      definition: 'TypeScript offers two equivalent ways to write array types: `T[]` (bracket notation) and `Array<T>` (generic notation). Both mean the same thing - an array of type T. The bracket notation `T[]` is more common and concise.',
+      syntax: 'T[] or Array<T>',
+      example: {
+        code: '// Both are equivalent\nlet list1: string[] = ["a", "b"];\nlet list2: Array<string> = ["a", "b"];\n\n// Works for any type\nlet numbers: number[] = [1, 2, 3];\nlet booleans: Array<boolean> = [true, false];',
+        explanation: '`string[]` and `Array<string>` are identical - both mean "an array of strings". The `[]` syntax is shorter and more commonly used.',
+      },
+      whyItMatters: 'Understanding both syntaxes helps you read TypeScript code written by others. The bracket notation is preferred for its brevity, but both are valid.',
+    },
+    {
+      id: 'array-initialization',
+      term: 'Array Initialization',
+      definition: 'Array initialization is how you create an array with its initial values. You can initialize arrays empty `[]`, with values `[1, 2, 3]`, or using the `new Array()` constructor. TypeScript infers the array type from the values you provide.',
+      syntax: 'let arr: type[] = [values];',
+      example: {
+        code: '// Empty array with explicit type\nlet numbers: number[] = [];\n\n// Array with initial values\nlet names: string[] = ["Alice", "Bob"];\n\n// TypeScript infers the type\nlet scores = [95, 87, 92];  // TypeScript knows this is number[]',
+        explanation: 'You can create empty arrays and add elements later, or initialize with values. TypeScript can often infer the type from the values you provide.',
+      },
+      whyItMatters: 'Proper array initialization sets up your data structures correctly from the start. Understanding initialization helps you create arrays that match your intended types.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',

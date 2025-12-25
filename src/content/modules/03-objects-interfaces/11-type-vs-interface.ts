@@ -11,6 +11,41 @@ export const lesson: Lesson = {
   xpReward: 50,
   prerequisites: ['10-optional-readonly'],
   tags: ['types', 'interfaces', 'best-practices'],
+  keyConcepts: [
+    {
+      id: 'type-aliases',
+      term: 'Type Aliases',
+      definition: 'Type aliases create a new name for an existing type. They can represent object shapes, unions, intersections, primitives, and more. Type aliases are more flexible than interfaces and can represent any TypeScript type.',
+      syntax: 'type AliasName = existingType;',
+      example: {
+        code: '// Object type\ntype User = {\n  name: string;\n  age: number;\n};\n\n// Union type\ntype ID = string | number;\n\n// Complex type\ntype EventHandler = (event: Event) => void;',
+        explanation: 'Type aliases can represent objects (like `User`), unions (like `ID`), function types (like `EventHandler`), and many other type structures. They\'re very versatile.',
+      },
+      whyItMatters: 'Type aliases give you flexibility to create custom names for any type. They\'re especially useful for unions, intersections, and complex types that interfaces can\'t represent.',
+    },
+    {
+      id: 'interface-declaration-merging',
+      term: 'Interface Declaration Merging',
+      definition: 'When you declare an interface with the same name multiple times, TypeScript automatically merges them into a single interface. This is called declaration merging. All properties from all declarations are combined.',
+      syntax: 'interface Name { prop1: type; }\ninterface Name { prop2: type; }  // Merged!',
+      example: {
+        code: '// First declaration\ninterface Window {\n  title: string;\n}\n\n// Second declaration - automatically merged\ninterface Window {\n  width: number;\n}\n\n// Result: Window has both title AND width\nlet win: Window = { title: "My App", width: 800 };',
+        explanation: 'Both `Window` declarations are merged into one. The final `Window` interface has both `title` and `width` properties. This is unique to interfaces - type aliases cannot be merged.',
+      },
+      whyItMatters: 'Declaration merging lets you extend interfaces across multiple files or modules. This is useful for library types where you want to add properties to existing interfaces.',
+    },
+    {
+      id: 'when-to-use-each',
+      term: 'When to Use Each',
+      definition: 'Use interfaces for object shapes that might need extension or merging. Use type aliases for unions, intersections, primitives, and complex types. For simple object shapes, interfaces are preferred, but types work too. The choice often comes down to team preference and specific needs.',
+      syntax: 'interface for objects | type for unions/complex types',
+      example: {
+        code: '// Interface - good for objects\ninterface User {\n  name: string;\n}\n\n// Type - good for unions\ntype Status = "active" | "inactive" | "pending";\n\n// Type - good for intersections\ntype AdminUser = User & { permissions: string[] };',
+        explanation: 'Interfaces excel at object shapes. Types excel at unions, intersections, and other complex type operations. Choose based on what you\'re modeling.',
+      },
+      whyItMatters: 'Knowing when to use interfaces vs types helps you write idiomatic TypeScript. The right choice makes your code more maintainable and easier for other developers to understand.',
+    },
+  ],
   steps: [
     {
       id: 'step-1-intro',
