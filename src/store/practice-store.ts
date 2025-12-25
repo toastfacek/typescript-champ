@@ -46,7 +46,8 @@ interface PracticeState {
   startSession: (
     topic: PracticeTopic,
     difficulty: PracticeDifficulty,
-    exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed'
+    exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed',
+    language?: 'typescript' | 'python'
   ) => void
   endSession: () => void
   generateNextExercise: () => Promise<void>
@@ -118,12 +119,13 @@ export const usePracticeStore = create<PracticeState>()(
       sessionHistory: {},
 
       // Actions
-      startSession: (topic, difficulty, exerciseType) => {
+      startSession: (topic, difficulty, exerciseType, language = 'typescript') => {
         const session: PracticeSession = {
           id: `session-${Date.now()}`,
           topic,
           difficulty,
           exerciseType,
+          language,
           startedAt: new Date(),
           exercisesAttempted: 0,
           exercisesCompleted: 0
@@ -202,7 +204,8 @@ export const usePracticeStore = create<PracticeState>()(
           const response = await apiGenerateExercise({
             topic: currentSession.topic,
             difficulty: currentSession.difficulty,
-            exerciseType
+            exerciseType,
+            language: currentSession.language
           })
 
           if (!response.success || !response.exercise) {
@@ -235,7 +238,8 @@ export const usePracticeStore = create<PracticeState>()(
             topic: currentSession.topic,
             difficulty: currentSession.difficulty,
             count: 5,
-            exerciseTypes
+            exerciseTypes,
+            language: currentSession.language
           })
 
           if (response.success && response.exercises.length > 0) {

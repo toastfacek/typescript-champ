@@ -7,6 +7,7 @@ import * as module05 from './05-advanced-types'
 import * as module06 from './06-generics'
 import * as module07 from './07-async-typescript'
 import * as module08 from './08-nodejs-npm'
+import * as pythonModule01 from './python-01-basics'
 
 // Aggregate all modules
 export const modules: Module[] = [
@@ -18,6 +19,7 @@ export const modules: Module[] = [
   module06.module,
   module07.module,
   module08.module,
+  pythonModule01.module,
 ]
 
 // Aggregate all lessons into a single Record
@@ -30,4 +32,5 @@ export const lessons: Record<string, Lesson> = {
   ...module06.lessons,
   ...module07.lessons,
   ...module08.lessons,
+  ...pythonModule01.lessons,
 }

@@ -59,6 +59,7 @@ export async function generateExercise(params: {
   topic: PracticeTopic
   difficulty: PracticeDifficulty
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz'
+  language?: 'typescript' | 'python'
   themeContext?: ThemeContext
 }): Promise<GenerateExerciseResponse> {
   return fetchJson<GenerateExerciseResponse>('/api/exercise/generate', {
@@ -84,6 +85,7 @@ export async function generateExerciseBatch(params: {
   difficulty: PracticeDifficulty
   count?: number
   exerciseTypes?: ('code-exercise' | 'fill-in-blank' | 'quiz')[]
+  language?: 'typescript' | 'python'
   themeContext?: ThemeContext
 }): Promise<BatchGenerateResponse> {
   return fetchJson<BatchGenerateResponse>('/api/exercise/generate-batch', {

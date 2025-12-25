@@ -75,12 +75,12 @@ export function AuthPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-accent-500 rounded-xl flex items-center justify-center shadow-glow mx-auto mb-4">
-            <span className="text-surface-900 font-heading font-bold text-2xl">TS</span>
+            <span className="text-surface-900 font-heading font-bold text-2xl">CH</span>
           </div>
-          <h1 className="text-3xl font-heading font-bold text-surface-50 mb-2">TypeScript Champ</h1>
+          <h1 className="text-3xl font-heading font-bold text-surface-50 mb-2">CodeHabit</h1>
           <p className="text-surface-300">
             {mode === 'signin' && 'Welcome back!'}
-            {mode === 'signup' && 'Start your TypeScript journey'}
+            {mode === 'signup' && 'Start your coding journey'}
             {mode === 'magic-link' && 'Sign in with magic link'}
           </p>
         </div>

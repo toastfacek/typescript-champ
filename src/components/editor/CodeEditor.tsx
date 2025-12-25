@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
+import { python } from '@codemirror/lang-python'
 import { EditorView } from '@codemirror/view'
 import { linter } from '@codemirror/lint'
 import type { Diagnostic } from '@codemirror/lint'
@@ -14,6 +15,7 @@ interface CodeEditorProps {
   readOnly?: boolean
   height?: string
   className?: string
+  language?: 'typescript' | 'python'
 }
 
 // Custom dark theme for gamified look
@@ -96,6 +98,7 @@ export function CodeEditor({
   readOnly = false,
   height = '300px',
   className = '',
+  language = 'typescript',
 }: CodeEditorProps) {
   const { compileDebounced } = useTypeScriptWorker()
   const { effectiveTheme } = useTheme()
@@ -107,8 +110,11 @@ export function CodeEditor({
     [onChange]
   )
 
-  // Create TypeScript linter
+  // Create TypeScript linter (only for TypeScript)
   const tsLinter = useMemo(() => {
+    if (language !== 'typescript') {
+      return null
+    }
     return linter(async (view): Promise<Diagnostic[]> => {
       const code = view.state.doc.toString()
       
@@ -144,11 +150,15 @@ export function CodeEditor({
     }, {
       delay: 300,
     })
-  }, [compileDebounced])
-
+  }, [compileDebounced, language])
 
   const customTheme = effectiveTheme === 'dark' ? customDarkTheme : customLightTheme
   const codeMirrorTheme = effectiveTheme === 'dark' ? 'dark' : 'light'
+
+  // Choose language extension
+  const languageExtension = useMemo(() => {
+    return language === 'python' ? python() : javascript({ typescript: true })
+  }, [language])
 
   return (
     <div className={`rounded-lg overflow-hidden border ${effectiveTheme === 'dark' ? 'border-surface-700' : 'border-surface-200'} ${className}`}>
@@ -157,10 +167,10 @@ export function CodeEditor({
         height={height}
         theme={codeMirrorTheme}
         extensions={[
-          javascript({ typescript: true }),
+          languageExtension,
           customTheme,
           EditorView.lineWrapping,
-          ...(readOnly ? [] : [tsLinter]),
+          ...(readOnly || !tsLinter ? [] : [tsLinter]),
         ]}
         onChange={handleChange}
         readOnly={readOnly}
@@ -172,8 +182,8 @@ export function CodeEditor({
           dropCursor: true,
           allowMultipleSelections: true,
           indentOnInput: true,
-          bracketMatching: true,
-          closeBrackets: true,
+          bracketMatching: language !== 'python',
+          closeBrackets: language !== 'python',
           autocompletion: false,
           rectangularSelection: true,
           crosshairCursor: false,

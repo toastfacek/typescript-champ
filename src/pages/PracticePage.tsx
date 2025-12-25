@@ -5,6 +5,7 @@ import { TopicSelector, DifficultyPicker, ExerciseTypeSelector } from '@/compone
 import { LessonPracticeSelector } from '@/components/practice/LessonPracticeSelector'
 import { usePracticeStore } from '@/store/practice-store'
 import type { PracticeTopic, PracticeDifficulty } from '@/types/practice'
+import { getTopics } from '@/constants/practice-topics'
 
 export function PracticePage() {
   const navigate = useNavigate()
@@ -14,11 +15,22 @@ export function PracticePage() {
   const [selectedTopic, setSelectedTopic] = useState<PracticeTopic | null>(null)
   const [difficulty, setDifficulty] = useState<PracticeDifficulty>('medium')
   const [exerciseType, setExerciseType] = useState<'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed'>('mixed')
+  const [language, setLanguage] = useState<'typescript' | 'python'>('typescript')
+
+  // Clear selected topic when switching languages if it's not valid for the new language
+  const handleLanguageChange = (newLanguage: 'typescript' | 'python') => {
+    setLanguage(newLanguage)
+    const topics = getTopics(newLanguage)
+    const topicIds = topics.map(t => t.id)
+    if (selectedTopic && !topicIds.includes(selectedTopic)) {
+      setSelectedTopic(null)
+    }
+  }
 
   const handleStartPractice = () => {
     if (!selectedTopic) return
 
-    startSession(selectedTopic, difficulty, exerciseType)
+    startSession(selectedTopic, difficulty, exerciseType, language)
     navigate('/practice/session')
   }
 
@@ -26,10 +38,42 @@ export function PracticePage() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-heading font-bold text-surface-50 mb-2">Practice Mode</h1>
-        <p className="text-surface-300">
-          Sharpen your TypeScript skills with AI-generated exercises.
-        </p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-heading font-bold text-surface-50 mb-2">Practice Mode</h1>
+            <p className="text-surface-300">
+              Sharpen your coding skills with AI-generated exercises.
+            </p>
+          </div>
+          
+          {/* Language Toggle */}
+          <div className="flex items-center gap-2 bg-surface-800/50 rounded-xl p-1 border border-surface-700/50">
+            <button
+              onClick={() => handleLanguageChange('typescript')}
+              className={`
+                px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${language === 'typescript'
+                  ? 'bg-accent-500/20 text-accent-400'
+                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
+                }
+              `}
+            >
+              TypeScript
+            </button>
+            <button
+              onClick={() => handleLanguageChange('python')}
+              className={`
+                px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${language === 'python'
+                  ? 'bg-accent-500/20 text-accent-400'
+                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
+                }
+              `}
+            >
+              Python
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -50,6 +94,7 @@ export function PracticePage() {
             <TopicSelector
               selectedTopic={selectedTopic}
               onSelectTopic={setSelectedTopic}
+              language={language}
             />
           </Card>
 
