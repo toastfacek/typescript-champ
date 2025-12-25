@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card, Badge, ProgressBar, Button } from '@/components/ui'
 import { useStore } from '@/store'
@@ -7,6 +8,24 @@ export function CurriculumPage() {
   const navigate = useNavigate()
   const lessonProgress = useStore((state) => state.lessonProgress)
   const redoLesson = useStore((state) => state.redoLesson)
+  const [language, setLanguage] = useState<'typescript' | 'python'>('typescript')
+
+  // Filter modules based on language
+  const filteredModules = curriculum.modules.filter((module) => {
+    if (language === 'python') {
+      // Python modules start with 'python-'
+      return module.id.startsWith('python-')
+    } else {
+      // TypeScript modules don't start with 'python-'
+      return !module.id.startsWith('python-')
+    }
+  })
+
+  // Get curriculum title and description based on language
+  const curriculumTitle = language === 'python' ? 'Python Fundamentals' : curriculum.title
+  const curriculumDescription = language === 'python' 
+    ? 'Master Python from the ground up' 
+    : curriculum.description
 
   const getLessonStatus = (lessonId: string) => {
     const lp = lessonProgress[lessonId]
@@ -15,7 +34,7 @@ export function CurriculumPage() {
   }
 
   const getModuleProgress = (moduleId: string) => {
-    const module = curriculum.modules.find((m) => m.id === moduleId)
+    const module = filteredModules.find((m) => m.id === moduleId)
     if (!module) return 0
     const completed = module.lessons.filter(
       (id) => getLessonStatus(id) === 'completed'
@@ -40,14 +59,46 @@ export function CurriculumPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-heading font-bold text-surface-100 mb-2">
-          {curriculum.title}
-        </h1>
-        <p className="text-surface-300">{curriculum.description}</p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-heading font-bold text-surface-100 mb-2">
+              {curriculumTitle}
+            </h1>
+            <p className="text-surface-300">{curriculumDescription}</p>
+          </div>
+          
+          {/* Language Toggle */}
+          <div className="flex items-center gap-2 bg-surface-800/50 rounded-xl p-1 border border-surface-700/50">
+            <button
+              onClick={() => setLanguage('typescript')}
+              className={`
+                px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${language === 'typescript'
+                  ? 'bg-accent-500/20 text-accent-400'
+                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
+                }
+              `}
+            >
+              TypeScript
+            </button>
+            <button
+              onClick={() => setLanguage('python')}
+              className={`
+                px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                ${language === 'python'
+                  ? 'bg-accent-500/20 text-accent-400'
+                  : 'text-surface-400 hover:text-surface-200 hover:bg-surface-700/50'
+                }
+              `}
+            >
+              Python
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-8">
-        {curriculum.modules.map((module, moduleIndex) => {
+        {filteredModules.map((module, moduleIndex) => {
           const moduleProgress = getModuleProgress(module.id)
           const isComplete = moduleProgress === 1
 

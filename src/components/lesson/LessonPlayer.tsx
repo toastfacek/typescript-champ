@@ -113,6 +113,7 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
         return (
           <CodeExerciseStep
             step={step}
+            lesson={lesson}
             isComplete={isStepComplete}
             onComplete={() => handleStepComplete(step.id)}
             onHintUsed={handleHintUsed}

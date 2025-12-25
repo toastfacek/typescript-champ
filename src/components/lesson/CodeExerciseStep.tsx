@@ -1,11 +1,13 @@
 import { useState, useCallback } from 'react'
-import type { CodeExerciseStep as CodeExerciseStepType } from '@/types'
+import type { CodeExerciseStep as CodeExerciseStepType, Lesson } from '@/types'
 import { Button } from '@/components/ui'
 import { CodeEditor, OutputPanel } from '@/components/editor'
 import { runTypeScriptCode, runWithTests } from '@/lib/typescript-runner'
+import { runPythonCode, runWithTests as runPythonWithTests } from '@/lib/python-runner'
 
 interface CodeExerciseStepProps {
   step: CodeExerciseStepType
+  lesson?: Lesson
   isComplete: boolean
   onComplete: () => void
   onHintUsed: () => void
@@ -25,6 +27,7 @@ interface OutputLine {
 
 export function CodeExerciseStep({
   step,
+  lesson,
   isComplete,
   onComplete,
   onHintUsed,
@@ -37,6 +40,9 @@ export function CodeExerciseStep({
   const [currentHintIndex, setCurrentHintIndex] = useState(-1)
   const [showSolution, setShowSolution] = useState(false)
 
+  const language = lesson?.language || 'typescript'
+  const isPython = language === 'python'
+
   // Execute code and show console output (no tests)
   const executeCode = useCallback(async () => {
     setIsRunning(true)
@@ -44,18 +50,18 @@ export function CodeExerciseStep({
     setTestResults([]) // Clear test results when just running code
 
     try {
-      const result = await runTypeScriptCode(code)
+      const result = isPython ? await runPythonCode(code) : await runTypeScriptCode(code)
 
       const outputLogs: OutputLine[] = (result.logs || []).map((log) => ({
         type: 'log' as const,
         content: log,
       }))
 
-      // Check for type errors
-      if (result.typeErrors) {
+      // Check for type errors (TypeScript only)
+      if (!isPython && 'typeErrors' in result && (result as { typeErrors?: string }).typeErrors) {
         outputLogs.push({
           type: 'error',
-          content: result.typeErrors,
+          content: (result as { typeErrors: string }).typeErrors,
         })
         outputLogs.push({
           type: 'info',
@@ -94,43 +100,47 @@ export function CodeExerciseStep({
     setTestResults([])
 
     try {
-      // First check if code compiles
-      const compileCheck = await runTypeScriptCode(code)
-      
-      if (compileCheck.typeErrors) {
-        setTestResults([{
-          id: 'compile-error',
-          description: 'Code has type errors',
-          passed: false,
-          error: compileCheck.typeErrors,
-        }])
-        setIsRunningTests(false)
-        return
-      }
+      // First check if code compiles/runs (TypeScript only)
+      if (!isPython) {
+        const compileCheck = await runTypeScriptCode(code)
+        
+        if (compileCheck.typeErrors) {
+          setTestResults([{
+            id: 'compile-error',
+            description: 'Code has type errors',
+            passed: false,
+            error: compileCheck.typeErrors,
+          }])
+          setIsRunningTests(false)
+          return
+        }
 
-      if (!compileCheck.success) {
-        setTestResults([{
-          id: 'runtime-error',
-          description: 'Code has runtime errors',
-          passed: false,
-          error: compileCheck.error || 'Unknown error',
-        }])
-        setIsRunningTests(false)
-        return
+        if (!compileCheck.success) {
+          setTestResults([{
+            id: 'runtime-error',
+            description: 'Code has runtime errors',
+            passed: false,
+            error: compileCheck.error || 'Unknown error',
+          }])
+          setIsRunningTests(false)
+          return
+        }
       }
 
       // Run tests
       const results: TestResult[] = []
       for (const test of step.testCases) {
-        const testResult = await runWithTests(code, test.testCode)
+        const testResult = isPython 
+          ? await runPythonWithTests(code, test.testCode)
+          : await runWithTests(code, test.testCode)
         
-        // Check for type errors in test
-        if (testResult.typeErrors) {
+        // Check for type errors in test (TypeScript only)
+        if (!isPython && 'typeErrors' in testResult && (testResult as { typeErrors?: string }).typeErrors) {
           results.push({
             id: test.id,
             description: test.description,
             passed: false,
-            error: testResult.typeErrors,
+            error: (testResult as { typeErrors: string }).typeErrors,
           })
           continue
         }
@@ -163,7 +173,7 @@ export function CodeExerciseStep({
     }
 
     setIsRunningTests(false)
-  }, [code, step.testCases, isComplete, onComplete])
+  }, [code, step.testCases, isComplete, onComplete, isPython])
 
   const showHint = useCallback(() => {
     if (currentHintIndex < step.hints.length - 1) {
@@ -217,6 +227,7 @@ export function CodeExerciseStep({
           code={code}
           onChange={setCode}
           height="200px"
+          language={language}
         />
       </div>
 

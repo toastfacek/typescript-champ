@@ -125,6 +125,20 @@ export function PracticeSessionPage() {
         {step.type === 'code-exercise' && (
           <CodeExerciseStep
             step={step as CodeExerciseStepType}
+            lesson={currentSession ? {
+              id: 'practice-exercise',
+              slug: 'practice',
+              title: 'Practice Exercise',
+              description: '',
+              order: 0,
+              estimatedMinutes: 0,
+              difficulty: 'beginner',
+              xpReward: 0,
+              prerequisites: [],
+              tags: [],
+              steps: [],
+              language: currentSession.language
+            } : undefined}
             isComplete={exerciseComplete}
             onComplete={handleExerciseComplete}
             onHintUsed={() => {}}

@@ -46,14 +46,14 @@ export function HomePage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-500"></span>
             </span>
-            <span className="text-accent-400 text-sm font-medium">Interactive TypeScript Learning</span>
+            <span className="text-accent-400 text-sm font-medium">Interactive Coding Learning</span>
           </div>
 
           {/* Heading */}
           <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 animate-slide-up">
-            <span className="text-surface-100">Master TypeScript</span>
+            <span className="text-surface-100">Build Your</span>
             <br />
-            <span className="text-gradient">One Challenge at a Time</span>
+            <span className="text-gradient">Code Habit</span>
           </h1>
 
           {/* Subtitle */}
@@ -224,7 +224,7 @@ export function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-heading text-3xl font-bold text-surface-100 mb-4">
-              Why TypeScript Champ?
+              Why CodeHabit?
             </h2>
             <p className="text-surface-500">Learn the way that actually sticks</p>
           </div>
@@ -238,7 +238,7 @@ export function HomePage() {
                   </svg>
                 ),
                 title: 'Real Code Practice',
-                description: 'Write TypeScript in the browser with real-time type checking and instant feedback.',
+                description: 'Write code in the browser with real-time execution and instant feedback. Learn TypeScript and Python.',
                 color: 'accent',
               },
               {
@@ -287,10 +287,10 @@ export function HomePage() {
             <div className="absolute -inset-4 bg-gradient-to-br from-accent-500/5 to-gold-500/5 blur-2xl rounded-3xl" />
             <div className="relative z-10">
               <h2 className="font-heading text-2xl font-bold text-surface-100 mb-3">
-                Ready to become a TypeScript pro?
+                Ready to build your coding habit?
               </h2>
               <p className="text-surface-400 mb-6">
-                Start with the basics and build your way up to advanced patterns.
+                Start with the basics and build your way up to advanced patterns. Learn TypeScript, Python, and more.
               </p>
               {nextLessonId && (
                 <Link to={`/lesson/${nextLessonId}`}>

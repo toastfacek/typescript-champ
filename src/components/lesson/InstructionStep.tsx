@@ -161,7 +161,7 @@ export function InstructionStep({ step, onComplete }: InstructionStepProps) {
                 <div className="w-3 h-3 rounded-full bg-success-500/80" />
               </div>
               <span className="text-xs text-surface-500 ml-2 font-mono">
-                {step.codeExample.language === 'typescript' ? 'TypeScript' : 'JavaScript'}
+                {step.codeExample.language === 'typescript' ? 'TypeScript' : step.codeExample.language === 'python' ? 'Python' : 'JavaScript'}
               </span>
             </div>
             <pre className="p-4 overflow-x-auto">

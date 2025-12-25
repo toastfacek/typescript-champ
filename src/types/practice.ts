@@ -3,15 +3,22 @@ import type { CodeExerciseStep, FillInBlankStep, QuizStep } from './lesson'
 export type PracticeDifficulty = 'easy' | 'medium' | 'hard'
 
 export type PracticeTopic =
+  // Shared topics (used by both TypeScript and Python)
   | 'basics'
   | 'types'
   | 'functions'
+  | 'classes'
+  // TypeScript-specific topics
   | 'objects'
   | 'arrays'
   | 'generics'
   | 'advanced-types'
   | 'async'
-  | 'classes'
+  // Python-specific topics
+  | 'input-output'
+  | 'operators'
+  | 'control-flow'
+  | 'data-structures'
 
 export interface TopicInfo {
   id: PracticeTopic
@@ -37,6 +44,7 @@ export interface PracticeSession {
   topic: PracticeTopic
   difficulty: PracticeDifficulty
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed'
+  language: 'typescript' | 'python'
   startedAt: Date
   endedAt?: Date
   exercisesAttempted: number
@@ -68,6 +76,7 @@ export interface GenerateExerciseRequest {
   topic: PracticeTopic
   difficulty: PracticeDifficulty
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz'
+  language?: 'typescript' | 'python'
   themeContext?: ThemeContext
 }
 

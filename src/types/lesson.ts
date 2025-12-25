@@ -25,6 +25,7 @@ export interface Lesson {
   tags: string[]
   steps: LessonStep[]
   keyConcepts?: KeyConcept[]
+  language?: 'typescript' | 'python' // Defaults to 'typescript' if not specified
 }
 
 // Individual step within a lesson
@@ -51,7 +52,7 @@ export interface InstructionStep extends BaseStep {
   content: string
   codeExample?: {
     code: string
-    language: 'typescript' | 'javascript'
+    language: 'typescript' | 'javascript' | 'python'
     highlight?: number[]
   }
 }

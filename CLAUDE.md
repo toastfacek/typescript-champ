@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TypeScript Champ is an interactive TypeScript learning platform modeled after Duolingo. It features 25-minute learning sessions, gamification (XP, streaks, levels), and AI-powered exercise generation using Gemini API.
+CodeHabit is an interactive coding learning platform modeled after Duolingo. It features 25-minute learning sessions, gamification (XP, streaks, levels), and AI-powered exercise generation using Gemini API. The platform supports multiple programming languages, currently TypeScript and Python.
 
 ## Commands
 
@@ -35,17 +35,19 @@ npm run typecheck    # TypeScript check without building
 - **Module Structure**:
   ```
   src/content/modules/
-  ├── 01-getting-started/
+  ├── 01-getting-started/          # TypeScript modules
   │   ├── 01-hello-typescript.ts
   │   ├── 02-basic-types.ts
   │   ├── 03-type-inference.ts
-  │   └── index.ts                    # Aggregates lessons + module definition
-  ├── 02-functions/
-  │   ├── 04-function-basics.ts
   │   └── index.ts
-  └── index.ts                        # Main aggregator (imports all modules)
+  ├── python-01-basics/            # Python modules (prefixed with 'python-')
+  │   ├── py-01-hello-python.ts
+  │   ├── py-02-variables-types.ts
+  │   └── index.ts
+  └── index.ts                     # Main aggregator (imports all modules)
   ```
-- **curriculum.ts**: Thin re-export layer (12 lines) that imports from `modules/index.ts`
+- **curriculum.ts**: Thin re-export layer that imports from `modules/index.ts`
+- **Language Support**: Lessons can specify `language: 'typescript' | 'python'` (defaults to 'typescript')
 - **Step Types**: Four discriminated union types for lessons:
   - `instruction` - Tutorial content with optional code examples
   - `code-exercise` - Write code validated by test cases
@@ -60,10 +62,16 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
   - Helps beginners understand prerequisite knowledge without disrupting lesson flow
   - Currently implemented for lessons 01-04; remaining lessons need key concepts added
 
-**TypeScript Execution**: User code runs in-browser via `lib/typescript-runner.ts`:
-1. Code compiled using TypeScript compiler in a Web Worker (`typescript-worker-singleton.ts`)
-2. Compiled JS executed via `new Function()`
-3. Test validation runs by appending test code to user code before execution
+**Code Execution**: User code runs in-browser:
+- **TypeScript**: Via `lib/typescript-runner.ts`:
+  1. Code compiled using TypeScript compiler in a Web Worker (`typescript-worker-singleton.ts`)
+  2. Compiled JS executed via `new Function()`
+  3. Test validation runs by appending test code to user code before execution
+- **Python**: Via `lib/python-runner.ts`:
+  1. Uses Pyodide (Python runtime compiled to WebAssembly)
+  2. Lazy-loaded on first Python lesson access (~10MB)
+  3. Captures stdout/stderr for output display
+  4. Test validation uses Python assert statements
 
 **Path Aliases**: `@/` maps to `src/` (configured in vite.config.ts and tsconfig.json)
 
@@ -102,7 +110,10 @@ interface Lesson {
 }
 
 // Practice topics (src/types/practice.ts)
-type PracticeTopic = 'basic-types' | 'functions' | 'objects' | 'arrays' | ...
+// Topics vary by language - see src/constants/practice-topics.ts
+type PracticeTopic = 'basics' | 'types' | 'functions' | 'objects' | 'arrays' | 
+  'generics' | 'advanced-types' | 'async' | 'classes' |  // TypeScript
+  'input-output' | 'operators' | 'control-flow' | 'data-structures'  // Python
 
 // XP level calculation uses thresholds: [0, 100, 250, 500, 850, 1300, ...]
 ```

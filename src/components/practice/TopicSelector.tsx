@@ -1,18 +1,7 @@
 import { SelectionGroup, SelectionItem, Badge } from '@/components/ui'
-import type { PracticeTopic, TopicInfo, MasteryLevel } from '@/types/practice'
+import type { PracticeTopic, MasteryLevel } from '@/types/practice'
 import { usePracticeStore } from '@/store/practice-store'
-
-const TOPICS: TopicInfo[] = [
-  { id: 'basics', name: 'TypeScript Basics', description: 'Variables, types, and fundamentals' },
-  { id: 'types', name: 'Type System', description: 'Type annotations and inference' },
-  { id: 'functions', name: 'Functions', description: 'Parameters, returns, and arrow functions' },
-  { id: 'objects', name: 'Objects & Interfaces', description: 'Object types and interfaces' },
-  { id: 'arrays', name: 'Arrays & Collections', description: 'Typed arrays and array methods' },
-  { id: 'generics', name: 'Generics', description: 'Generic types and constraints' },
-  { id: 'advanced-types', name: 'Advanced Types', description: 'Unions, intersections, and guards' },
-  { id: 'async', name: 'Async TypeScript', description: 'Promises, async/await, error handling' },
-  { id: 'classes', name: 'Classes', description: 'Classes, inheritance, and access modifiers' }
-]
+import { getTopics } from '@/constants/practice-topics'
 
 const MASTERY_VARIANTS: Record<MasteryLevel, 'default' | 'accent' | 'success' | 'gold'> = {
   learning: 'default',
@@ -31,10 +20,12 @@ const MASTERY_LABELS: Record<MasteryLevel, string> = {
 interface TopicSelectorProps {
   selectedTopic: PracticeTopic | null
   onSelectTopic: (topic: PracticeTopic) => void
+  language?: 'typescript' | 'python'
 }
 
-export function TopicSelector({ selectedTopic, onSelectTopic }: TopicSelectorProps) {
+export function TopicSelector({ selectedTopic, onSelectTopic, language = 'typescript' }: TopicSelectorProps) {
   const getStats = usePracticeStore((s) => s.getStats)
+  const topics = getTopics(language)
 
   return (
     <SelectionGroup
@@ -44,7 +35,7 @@ export function TopicSelector({ selectedTopic, onSelectTopic }: TopicSelectorPro
       columns={3}
       gap="md"
     >
-      {TOPICS.map((topic) => {
+      {topics.map((topic) => {
         const stats = getStats(topic.id)
 
         return (

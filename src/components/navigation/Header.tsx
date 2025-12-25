@@ -25,12 +25,12 @@ export function Header() {
           <Link to="/" className="flex items-center gap-3 group">
             <div className="relative">
               <div className="w-10 h-10 bg-gradient-to-br from-accent-400 to-accent-600 rounded-xl flex items-center justify-center shadow-glow-sm group-hover:shadow-glow transition-shadow duration-300">
-                <span className="text-surface-900 font-bold text-lg font-heading">TS</span>
+                <span className="text-surface-900 font-bold text-lg font-heading">CH</span>
               </div>
               <div className="absolute -inset-1 bg-gradient-to-br from-accent-400/20 to-accent-600/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <span className="font-heading font-bold text-xl text-surface-100 hidden sm:block">
-              TypeScript<span className="text-accent-400">Champ</span>
+              Code<span className="text-accent-400">Habit</span>
             </span>
           </Link>
 
