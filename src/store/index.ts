@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User, UserProgress, LessonProgress, UserSettings } from '@/types'
-import { syncUserProgress, syncLessonProgress, syncUserSettings } from '@/services/supabase-sync'
+import type { ActivityHistory } from '@/types/gamification'
+import { syncUserProgress, syncLessonProgress, syncUserSettings, syncDailyActivity } from '@/services/supabase-sync'
 
 interface AppState {
   // User state
@@ -9,6 +10,7 @@ interface AppState {
   settings: UserSettings
   progress: UserProgress | null
   lessonProgress: Record<string, LessonProgress>
+  activityHistory: ActivityHistory
 
   // UI state
   isLoading: boolean
@@ -23,6 +25,8 @@ interface AppState {
   addXP: (amount: number) => void
   completeLesson: (lessonId: string, xpEarned: number) => void
   redoLesson: (lessonId: string) => void
+  recordActivity: () => void
+  getActivityForDate: (date: string) => number
   setLoading: (loading: boolean) => void
   toggleSidebar: () => void
   reset: () => void
@@ -53,6 +57,7 @@ export const useStore = create<AppState>()(
       settings: defaultSettings,
       progress: null,
       lessonProgress: {},
+      activityHistory: {},
       isLoading: false,
       isSidebarOpen: true,
 
@@ -115,12 +120,53 @@ export const useStore = create<AppState>()(
           return { progress: newProgress }
         }),
 
+      recordActivity: () =>
+        set((state) => {
+          const today = new Date().toISOString().split('T')[0]
+          const currentCount = state.activityHistory[today] || 0
+          const newActivityHistory = {
+            ...state.activityHistory,
+            [today]: currentCount + 1,
+          }
+
+          // Sync to Supabase if user is logged in
+          const userId = state.user?.id
+          if (userId) {
+            syncDailyActivity(userId, today, currentCount + 1).catch(err =>
+              console.error('Sync error:', err)
+            )
+          }
+
+          return { activityHistory: newActivityHistory }
+        }),
+
+      getActivityForDate: (date: string) => {
+        const state = useStore.getState()
+        return state.activityHistory[date] || 0
+      },
+
       completeLesson: (lessonId, xpEarned) =>
         set((state) => {
           const currentProgress = state.progress || defaultProgress
           const alreadyCompleted = currentProgress.lessonsCompleted.includes(lessonId)
 
           if (alreadyCompleted) return state
+
+          // Record activity for lesson completion
+          const today = new Date().toISOString().split('T')[0]
+          const currentActivityCount = state.activityHistory[today] || 0
+          const newActivityHistory = {
+            ...state.activityHistory,
+            [today]: currentActivityCount + 1,
+          }
+
+          // Sync to Supabase if user is logged in
+          const userId = state.user?.id
+          if (userId) {
+            syncDailyActivity(userId, today, currentActivityCount + 1).catch(err =>
+              console.error('Sync error:', err)
+            )
+          }
 
           const existingLessonProgress = state.lessonProgress[lessonId]
           const hasEarnedXP = existingLessonProgress?.hasEarnedXP === true
@@ -218,6 +264,7 @@ export const useStore = create<AppState>()(
               ...state.lessonProgress,
               [lessonId]: newLessonProgress,
             },
+            activityHistory: newActivityHistory,
           }
         }),
 
@@ -273,6 +320,7 @@ export const useStore = create<AppState>()(
           user: null,
           progress: null,
           lessonProgress: {},
+          activityHistory: {},
         }),
     }),
     {
@@ -282,6 +330,7 @@ export const useStore = create<AppState>()(
         settings: state.settings,
         progress: state.progress,
         lessonProgress: state.lessonProgress,
+        activityHistory: state.activityHistory,
       }),
     }
   )

@@ -454,3 +454,57 @@ export async function deleteFocusedPracticeSession(
 
   return true
 }
+
+// Daily activity methods
+export async function syncDailyActivity(
+  userId: string,
+  date: string,
+  count: number
+): Promise<boolean> {
+  if (isDemoMode || userId === 'demo-user') return false
+
+  const activityData: any = {
+    user_id: userId,
+    date,
+    count,
+    updated_at: new Date().toISOString(),
+  }
+
+  const { error } = await supabase
+    .from('daily_activity')
+    .upsert(activityData, { onConflict: 'user_id,date' })
+
+  if (error) {
+    console.error('Error syncing daily activity:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function getDailyActivity(
+  userId: string,
+  startDate: string,
+  endDate: string
+): Promise<Record<string, number>> {
+  if (isDemoMode) return {}
+
+  const { data, error } = await supabase
+    .from('daily_activity')
+    .select('date, count')
+    .eq('user_id', userId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+
+  if (error) {
+    console.error('Error fetching daily activity:', error)
+    return {}
+  }
+
+  const activityHistory: Record<string, number> = {}
+  for (const row of data || []) {
+    activityHistory[(row as any).date] = (row as any).count
+  }
+
+  return activityHistory
+}
