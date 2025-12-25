@@ -9,7 +9,7 @@ import { useTypeScriptWorker } from '@/lib/useTypeScriptWorker'
 import { DiagnosticCategory } from '@/lib/typescript-worker-singleton'
 import { useTheme } from '@/hooks/useTheme'
 
-interface CodeEditorProps {
+export interface CodeEditorProps {
   code: string
   onChange: (code: string) => void
   readOnly?: boolean

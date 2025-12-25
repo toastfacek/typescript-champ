@@ -9,6 +9,30 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // React vendor chunk
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router')) {
+            return 'react-vendor'
+          }
+          // CodeMirror vendor chunk
+          if (id.includes('node_modules/@codemirror') || id.includes('node_modules/@uiw/react-codemirror') || id.includes('node_modules/codemirror')) {
+            return 'codemirror-vendor'
+          }
+          // Utils vendor chunk
+          if (id.includes('node_modules/zustand') || id.includes('node_modules/clsx') || id.includes('node_modules/canvas-confetti')) {
+            return 'utils-vendor'
+          }
+          // Other node_modules go into default chunk
+          if (id.includes('node_modules')) {
+            return 'vendor'
+          }
+        },
+      },
+    },
+  },
   preview: {
     allowedHosts: process.env.VITE_ALLOWED_HOST ? [process.env.VITE_ALLOWED_HOST] : [],
   },

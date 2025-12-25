@@ -1,12 +1,21 @@
 import { Routes, Route } from 'react-router-dom'
+import { Suspense, lazy, useEffect } from 'react'
 import { Header } from '@/components/navigation'
-import { HomePage, CurriculumPage, ProfilePage, LessonPage, PracticePage, PracticeSessionPage, FocusedPracticePage, AuthPage } from '@/pages'
-import { useEffect } from 'react'
 import { useStore } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { useTheme } from '@/hooks/useTheme'
 import { isDemoMode } from '@/lib/supabase'
+
+// Lazy load all pages for code splitting
+const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })))
+const CurriculumPage = lazy(() => import('@/pages/CurriculumPage').then(m => ({ default: m.CurriculumPage })))
+const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })))
+const LessonPage = lazy(() => import('@/pages/LessonPage').then(m => ({ default: m.LessonPage })))
+const PracticePage = lazy(() => import('@/pages/PracticePage').then(m => ({ default: m.PracticePage })))
+const PracticeSessionPage = lazy(() => import('@/pages/PracticeSessionPage').then(m => ({ default: m.PracticeSessionPage })))
+const FocusedPracticePage = lazy(() => import('@/pages/FocusedPracticePage').then(m => ({ default: m.FocusedPracticePage })))
+const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })))
 
 export default function App() {
   const { isLoading, isAuthenticated } = useAuth()
@@ -73,16 +82,30 @@ export default function App() {
       )}
       <Header />
       <main>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/curriculum" element={<CurriculumPage />} />
-          <Route path="/practice" element={<PracticePage />} />
-          <Route path="/practice/session" element={<PracticeSessionPage />} />
-          <Route path="/practice/focused/:lessonId" element={<FocusedPracticePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/lesson/:lessonId" element={<LessonPage />} />
-          <Route path="/auth" element={<AuthPage />} />
-        </Routes>
+        <Suspense
+          fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-surface-700 rounded-full" />
+                  <div className="absolute top-0 left-0 w-16 h-16 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+                </div>
+                <p className="mt-4 text-surface-500 font-medium">Loading...</p>
+              </div>
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/curriculum" element={<CurriculumPage />} />
+            <Route path="/practice" element={<PracticePage />} />
+            <Route path="/practice/session" element={<PracticeSessionPage />} />
+            <Route path="/practice/focused/:lessonId" element={<FocusedPracticePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/lesson/:lessonId" element={<LessonPage />} />
+            <Route path="/auth" element={<AuthPage />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   )
