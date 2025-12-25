@@ -12,6 +12,31 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- #region agent log -->
+    <script>
+      // Debug: Catch module loading errors before they happen
+      window.__debugLogs = [];
+      window.__debugLog = function(location, message, data) {
+        const entry = {location, message, data, timestamp: Date.now()};
+        window.__debugLogs.push(entry);
+        console.log('[DEBUG]', location, message, data);
+        fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...entry,sessionId:'debug-session',hypothesisId:'H1-H5'})}).catch(()=>{});
+      };
+      window.__debugLog('index.html:inline', 'Script tag executing - BUILD ID: ' + Date.now(), {url: window.location.href, port: window.location.port});
+      window.addEventListener('error', function(e) {
+        window.__debugLog('index.html:error', 'Global error caught', {message: e.message, filename: e.filename, lineno: e.lineno, colno: e.colno, stack: e.error?.stack});
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        window.__debugLog('index.html:rejection', 'Unhandled rejection', {reason: String(e.reason)});
+      });
+      // Check for service worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          window.__debugLog('index.html:sw', 'Service workers found', {count: regs.length});
+        });
+      }
+    </script>
+    <!-- #endregion -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

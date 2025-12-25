@@ -7,8 +7,17 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { useTheme } from '@/hooks/useTheme'
 import { isDemoMode } from '@/lib/supabase'
 
+// #region agent log
+fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.tsx:10',message:'App.tsx module evaluated, about to define lazy imports',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+// #endregion
+
 // Lazy load all pages for code splitting
-const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })))
+const HomePage = lazy(() => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/95582442-452b-41ec-b183-d126686c5710',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'App.tsx:HomePage-lazy',message:'HomePage lazy import triggered',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'H3'})}).catch(()=>{});
+  // #endregion
+  return import('@/pages/HomePage').then(m => ({ default: m.HomePage }))
+})
 const CurriculumPage = lazy(() => import('@/pages/CurriculumPage').then(m => ({ default: m.CurriculumPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })))
 const LessonPage = lazy(() => import('@/pages/LessonPage').then(m => ({ default: m.LessonPage })))

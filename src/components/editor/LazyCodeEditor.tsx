@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import type { CodeEditorProps } from './CodeEditor'
+import type { CodeEditorProps } from './types'
 
 // Lazy load CodeEditor to reduce initial bundle size
 // CodeMirror is only needed on lesson/practice pages
