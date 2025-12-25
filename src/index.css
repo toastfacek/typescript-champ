@@ -410,7 +410,6 @@
   background-color: rgba(255, 255, 255, 1) !important;
   border-color: rgba(6, 182, 212, 0.5) !important;
   box-shadow: 0 10px 15px -3px rgba(6, 182, 212, 0.12), 0 4px 6px -2px rgba(6, 182, 212, 0.06) !important;
-  transform: translateY(-2px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
