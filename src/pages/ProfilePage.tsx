@@ -38,7 +38,17 @@ export function ProfilePage() {
   const xpNeededForNext = xpForNext - currentThreshold
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+        {/* Left Sidebar - Learning Activity */}
+        <aside className="lg:sticky lg:top-8 h-fit">
+          <Card className="mb-8">
+            <ContributionGrid activityHistory={activityHistory} variant="full" />
+          </Card>
+        </aside>
+
+        {/* Main Content */}
+        <div className="min-w-0">
       {/* Profile Header */}
       <Card className="mb-8" variant="gradient" glow="accent">
         <div className="flex items-center gap-6">
@@ -154,11 +164,6 @@ export function ProfilePage() {
         </div>
       </Card>
 
-      {/* Learning Activity */}
-      <Card className="mb-8">
-        <ContributionGrid activityHistory={activityHistory} />
-      </Card>
-
       {/* Achievements Preview */}
       <Card className="mb-8">
         <div className="flex items-center justify-between mb-6">
@@ -214,6 +219,8 @@ export function ProfilePage() {
           </div>
         )}
       </Card>
+        </div>
+      </div>
     </div>
   )
 }

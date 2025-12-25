@@ -1,8 +1,12 @@
 import { useState, useMemo, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui'
 import type { ActivityHistory, ContributionViewMode } from '@/types/gamification'
 
 interface ContributionGridProps {
   activityHistory: ActivityHistory
+  variant?: 'compact' | 'full'
+  nextLessonId?: string | null
 }
 
 interface GridDay {
@@ -11,14 +15,54 @@ interface GridDay {
   intensity: 'none' | 'light' | 'medium' | 'dark'
 }
 
-export function ContributionGrid({ activityHistory }: ContributionGridProps) {
+export function ContributionGrid({ activityHistory, variant = 'full', nextLessonId = null }: ContributionGridProps) {
   const [viewMode, setViewMode] = useState<ContributionViewMode>('1month')
   const [hoveredDay, setHoveredDay] = useState<GridDay | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
-  // Calculate date range based on view mode
+  // Compact mode: always show last 7 days
+  const compactDays = useMemo(() => {
+    const days: GridDay[] = []
+    const today = new Date()
+    today.setHours(23, 59, 59, 999)
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - i)
+      date.setHours(0, 0, 0, 0)
+      
+      const dateStr = date.toISOString().split('T')[0]
+      const count = activityHistory[dateStr] || 0
+      
+      let intensity: 'none' | 'light' | 'medium' | 'dark'
+      if (count === 0) {
+        intensity = 'none'
+      } else if (count === 1) {
+        intensity = 'light'
+      } else if (count >= 2 && count <= 3) {
+        intensity = 'medium'
+      } else {
+        intensity = 'dark'
+      }
+      
+      days.push({ date, count, intensity })
+    }
+    
+    return days
+  }, [activityHistory])
+
+  // Calculate activity count for this week (compact mode)
+  const weekActivityCount = useMemo(() => {
+    return compactDays.filter(d => d.count > 0).length
+  }, [compactDays])
+
+  // Calculate date range based on view mode (full mode only)
   const { startDate, endDate, weeks } = useMemo(() => {
+    if (variant === 'compact') {
+      return { startDate: new Date(), endDate: new Date(), weeks: 0 }
+    }
+
     const end = new Date()
     end.setHours(23, 59, 59, 999)
     
@@ -57,10 +101,12 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
       endDate: end,
       weeks: weeksCount,
     }
-  }, [viewMode])
+  }, [viewMode, variant])
 
-  // Generate grid data
+  // Generate grid data (full mode)
   const gridData = useMemo(() => {
+    if (variant === 'compact') return []
+    
     const days: GridDay[] = []
     const currentDate = new Date(startDate)
 
@@ -97,43 +143,20 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
     }
 
     return days
-  }, [startDate, endDate, weeks, activityHistory])
+  }, [startDate, endDate, weeks, activityHistory, variant])
 
-  // Group days into weeks (7 days per week)
+  // Group days into weeks (7 days per week) - full mode
   const weeksData = useMemo(() => {
+    if (variant === 'compact') return []
+    
     const weeks: GridDay[][] = []
     for (let i = 0; i < gridData.length; i += 7) {
       weeks.push(gridData.slice(i, i + 7))
     }
-    return weeks
-  }, [gridData])
+    // Reverse so newest week is at top
+    return weeks.reverse()
+  }, [gridData, variant])
 
-  // Get month labels for top of grid - simplified approach
-  const monthLabels = useMemo(() => {
-    const labels: Array<{ month: string; weekIndex: number }> = []
-    const seenMonths = new Set<string>()
-
-    // Find the first week that contains the 1st of each month
-    weeksData.forEach((week, weekIndex) => {
-      if (week.length > 0) {
-        const firstDay = week[0].date
-        const monthKey = `${firstDay.getFullYear()}-${firstDay.getMonth()}`
-        
-        // Only add label if this is the first week of the month (1st is in this week)
-        const firstOfMonth = new Date(firstDay.getFullYear(), firstDay.getMonth(), 1)
-        const weekStart = week[0].date
-        const weekEnd = week[week.length - 1].date
-        
-        if (!seenMonths.has(monthKey) && firstOfMonth >= weekStart && firstOfMonth <= weekEnd) {
-          seenMonths.add(monthKey)
-          const monthName = firstDay.toLocaleDateString('en-US', { month: 'short' })
-          labels.push({ month: monthName, weekIndex })
-        }
-      }
-    })
-
-    return labels
-  }, [weeksData])
 
   const formatDate = (date: Date): string => {
     return date.toLocaleDateString('en-US', {
@@ -159,12 +182,89 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
     }
   }
 
+  // Compact mode render
+  if (variant === 'compact') {
+    const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    
+    return (
+      <div className="w-full">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-surface-100">Your Week</h3>
+          {nextLessonId && (
+            <Link to={`/lesson/${nextLessonId}`}>
+              <Button size="sm" variant="outline" className="group">
+                Continue Lesson
+                <svg className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Button>
+            </Link>
+          )}
+        </div>
+        
+        {/* Weekday Labels */}
+        <div className="flex gap-2 mb-2">
+          {weekdayLabels.map((day) => (
+            <div key={day} className="flex-1 text-center text-xs text-surface-500">
+              {day}
+            </div>
+          ))}
+        </div>
+        
+        {/* Activity Boxes */}
+        <div className="flex gap-2 mb-3">
+          {compactDays.map((day, idx) => (
+            <div
+              key={idx}
+              className={`flex-1 aspect-square rounded transition-all cursor-pointer ${getIntensityColor(day.intensity)} ${
+                hoveredDay?.date.getTime() === day.date.getTime()
+                  ? 'ring-2 ring-accent-400 scale-105'
+                  : 'hover:ring-2 hover:ring-accent-400/50'
+              }`}
+              onMouseEnter={() => setHoveredDay(day)}
+              onMouseLeave={() => setHoveredDay(null)}
+            />
+          ))}
+        </div>
+        
+        {/* Activity Summary */}
+        <div className="text-sm text-surface-400">
+          {weekActivityCount > 0 ? (
+            <span>
+              {weekActivityCount} {weekActivityCount === 1 ? 'day' : 'days'} this week · Keep your streak going!
+            </span>
+          ) : (
+            <span>Start learning today to build your streak!</span>
+          )}
+        </div>
+        
+        {/* Tooltip */}
+        {hoveredDay && (
+          <div className="absolute z-50 px-3 py-2 bg-surface-800 border border-surface-700 rounded-lg shadow-lg text-sm pointer-events-none"
+            style={{
+              left: '50%',
+              top: '-80px',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <div className="font-medium text-surface-100">
+              {hoveredDay.count} {hoveredDay.count === 1 ? 'activity' : 'activities'}
+            </div>
+            <div className="text-surface-400 text-xs mt-0.5">
+              {formatDate(hoveredDay.date)}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
+  // Full mode render - vertical orientation
   return (
     <div className="w-full relative">
       {/* View Mode Toggle */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-surface-100">Your Learning Activity</h3>
+        <h3 className="text-lg font-semibold text-surface-100">Learning Activity</h3>
         <div className="flex gap-1 bg-surface-800 rounded-lg p-1 flex-wrap">
           <button
             onClick={() => setViewMode('1week')}
@@ -219,103 +319,78 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
         </div>
       </div>
 
-      {/* Grid Container */}
-      <div className="overflow-x-auto" ref={gridRef}>
+      {/* Grid Container - Vertical Orientation */}
+      <div className="overflow-y-auto max-h-[600px]" ref={gridRef}>
         <div className="inline-block min-w-full">
-          {/* Month Labels */}
-          <div className="flex mb-2" style={{ paddingLeft: '24px' }}>
-            {monthLabels.map((label, idx) => {
-              // Each week is 10px (square) + 4px (gap) = 14px wide
-              const weekWidth = 14
-              const prevWeekIndex = idx > 0 ? monthLabels[idx - 1].weekIndex : 0
-              const weekOffset = (label.weekIndex - prevWeekIndex) * weekWidth
+          {/* Weekday Headers (columns) */}
+          <div className="flex gap-1 mb-2" style={{ paddingLeft: '60px' }}>
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+              <div key={day} className="flex-1 text-center text-xs text-surface-500">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Weeks as Rows */}
+          <div className="flex flex-col gap-1">
+            {weeksData.map((week, weekIndex) => {
+              // Get week label (first day of week)
+              const weekStart = week[0]?.date
+              const weekLabel = weekStart
+                ? weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                : ''
               
               return (
-                <div
-                  key={idx}
-                  className="text-xs text-surface-500 whitespace-nowrap"
-                  style={{
-                    marginLeft: idx === 0 ? '0' : `${weekOffset}px`,
-                  }}
-                >
-                  {label.month}
+                <div key={weekIndex} className="flex gap-1 items-center">
+                  {/* Week Label */}
+                  <div className="w-14 text-xs text-surface-500 text-right pr-2 shrink-0">
+                    {weekLabel}
+                  </div>
+                  
+                  {/* Days in Week */}
+                  <div className="flex gap-1 flex-1">
+                    {week.map((day, dayIndex) => {
+                      const isInRange = day.date >= startDate && day.date <= endDate
+                      if (!isInRange) {
+                        return (
+                          <div
+                            key={`${weekIndex}-${dayIndex}`}
+                            className="flex-1 aspect-square rounded"
+                            style={{ backgroundColor: 'transparent' }}
+                          />
+                        )
+                      }
+
+                      return (
+                        <div
+                          key={`${weekIndex}-${dayIndex}`}
+                          className={`flex-1 aspect-square rounded transition-all cursor-pointer ${getIntensityColor(day.intensity)} ${
+                            hoveredDay?.date.getTime() === day.date.getTime()
+                              ? 'ring-2 ring-accent-400 scale-110'
+                              : 'hover:ring-2 hover:ring-accent-400/50'
+                          }`}
+                          onMouseEnter={(e) => {
+                            setHoveredDay(day)
+                            if (gridRef.current) {
+                              const rect = gridRef.current.getBoundingClientRect()
+                              const targetRect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                              setTooltipPosition({
+                                x: targetRect.left - rect.left + targetRect.width / 2,
+                                y: targetRect.top - rect.top,
+                              })
+                            }
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredDay(null)
+                            setTooltipPosition(null)
+                          }}
+                        />
+                      )
+                    })}
+                  </div>
                 </div>
               )
             })}
-          </div>
-
-          {/* Grid */}
-          <div className="flex gap-1">
-            {/* Weekday Labels */}
-            <div className="flex flex-col gap-1 mr-2">
-              {[0, 2, 4].map((dayIdx) => {
-                // Each row is 10px (square) + 4px (gap) = 14px tall
-                const rowHeight = 14
-                // For Mon (0): no margin, Wed (2): 2 rows down = 28px, Fri (4): 4 rows down = 56px
-                // But we need to account for the gap-1 (4px) between rows
-                const marginTop = dayIdx === 0 ? 0 : dayIdx * rowHeight
-                return (
-                  <div
-                    key={dayIdx}
-                    className="text-xs text-surface-500"
-                    style={{ 
-                      height: `${rowHeight}px`, 
-                      lineHeight: `${rowHeight}px`,
-                      marginTop: `${marginTop}px`
-                    }}
-                  >
-                    {dayIdx === 0 ? 'Mon' : dayIdx === 2 ? 'Wed' : 'Fri'}
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Contribution Squares */}
-            <div className="flex gap-1 flex-1">
-              {weeksData.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-1">
-                  {week.map((day, dayIndex) => {
-                    const isInRange = day.date >= startDate && day.date <= endDate
-                    if (!isInRange) {
-                    return (
-                      <div
-                        key={`${weekIndex}-${dayIndex}`}
-                        className="rounded"
-                        style={{ width: '10px', height: '10px' }}
-                      />
-                    )
-                    }
-
-                    return (
-                      <div
-                        key={`${weekIndex}-${dayIndex}`}
-                        className={`rounded transition-all cursor-pointer ${getIntensityColor(day.intensity)} ${
-                          hoveredDay?.date.getTime() === day.date.getTime()
-                            ? 'ring-2 ring-accent-400 scale-110'
-                            : 'hover:ring-2 hover:ring-accent-400/50'
-                        }`}
-                        style={{ width: '10px', height: '10px' }}
-                        onMouseEnter={(e) => {
-                          setHoveredDay(day)
-                          if (gridRef.current) {
-                            const rect = gridRef.current.getBoundingClientRect()
-                            const targetRect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-                            setTooltipPosition({
-                              x: targetRect.left - rect.left + targetRect.width / 2,
-                              y: targetRect.top - rect.top,
-                            })
-                          }
-                        }}
-                        onMouseLeave={() => {
-                          setHoveredDay(null)
-                          setTooltipPosition(null)
-                        }}
-                      />
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -324,10 +399,10 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
       <div className="flex items-center gap-4 mt-4 text-sm text-surface-500">
         <span>Less</span>
         <div className="flex gap-1">
-          <div className="rounded bg-surface-700" style={{ width: '10px', height: '10px' }} />
-          <div className="rounded bg-accent-500/30" style={{ width: '10px', height: '10px' }} />
-          <div className="rounded bg-accent-500/60" style={{ width: '10px', height: '10px' }} />
-          <div className="rounded bg-accent-500" style={{ width: '10px', height: '10px' }} />
+          <div className="w-3 h-3 rounded bg-surface-700" />
+          <div className="w-3 h-3 rounded bg-accent-500/30" />
+          <div className="w-3 h-3 rounded bg-accent-500/60" />
+          <div className="w-3 h-3 rounded bg-accent-500" />
         </div>
         <span>More</span>
       </div>
@@ -353,4 +428,3 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
     </div>
   )
 }
-

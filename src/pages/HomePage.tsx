@@ -140,11 +140,11 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Contribution Grid */}
+      {/* Contribution Grid - Compact */}
       <section className="pt-4 pb-8 px-4">
         <div className="max-w-4xl mx-auto">
           <Card padding="lg">
-            <ContributionGrid activityHistory={activityHistory} />
+            <ContributionGrid activityHistory={activityHistory} variant="compact" nextLessonId={nextLessonId} />
           </Card>
         </div>
       </section>
