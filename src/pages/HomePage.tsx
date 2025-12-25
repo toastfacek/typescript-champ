@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom'
 import { Button, Card, ProgressBar } from '@/components/ui'
 import { XPCounter, StreakBadge } from '@/components/gamification'
+import { WelcomeRecapCard } from '@/components/home/WelcomeRecapCard'
+import { ResumeLessonCard } from '@/components/home/ResumeLessonCard'
 import { useStore } from '@/store'
+import { useRecapStore } from '@/store/recap-store'
 import { curriculum } from '@/content/curriculum'
 
 export function HomePage() {
   const progress = useStore((state) => state.progress)
   const lessonProgress = useStore((state) => state.lessonProgress)
+  const recapCache = useRecapStore((state) => state.getValidCache())
 
   const completedCount = progress?.lessonsCompleted.length || 0
   const totalLessons = curriculum.modules.reduce(
@@ -27,7 +31,21 @@ export function HomePage() {
     return curriculum.modules[0]?.lessons[0] || null
   }
 
+  // Find in-progress lesson for ResumeLessonCard
+  const findInProgressLesson = () => {
+    for (const module of curriculum.modules) {
+      for (const lessonId of module.lessons) {
+        const lp = lessonProgress[lessonId]
+        if (lp && lp.status === 'in-progress') {
+          return { lessonId, progress: lp }
+        }
+      }
+    }
+    return null
+  }
+
   const nextLessonId = getNextLesson()
+  const inProgressLesson = findInProgressLesson()
 
   return (
     <div className="min-h-[calc(100vh-4rem)]">
@@ -80,6 +98,20 @@ export function HomePage() {
               </Link>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Welcome Recap or Resume Lesson Card */}
+      <section className="py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          {recapCache ? (
+            <WelcomeRecapCard cache={recapCache} />
+          ) : inProgressLesson ? (
+            <ResumeLessonCard
+              lessonId={inProgressLesson.lessonId}
+              progress={inProgressLesson.progress}
+            />
+          ) : null}
         </div>
       </section>
 

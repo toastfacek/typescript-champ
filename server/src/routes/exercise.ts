@@ -23,6 +23,10 @@ import {
   FOCUSED_PRACTICE_SYSTEM_PROMPT,
   buildFocusedPracticePrompt
 } from '../prompts/focused-practice.js'
+import {
+  RECAP_EXERCISE_SYSTEM_PROMPT,
+  buildRecapExercisePrompt
+} from '../prompts/recap-exercise.js'
 
 export const exerciseRouter = Router()
 
@@ -474,6 +478,170 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
     })
   } catch (error) {
     console.error('Focused practice generation error:', error)
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+})
+
+// Generate recap exercise
+const GenerateRecapSchema = z.object({
+  lessonId: z.string(),
+  lessonTitle: z.string(),
+  lessonDescription: z.string(),
+  lessonTags: z.array(z.string()),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced']),
+  language: z.enum(['typescript', 'python']).default('typescript'),
+  timesCompleted: z.number().optional().default(0)
+})
+
+exerciseRouter.post('/generate-recap', async (req, res) => {
+  try {
+    const parseResult = GenerateRecapSchema.safeParse(req.body)
+    if (!parseResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid request',
+        details: parseResult.error.errors
+      })
+    }
+
+    const { lessonTitle, lessonDescription, lessonTags, difficulty, language, timesCompleted } = parseResult.data
+
+    // Determine exercise type - prefer quiz or fill-in-blank for quick recap
+    const exerciseTypes: Array<'code-exercise' | 'fill-in-blank' | 'quiz'> = [
+      'quiz',
+      'fill-in-blank',
+      'code-exercise'
+    ]
+    const exerciseType = exerciseTypes[timesCompleted % exerciseTypes.length]
+
+    // Build prompt
+    const userPrompt = buildRecapExercisePrompt(
+      lessonTitle,
+      lessonDescription,
+      lessonTags,
+      difficulty,
+      language,
+      timesCompleted
+    )
+
+    // Generate exercise from Gemini
+    const startTime = Date.now()
+    const generated = await completeWithJSON(userPrompt, {
+      systemPrompt: RECAP_EXERCISE_SYSTEM_PROMPT,
+      temperature: 0.8
+    })
+    const generationTimeMs = Date.now() - startTime
+
+    // Validate generated content
+    let validation
+    switch (exerciseType) {
+      case 'code-exercise':
+        validation = validateCodeExercise(generated)
+        break
+      case 'fill-in-blank':
+        validation = validateFillBlank(generated)
+        break
+      case 'quiz':
+        validation = validateQuiz(generated)
+        break
+    }
+
+    if (!validation.valid) {
+      console.error('Generated recap exercise failed validation:', validation.errors)
+      return res.status(422).json({
+        success: false,
+        error: 'Generated exercise failed validation',
+        validationErrors: validation.errors
+      })
+    }
+
+    // Build the step object matching frontend types
+    const exerciseId = `recap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+    let step: unknown
+    const data = generated as any
+    switch (exerciseType) {
+      case 'code-exercise':
+        step = {
+          id: `step-${exerciseId}`,
+          order: 1,
+          type: 'code-exercise',
+          title: data.title,
+          instructions: data.instructions,
+          starterCode: data.starterCode,
+          solutionCode: data.solutionCode,
+          testCases: data.testCases,
+          hints: data.hints
+        }
+        break
+      case 'fill-in-blank':
+        step = {
+          id: `step-${exerciseId}`,
+          order: 1,
+          type: 'fill-in-blank',
+          title: data.title,
+          instructions: data.instructions,
+          codeTemplate: data.codeTemplate,
+          blanks: data.blanks,
+          hints: data.hints
+        }
+        break
+      case 'quiz':
+        step = {
+          id: `step-${exerciseId}`,
+          order: 1,
+          type: 'quiz',
+          title: data.title,
+          question: data.question,
+          codeContext: data.codeContext,
+          options: data.options,
+          explanation: data.explanation
+        }
+        break
+    }
+
+    // Map lesson tags to practice topic
+    const tagStr = lessonTags.join(' ').toLowerCase()
+    let topic = 'basics'
+    if (tagStr.includes('function') || tagStr.includes('arrow')) topic = 'functions'
+    else if (tagStr.includes('type') || tagStr.includes('interface')) topic = 'types'
+    else if (tagStr.includes('array') || tagStr.includes('list')) topic = 'arrays'
+    else if (tagStr.includes('object') || tagStr.includes('class')) topic = 'objects'
+    else if (tagStr.includes('generic')) topic = 'generics'
+    else if (tagStr.includes('async') || tagStr.includes('promise')) topic = 'async'
+
+    // Map difficulty
+    const difficultyMap = {
+      beginner: 'easy' as const,
+      intermediate: 'medium' as const,
+      advanced: 'hard' as const
+    }
+    const practiceDifficulty = difficultyMap[difficulty]
+
+    res.json({
+      success: true,
+      exercise: {
+        id: exerciseId,
+        type: exerciseType,
+        topic,
+        difficulty: practiceDifficulty,
+        step,
+        generatedAt: new Date().toISOString(),
+        aiMetadata: {
+          generationTimeMs,
+          modelUsed: 'gemini-3-flash-preview'
+        }
+      },
+      validation: {
+        valid: true,
+        warnings: validation.warnings
+      }
+    })
+  } catch (error) {
+    console.error('Recap exercise generation error:', error)
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
