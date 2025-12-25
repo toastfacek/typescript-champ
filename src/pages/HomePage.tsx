@@ -4,6 +4,7 @@ import { Button, Card, ProgressBar } from '@/components/ui'
 import { XPCounter, StreakBadge, ContributionGrid } from '@/components/gamification'
 import { ResumeLessonCard } from '@/components/home/ResumeLessonCard'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { useRecapStore } from '@/store/recap-store'
 import { curriculum } from '@/content/curriculum'
 
@@ -11,9 +12,9 @@ import { curriculum } from '@/content/curriculum'
 const WelcomeRecapCard = lazy(() => import('@/components/home/WelcomeRecapCard').then(m => ({ default: m.WelcomeRecapCard })))
 
 export function HomePage() {
-  const progress = useStore((state) => state.progress)
-  const lessonProgress = useStore((state) => state.lessonProgress)
-  const activityHistory = useStore((state) => state.activityHistory)
+  const progress = useStore((state: AppState) => state.progress)
+  const lessonProgress = useStore((state: AppState) => state.lessonProgress)
+  const activityHistory = useStore((state: AppState) => state.activityHistory)
   const recapCache = useRecapStore((state) => state.getValidCache())
 
   const completedCount = progress?.lessonsCompleted.length || 0

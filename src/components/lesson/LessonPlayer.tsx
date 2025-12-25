@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Lesson, LessonStep } from '@/types'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { Button, Card, ProgressBar } from '@/components/ui'
 import { InstructionStep } from './InstructionStep'
 import { CodeExerciseStep } from './CodeExerciseStep'
@@ -21,9 +22,9 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
   const [isComplete, setIsComplete] = useState(false)
   const [hintsUsed, setHintsUsed] = useState(0)
 
-  const completeLesson = useStore((state) => state.completeLesson)
-  const lessonProgress = useStore((state) => state.lessonProgress)
-  const setLessonProgress = useStore((state) => state.setLessonProgress)
+  const completeLesson = useStore((state: AppState) => state.completeLesson)
+  const lessonProgress = useStore((state: AppState) => state.lessonProgress)
+  const setLessonProgress = useStore((state: AppState) => state.setLessonProgress)
 
   const currentStep = lesson.steps[currentStepIndex]
   const totalSteps = lesson.steps.length

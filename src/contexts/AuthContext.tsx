@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { authHelpers, isDemoMode } from '@/lib/supabase'
 import { loadAllDataFromSupabase, syncAllDataToSupabase } from '@/services/supabase-sync'
+import type { LessonProgress } from '@/types'
 import { useStore } from '@/store'
 import { usePracticeStore } from '@/store/practice-store'
 
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const updatedProgress = { ...progress, userId: authUser.id }
 
       // Update userId in all lesson progress
-      const updatedLessonProgress: Record<string, any> = {}
+      const updatedLessonProgress: Record<string, LessonProgress> = {}
       for (const [lessonId, lesson] of Object.entries(lessonProgress)) {
         updatedLessonProgress[lessonId] = { ...lesson, userId: authUser.id }
       }

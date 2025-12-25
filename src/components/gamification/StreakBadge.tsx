@@ -1,5 +1,6 @@
 import { clsx } from 'clsx'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 
 interface StreakBadgeProps {
   size?: 'sm' | 'md' | 'lg'
@@ -8,7 +9,7 @@ interface StreakBadgeProps {
 }
 
 export function StreakBadge({ size = 'md', showLabel = true, className }: StreakBadgeProps) {
-  const progress = useStore((state) => state.progress)
+  const progress = useStore((state: AppState) => state.progress)
   const streak = progress?.currentStreak || 0
   const isActive = streak > 0
 

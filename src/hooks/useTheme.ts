@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 
 type Theme = 'light' | 'dark' | 'system'
 type EffectiveTheme = 'light' | 'dark'
@@ -9,8 +10,8 @@ type EffectiveTheme = 'light' | 'dark'
  * Handles system preference detection and theme switching
  */
 export function useTheme() {
-  const theme = useStore((state) => state.settings.theme)
-  const updateSettings = useStore((state) => state.updateSettings)
+  const theme = useStore((state: AppState) => state.settings.theme)
+  const updateSettings = useStore((state: AppState) => state.updateSettings)
 
   // Calculate effective theme (resolves 'system' to actual light/dark)
   const effectiveTheme: EffectiveTheme = useMemo(() => {

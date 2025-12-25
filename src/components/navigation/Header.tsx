@@ -2,12 +2,13 @@ import { Link, useLocation } from 'react-router-dom'
 import { XPCounter, StreakBadge } from '@/components/gamification'
 import { ThemeToggle } from '@/components/ui'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
 import { clsx } from 'clsx'
 
 export function Header() {
-  const user = useStore((state) => state.user)
-  const progress = useStore((state) => state.progress)
+  const user = useStore((state: AppState) => state.user)
+  const progress = useStore((state: AppState) => state.progress)
   const { isAuthenticated, signOut } = useAuth()
   const location = useLocation()
 

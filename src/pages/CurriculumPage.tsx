@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Card, Badge, ProgressBar, Button } from '@/components/ui'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { curriculum, lessons } from '@/content/curriculum'
 
 export function CurriculumPage() {
   const navigate = useNavigate()
-  const lessonProgress = useStore((state) => state.lessonProgress)
-  const redoLesson = useStore((state) => state.redoLesson)
+  const lessonProgress = useStore((state: AppState) => state.lessonProgress)
+  const redoLesson = useStore((state: AppState) => state.redoLesson)
   const [language, setLanguage] = useState<'typescript' | 'python'>('typescript')
 
   // Filter modules based on language

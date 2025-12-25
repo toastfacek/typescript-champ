@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { getProgressToNextLevel } from '@/types'
 
 interface XPCounterProps {
@@ -10,7 +11,7 @@ interface XPCounterProps {
 }
 
 export function XPCounter({ size = 'md', showLevel = true, className }: XPCounterProps) {
-  const progress = useStore((state) => state.progress)
+  const progress = useStore((state: AppState) => state.progress)
   const [displayXP, setDisplayXP] = useState(progress?.totalXP || 0)
   const [isAnimating, setIsAnimating] = useState(false)
 

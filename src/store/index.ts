@@ -4,7 +4,7 @@ import type { User, UserProgress, LessonProgress, UserSettings } from '@/types'
 import type { ActivityHistory } from '@/types/gamification'
 import { syncUserProgress, syncLessonProgress, syncUserSettings, syncDailyActivity } from '@/services/supabase-sync'
 
-interface AppState {
+export interface AppState {
   // User state
   user: User | null
   settings: UserSettings
@@ -140,12 +140,11 @@ export const useStore = create<AppState>()(
           return { activityHistory: newActivityHistory }
         }),
 
-      getActivityForDate: (date: string) => {
-        const state = useStore.getState()
-        return state.activityHistory[date] || 0
+      getActivityForDate: (date: string): number => {
+        return useStore.getState().activityHistory[date] || 0
       },
 
-      completeLesson: (lessonId, xpEarned) =>
+      completeLesson: (lessonId: string, xpEarned: number) =>
         set((state) => {
           const currentProgress = state.progress || defaultProgress
           const alreadyCompleted = currentProgress.lessonsCompleted.includes(lessonId)
@@ -268,7 +267,7 @@ export const useStore = create<AppState>()(
           }
         }),
 
-      redoLesson: (lessonId) =>
+      redoLesson: (lessonId: string) =>
         set((state) => {
           const currentProgress = state.progress || defaultProgress
           const existingLessonProgress = state.lessonProgress[lessonId]
@@ -310,7 +309,7 @@ export const useStore = create<AppState>()(
           }
         }),
 
-      setLoading: (loading) => set({ isLoading: loading }),
+      setLoading: (loading: boolean) => set({ isLoading: loading }),
 
       toggleSidebar: () =>
         set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),

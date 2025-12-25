@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, ProgressBar, Badge, Button } from '@/components/ui'
 import { XPCounter, StreakBadge } from '@/components/gamification'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
 import { getProgressToNextLevel, getXPForNextLevel, LEVEL_THRESHOLDS } from '@/types'
 import { curriculum } from '@/content/curriculum'
@@ -9,9 +10,9 @@ import { curriculum } from '@/content/curriculum'
 export function ProfilePage() {
   const { isAuthenticated, signOut } = useAuth()
   const navigate = useNavigate()
-  const user = useStore((state) => state.user)
-  const progress = useStore((state) => state.progress)
-  const lessonProgress = useStore((state) => state.lessonProgress)
+  const user = useStore((state: AppState) => state.user)
+  const progress = useStore((state: AppState) => state.progress)
+  const lessonProgress = useStore((state: AppState) => state.lessonProgress)
 
   async function handleSignOut() {
     await signOut()

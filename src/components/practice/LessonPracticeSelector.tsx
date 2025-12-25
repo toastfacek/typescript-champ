@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, Button } from '@/components/ui'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
+import type { Lesson } from '@/types'
 import { lessons } from '@/content/curriculum'
 
 function formatTimeAgo(date: Date): string {
@@ -19,15 +21,15 @@ function formatTimeAgo(date: Date): string {
 
 export function LessonPracticeSelector() {
   const navigate = useNavigate()
-  const progress = useStore((state) => state.progress)
-  const lessonProgress = useStore((state) => state.lessonProgress)
+  const progress = useStore((state: AppState) => state.progress)
+  const lessonProgress = useStore((state: AppState) => state.lessonProgress)
 
   // Get all completed lessons - memoized to prevent infinite loops
   const completedLessons = useMemo(() => {
     if (!progress?.lessonsCompleted) return []
     
     return progress.lessonsCompleted
-      .map((lessonId) => {
+      .map((lessonId: string) => {
         const lesson = lessons[lessonId]
         const lp = lessonProgress[lessonId]
         if (!lesson || !lp || lp.status !== 'completed') return null
@@ -37,8 +39,8 @@ export function LessonPracticeSelector() {
           completedAt: lp.completedAt ? new Date(lp.completedAt) : null,
         }
       })
-      .filter((item): item is NonNullable<typeof item> => item !== null)
-      .sort((a, b) => {
+      .filter((item: { lesson: Lesson; completedAt: Date | null } | null): item is { lesson: Lesson; completedAt: Date | null } => item !== null)
+      .sort((a: { lesson: Lesson; completedAt: Date | null }, b: { lesson: Lesson; completedAt: Date | null }) => {
         // Sort by completion date, most recent first
         if (!a.completedAt || !b.completedAt) return 0
         return b.completedAt.getTime() - a.completedAt.getTime()
@@ -68,7 +70,7 @@ export function LessonPracticeSelector() {
 
   return (
     <div className="space-y-3">
-      {completedLessons.map(({ lesson, completedAt }) => (
+      {completedLessons.map(({ lesson, completedAt }: { lesson: Lesson; completedAt: Date | null }) => (
         <Card
           key={lesson.id}
           className="p-4 border border-surface-700/50 hover:border-accent-500/50 transition-colors"

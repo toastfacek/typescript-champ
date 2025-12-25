@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { Header } from '@/components/navigation'
 import { useStore } from '@/store'
+import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { useTheme } from '@/hooks/useTheme'
@@ -20,10 +21,10 @@ const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.A
 export default function App() {
   const { isLoading, isAuthenticated } = useAuth()
   const isOnline = useOnlineStatus()
-  const setProgress = useStore((state) => state.setProgress)
-  const setUser = useStore((state) => state.setUser)
-  const progress = useStore((state) => state.progress)
-  const user = useStore((state) => state.user)
+  const setProgress = useStore((state: AppState) => state.setProgress)
+  const setUser = useStore((state: AppState) => state.setUser)
+  const progress = useStore((state: AppState) => state.progress)
+  const user = useStore((state: AppState) => state.user)
   
   // Initialize theme on mount
   useTheme()
