@@ -100,57 +100,32 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
     return weeks
   }, [gridData])
 
-  // Get month labels for top of grid
+  // Get month labels for top of grid - simplified approach
   const monthLabels = useMemo(() => {
-    const labels: Array<{ month: string; weekIndex: number; dayOfMonth: number }> = []
+    const labels: Array<{ month: string; weekIndex: number }> = []
     const seenMonths = new Set<string>()
 
     // Find the first week that contains the 1st of each month
-    const currentMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
-    const endMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0)
-
-    while (currentMonth <= endMonth) {
-      const monthKey = `${currentMonth.getFullYear()}-${currentMonth.getMonth()}`
-      
-      if (!seenMonths.has(monthKey)) {
-        seenMonths.add(monthKey)
+    weeksData.forEach((week, weekIndex) => {
+      if (week.length > 0) {
+        const firstDay = week[0].date
+        const monthKey = `${firstDay.getFullYear()}-${firstDay.getMonth()}`
         
-        // Find which week contains the 1st of this month
-        const firstOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
-        let weekIndex = -1
+        // Only add label if this is the first week of the month (1st is in this week)
+        const firstOfMonth = new Date(firstDay.getFullYear(), firstDay.getMonth(), 1)
+        const weekStart = week[0].date
+        const weekEnd = week[week.length - 1].date
         
-        for (let i = 0; i < weeksData.length; i++) {
-          const week = weeksData[i]
-          if (week.length > 0) {
-            const weekStart = week[0].date
-            const weekEnd = week[week.length - 1].date
-            
-            // Check if first of month falls within this week
-            if (firstOfMonth >= weekStart && firstOfMonth <= weekEnd) {
-              weekIndex = i
-              break
-            }
-          }
-        }
-        
-        if (weekIndex >= 0) {
-          const monthName = firstOfMonth.toLocaleDateString('en-US', { month: 'short' })
-          // Calculate offset within the week (0-6 days)
-          const week = weeksData[weekIndex]
-          if (week && week.length > 0) {
-            const weekStart = week[0].date
-            const daysDiff = Math.floor((firstOfMonth.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24))
-            labels.push({ month: monthName, weekIndex, dayOfMonth: Math.max(0, daysDiff) })
-          }
+        if (!seenMonths.has(monthKey) && firstOfMonth >= weekStart && firstOfMonth <= weekEnd) {
+          seenMonths.add(monthKey)
+          const monthName = firstDay.toLocaleDateString('en-US', { month: 'short' })
+          labels.push({ month: monthName, weekIndex })
         }
       }
-      
-      // Move to next month
-      currentMonth.setMonth(currentMonth.getMonth() + 1)
-    }
+    })
 
     return labels
-  }, [weeksData, startDate, endDate])
+  }, [weeksData])
 
   const formatDate = (date: Date): string => {
     return date.toLocaleDateString('en-US', {
@@ -222,23 +197,17 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
           {/* Month Labels */}
           <div className="flex mb-2" style={{ paddingLeft: '24px' }}>
             {monthLabels.map((label, idx) => {
-              // Each week is 12px (square) + 4px (gap) = 16px wide
-              const weekWidth = 16
+              // Each week is 10px (square) + 4px (gap) = 14px wide
+              const weekWidth = 14
               const prevWeekIndex = idx > 0 ? monthLabels[idx - 1].weekIndex : 0
-              const prevDayOffset = idx > 0 ? monthLabels[idx - 1].dayOfMonth : 0
-              
-              // Calculate position: weeks difference + day offset within week
               const weekOffset = (label.weekIndex - prevWeekIndex) * weekWidth
-              const dayOffset = (label.dayOfMonth - prevDayOffset) * (weekWidth / 7)
-              
-              const totalOffset = idx === 0 ? label.dayOfMonth * (weekWidth / 7) : weekOffset + dayOffset
               
               return (
                 <div
                   key={idx}
                   className="text-xs text-surface-500 whitespace-nowrap"
                   style={{
-                    marginLeft: `${totalOffset}px`,
+                    marginLeft: idx === 0 ? '0' : `${weekOffset}px`,
                   }}
                 >
                   {label.month}
@@ -251,15 +220,26 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
           <div className="flex gap-1">
             {/* Weekday Labels */}
             <div className="flex flex-col gap-1 mr-2">
-              {[0, 2, 4].map((dayIdx) => (
-                <div
-                  key={dayIdx}
-                  className="text-xs text-surface-500"
-                  style={{ height: '12px', lineHeight: '12px', marginBottom: dayIdx < 4 ? '0px' : '0px' }}
-                >
-                  {dayIdx === 0 ? 'Mon' : dayIdx === 2 ? 'Wed' : 'Fri'}
-                </div>
-              ))}
+              {[0, 2, 4].map((dayIdx) => {
+                // Each row is 10px (square) + 4px (gap) = 14px tall
+                const rowHeight = 14
+                // For Mon (0): no margin, Wed (2): 2 rows down = 28px, Fri (4): 4 rows down = 56px
+                // But we need to account for the gap-1 (4px) between rows
+                const marginTop = dayIdx === 0 ? 0 : dayIdx * rowHeight
+                return (
+                  <div
+                    key={dayIdx}
+                    className="text-xs text-surface-500"
+                    style={{ 
+                      height: `${rowHeight}px`, 
+                      lineHeight: `${rowHeight}px`,
+                      marginTop: `${marginTop}px`
+                    }}
+                  >
+                    {dayIdx === 0 ? 'Mon' : dayIdx === 2 ? 'Wed' : 'Fri'}
+                  </div>
+                )
+              })}
             </div>
 
             {/* Contribution Squares */}
@@ -269,24 +249,24 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
                   {week.map((day, dayIndex) => {
                     const isInRange = day.date >= startDate && day.date <= endDate
                     if (!isInRange) {
-                      return (
-                        <div
-                          key={`${weekIndex}-${dayIndex}`}
-                          className="w-3 h-3 rounded"
-                          style={{ width: '12px', height: '12px' }}
-                        />
-                      )
+                    return (
+                      <div
+                        key={`${weekIndex}-${dayIndex}`}
+                        className="rounded"
+                        style={{ width: '10px', height: '10px' }}
+                      />
+                    )
                     }
 
                     return (
                       <div
                         key={`${weekIndex}-${dayIndex}`}
-                        className={`w-3 h-3 rounded transition-all cursor-pointer ${getIntensityColor(day.intensity)} ${
+                        className={`rounded transition-all cursor-pointer ${getIntensityColor(day.intensity)} ${
                           hoveredDay?.date.getTime() === day.date.getTime()
                             ? 'ring-2 ring-accent-400 scale-110'
                             : 'hover:ring-2 hover:ring-accent-400/50'
                         }`}
-                        style={{ width: '12px', height: '12px' }}
+                        style={{ width: '10px', height: '10px' }}
                         onMouseEnter={(e) => {
                           setHoveredDay(day)
                           if (gridRef.current) {
@@ -316,10 +296,10 @@ export function ContributionGrid({ activityHistory }: ContributionGridProps) {
       <div className="flex items-center gap-4 mt-4 text-sm text-surface-500">
         <span>Less</span>
         <div className="flex gap-1">
-          <div className="w-3 h-3 rounded bg-surface-700" />
-          <div className="w-3 h-3 rounded bg-accent-500/30" />
-          <div className="w-3 h-3 rounded bg-accent-500/60" />
-          <div className="w-3 h-3 rounded bg-accent-500" />
+          <div className="rounded bg-surface-700" style={{ width: '10px', height: '10px' }} />
+          <div className="rounded bg-accent-500/30" style={{ width: '10px', height: '10px' }} />
+          <div className="rounded bg-accent-500/60" style={{ width: '10px', height: '10px' }} />
+          <div className="rounded bg-accent-500" style={{ width: '10px', height: '10px' }} />
         </div>
         <span>More</span>
       </div>
