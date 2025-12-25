@@ -110,23 +110,19 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
     const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
     currentDate.setDate(currentDate.getDate() - daysToMonday)
 
-    // Also find the Sunday of the current week (end of week containing today)
+    // End at today (don't show future days)
     const today = new Date()
-    const todayDayOfWeek = today.getDay()
-    const daysToSunday = todayDayOfWeek === 0 ? 0 : 7 - todayDayOfWeek
-    const endOfCurrentWeek = new Date(today)
-    endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + daysToSunday)
-    endOfCurrentWeek.setHours(23, 59, 59, 999)
-
-    // Generate days until the end of the current week (so current week always shows)
-    const actualEndDate = endOfCurrentWeek > endDate ? endOfCurrentWeek : endDate
+    today.setHours(23, 59, 59, 999)
     
-    // Calculate total days to generate
-    const totalDays = Math.ceil((actualEndDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    // Calculate total days to generate (up to today)
+    const totalDays = Math.ceil((today.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
     
     for (let i = 0; i < totalDays; i++) {
       const date = new Date(currentDate)
       date.setDate(date.getDate() + i)
+      
+      // Don't go past today
+      if (date > today) break
 
       const dateStr = date.toISOString().split('T')[0]
       const count = activityHistory[dateStr] || 0
@@ -147,7 +143,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
     }
 
     return days
-  }, [startDate, endDate, activityHistory, variant])
+  }, [startDate, activityHistory, variant])
 
   // Group days into weeks (7 days per week) - full mode
   const weeksData = useMemo(() => {
@@ -278,7 +274,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
                 : 'text-surface-400 hover:text-surface-200'
             }`}
           >
-            1 week
+            1W
           </button>
           <button
             onClick={() => setViewMode('1month')}
@@ -288,7 +284,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
                 : 'text-surface-400 hover:text-surface-200'
             }`}
           >
-            1 month
+            1M
           </button>
           <button
             onClick={() => setViewMode('3months')}
@@ -298,7 +294,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
                 : 'text-surface-400 hover:text-surface-200'
             }`}
           >
-            3 months
+            3M
           </button>
           <button
             onClick={() => setViewMode('6months')}
@@ -308,7 +304,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
                 : 'text-surface-400 hover:text-surface-200'
             }`}
           >
-            6 months
+            6M
           </button>
           <button
             onClick={() => setViewMode('12months')}
@@ -318,7 +314,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
                 : 'text-surface-400 hover:text-surface-200'
             }`}
           >
-            12 months
+            1Y
           </button>
         </div>
       </div>
@@ -328,7 +324,7 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
         <div className="w-full">
           {/* Weekday Headers (columns) */}
           <div className="flex gap-1 mb-2" style={{ paddingLeft: '60px' }}>
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+            {['M', 'T', 'W', 'Th', 'F', 'Sa', 'Su'].map((day) => (
               <div key={day} className="flex-1 text-center text-xs text-surface-500">
                 {day}
               </div>
