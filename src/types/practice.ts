@@ -19,6 +19,11 @@ export type PracticeTopic =
   | 'operators'
   | 'control-flow'
   | 'data-structures'
+  // AI and Data Validation
+  | 'zod'
+  | 'http-apis'
+  | 'llm-concepts'
+  | 'ai-calls'
 
 export interface TopicInfo {
   id: PracticeTopic

@@ -9,7 +9,11 @@ export const TYPESCRIPT_TOPICS: TopicInfo[] = [
   { id: 'generics', name: 'Generics', description: 'Generic types and constraints' },
   { id: 'advanced-types', name: 'Advanced Types', description: 'Unions, intersections, and guards' },
   { id: 'async', name: 'Async TypeScript', description: 'Promises, async/await, error handling' },
-  { id: 'classes', name: 'Classes', description: 'Classes, inheritance, and access modifiers' }
+  { id: 'classes', name: 'Classes', description: 'Classes, inheritance, and access modifiers' },
+  { id: 'zod', name: 'Data Validation', description: 'Schema validation with Zod' },
+  { id: 'http-apis', name: 'HTTP & APIs', description: 'Fetch, responses, and API clients' },
+  { id: 'llm-concepts', name: 'LLM Concepts', description: 'Tokens, roles, and prompting' },
+  { id: 'ai-calls', name: 'AI API Calls', description: 'Claude and OpenAI SDKs' }
 ]
 
 export const PYTHON_TOPICS: TopicInfo[] = [

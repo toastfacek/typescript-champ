@@ -41,6 +41,9 @@ npm run typecheck    # TypeScript check without building
   │   ├── 02-basic-types.ts
   │   ├── 03-type-inference.ts
   │   └── index.ts
+  ├── 14-zod-validation/           # New AI-focused modules
+  │   ├── 01-zod-basics.ts
+  │   └── index.ts
   ├── python-01-basics/            # Python modules (prefixed with 'python-')
   │   ├── py-01-hello-python.ts
   │   ├── py-02-variables-types.ts
