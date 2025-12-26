@@ -15,6 +15,8 @@ import * as pythonModule05 from './python-05-lists'
 import * as pythonModule06 from './python-06-dicts-tuples'
 import * as pythonModule07 from './python-07-file-handling'
 import * as pythonModule08 from './python-08-error-handling'
+import * as pythonModule09 from './python-09-oop-basics'
+import * as pythonModule10 from './python-10-modules'
 
 // Aggregate all modules
 export const modules: Module[] = [
@@ -34,6 +36,8 @@ export const modules: Module[] = [
   pythonModule06.module,
   pythonModule07.module,
   pythonModule08.module,
+  pythonModule09.module,
+  pythonModule10.module,
 ]
 
 // Aggregate all lessons into a single Record
@@ -54,7 +58,10 @@ export const lessons: Record<string, Lesson> = {
   ...pythonModule06.lessons,
   ...pythonModule07.lessons,
   ...pythonModule08.lessons,
+  ...pythonModule09.lessons,
+  ...pythonModule10.lessons,
 }
+
 
 
 
