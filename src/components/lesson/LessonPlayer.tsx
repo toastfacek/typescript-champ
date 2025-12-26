@@ -86,8 +86,9 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
   }, [])
 
   const handleContinue = useCallback(() => {
-    navigate('/curriculum')
-  }, [navigate])
+    const langParam = lesson.language === 'python' ? '?lang=python' : '?lang=typescript'
+    navigate(`/curriculum${langParam}`)
+  }, [navigate, lesson.language])
 
   if (isComplete) {
     return (
@@ -156,7 +157,11 @@ export function LessonPlayer({ lesson }: LessonPlayerProps) {
       <div className="sticky top-0 z-40 glass-strong border-b border-surface-700/50">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/curriculum')}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(`/curriculum${lesson.language === 'python' ? '?lang=python' : '?lang=typescript'}`)}
+            >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>

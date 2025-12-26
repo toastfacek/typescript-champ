@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, Badge, ProgressBar, Button } from '@/components/ui'
 import { useStore } from '@/store'
 import type { AppState } from '@/store'
@@ -7,9 +7,14 @@ import { curriculum, lessons } from '@/content/curriculum'
 
 export function CurriculumPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const lessonProgress = useStore((state: AppState) => state.lessonProgress)
   const redoLesson = useStore((state: AppState) => state.redoLesson)
-  const [language, setLanguage] = useState<'typescript' | 'python'>('typescript')
+
+  // Initialize language from URL or default to typescript
+  const [language, setLanguage] = useState<'typescript' | 'python'>(
+    searchParams.get('lang') === 'python' ? 'python' : 'typescript'
+  )
 
   // Filter modules based on language
   const filteredModules = curriculum.modules.filter((module) => {
