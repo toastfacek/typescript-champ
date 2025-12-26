@@ -8,6 +8,7 @@ import type {
 import type { GoalAnalysisResponse, GoalExample } from '@/types/learning-path'
 import type { GenerateFocusedPracticeRequest, GenerateFocusedPracticeResponse } from '@/types/focused-practice'
 import type { GenerateRecapRequest, GenerateRecapResponse } from '@/types/recap'
+import type { TestCase } from '@/types/lesson'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -125,6 +126,38 @@ export async function analyzeGoal(goalDescription: string): Promise<GoalAnalysis
 export async function getGoalExamples(): Promise<GoalExample[]> {
   const response = await fetchJson<{ examples: GoalExample[] }>('/api/goal/examples')
   return response.examples
+}
+
+// AI Hint API
+
+export async function generateAIHint(params: {
+  instructions: string
+  starterCode: string
+  currentCode: string
+  testCases: TestCase[]
+  language: 'typescript' | 'python'
+  concept?: { id: string; name: string; description: string }
+}): Promise<{ success: boolean; hint: string; error?: string }> {
+  try {
+    const response = await fetchJson<{ success: boolean; hint: string; error?: string }>('/api/exercise/ai-hint', {
+      method: 'POST',
+      body: JSON.stringify(params)
+    })
+    return response
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        hint: '',
+        error: error.message
+      }
+    }
+    return {
+      success: false,
+      hint: '',
+      error: 'Failed to generate hint'
+    }
+  }
 }
 
 // Health check

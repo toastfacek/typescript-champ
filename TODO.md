@@ -37,11 +37,9 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [x] **Type System**: Added `KeyConcept` interface and `keyConcepts` field to `Lesson` type
 - [x] **UI Component**: Created `KeyConceptsPanel.tsx` with floating panel, accordion expansion, and concept details
 - [x] **Integration**: Integrated panel into `LessonPlayer` component
-- [x] **Content**: Added key concepts to first 4 lessons:
-  - [x] 01-hello-typescript.ts (6 concepts: Variable, let Keyword, Type Annotation, String, Number, Boolean)
-  - [x] 02-basic-types.ts (4 concepts: Quotes, Template Literals, Operators, Comparison Operators)
-  - [x] 03-type-inference.ts (2 concepts: Type Inference, const vs let)
-  - [x] 04-function-basics.ts (5 concepts: Function, Parameter, Return Type, Return Value, void)
+- [x] **Content**: Added key concepts to Foundation lessons (01-15) and Intermediate lessons (16-31):
+  - [x] Foundation lessons (01-15): All lessons include key concepts covering foundational programming concepts
+  - [x] Intermediate lessons (16-31): All lessons include key concepts for advanced TypeScript topics
 
 ### Practice Mode MVP ✅ (Dec 2024)
 - [x] **Backend API (Railway-ready)**
@@ -70,19 +68,19 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ## In Progress
 
 ### Key Concepts Glossary - Remaining Work
-- [ ] Add key concepts to remaining Foundation lessons (05-15):
-  - [ ] 05-parameters-defaults.ts (Optional Parameters, Default Parameters, Required Parameters)
-  - [ ] 06-arrow-functions.ts (Arrow Functions, this binding, Implicit Returns)
-  - [ ] 07-function-types.ts (Function Types, Type Aliases, Higher-Order Functions)
-  - [ ] 08-object-types.ts (Object Types, Property Types, Nested Objects)
-  - [ ] 09-interfaces.ts (Interfaces, Interface Extension, Interface vs Type)
-  - [ ] 10-optional-readonly.ts (Optional Properties, Readonly Properties, Partial/Readonly utilities)
-  - [ ] 11-type-vs-interface.ts (Type Aliases, Interface Declaration Merging, When to Use Each)
-  - [ ] 12-typed-arrays.ts (Array Types, Array Syntax, Array Initialization)
-  - [ ] 13-array-methods.ts (Array Methods, map/filter/reduce, Method Chaining)
-  - [ ] 14-tuples.ts (Tuples, Fixed-Length Arrays, Tuple Destructuring)
-  - [ ] 15-records-maps.ts (Record Type, Map Type, Object vs Map)
-- [ ] Add key concepts to Intermediate lessons (16-31) as they're created
+- [x] Add key concepts to remaining Foundation lessons (05-15):
+  - [x] 05-parameters-defaults.ts (Optional Parameters, Default Parameters, Required Parameters)
+  - [x] 06-arrow-functions.ts (Arrow Functions, this binding, Implicit Returns)
+  - [x] 07-function-types.ts (Function Types, Type Aliases, Higher-Order Functions)
+  - [x] 08-object-types.ts (Object Types, Property Types, Nested Objects)
+  - [x] 09-interfaces.ts (Interfaces, Interface Extension, Interface vs Type)
+  - [x] 10-optional-readonly.ts (Optional Properties, Readonly Properties, Partial/Readonly utilities)
+  - [x] 11-type-vs-interface.ts (Type Aliases, Interface Declaration Merging, When to Use Each)
+  - [x] 12-typed-arrays.ts (Array Types, Array Syntax, Array Initialization)
+  - [x] 13-array-methods.ts (Array Methods, map/filter/reduce, Method Chaining)
+  - [x] 14-tuples.ts (Tuples, Fixed-Length Arrays, Tuple Destructuring)
+  - [x] 15-records-maps.ts (Record Type, Map Type, Object vs Map)
+- [x] Add key concepts to Intermediate lessons (16-31) as they're created
 - [ ] Add key concepts to AI/Agent lessons (32-63) as they're created
 
 **Implementation Notes for Key Concepts**:
@@ -97,7 +95,7 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [x] Set `VITE_API_URL` in frontend to Railway URL
 - [x] Test end-to-end exercise generation
 - [x] Add batch exercise generation (5 exercises pre-loaded per session)
-- [ ] Practice XP integration (50% of normal XP)
+- [x] Practice XP integration (50% of normal XP)
 
 ### Goal-Driven Learning Paths
 - [ ] GoalSetupPage with goal input and path preview
@@ -111,28 +109,28 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 ## Upcoming Phases
 
 ### Phase 2: TypeScript Execution Improvements
-- [ ] Create TypeScript Web Worker for background compilation
-- [ ] Add real-time type error highlighting in CodeMirror
-- [ ] Improve test runner with better error messages
+- [x] Create TypeScript Web Worker for background compilation
+- [x] Add real-time type error highlighting in CodeMirror
+- [x] Improve test runner with better error messages
 - [ ] Add TypeScript autocomplete support
 
 ### Phase 3: Progress System (Supabase)
-- [ ] Set up Supabase database tables
-- [ ] Add Row Level Security policies
-- [ ] Create progress service to sync with Supabase
-- [ ] Resume lesson from last step on page load
-- [ ] Track time spent per lesson
+- [x] Set up Supabase database tables
+- [x] Add Row Level Security policies
+- [x] Create progress service to sync with Supabase
+- [x] Resume lesson from last step on page load
+- [x] Track time spent per lesson
 
 ### Phase 4: Gamification Enhancements
-- [ ] Achievement definitions and unlock logic
+- [x] Achievement definitions and unlock logic (types defined in `gamification.ts`, but unlock logic not implemented)
 - [ ] Achievement popup component with animations
-- [ ] Sound effects for milestones
-- [ ] Daily goal system
+- [ ] Sound effects for milestones (setting exists but no implementation)
+- [x] Daily goal system (setting exists and synced to Supabase, but UI display not implemented)
 
 ### Phase 5: AI Hints
-- [ ] Create Supabase Edge Function for Gemini API proxy
+- [ ] Create Supabase Edge Function for Gemini API proxy (Gemini used in Express backend, not Edge Function)
 - [ ] AI hint hook with rate limiting
-- [ ] Contextual hint display UI
+- [ ] Contextual hint display UI (static hints exist, but not AI-generated contextual hints)
 - [ ] Track AI hint usage for analytics
 
 ### Phase 6: Content Creation

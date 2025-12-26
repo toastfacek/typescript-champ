@@ -27,6 +27,11 @@ import {
   RECAP_EXERCISE_SYSTEM_PROMPT,
   buildRecapExercisePrompt
 } from '../prompts/recap-exercise.js'
+import {
+  AI_HINT_SYSTEM_PROMPT,
+  buildAIHintPrompt
+} from '../prompts/ai-hint.js'
+import { complete } from '../services/gemini.js'
 
 export const exerciseRouter = Router()
 
@@ -645,6 +650,73 @@ exerciseRouter.post('/generate-recap', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+})
+
+// Generate AI hint for code exercise
+const GenerateAIHintSchema = z.object({
+  instructions: z.string(),
+  starterCode: z.string(),
+  currentCode: z.string(),
+  testCases: z.array(z.object({
+    id: z.string(),
+    description: z.string(),
+    testCode: z.string()
+  })),
+  language: z.enum(['typescript', 'python']),
+  concept: z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string()
+  }).optional()
+})
+
+exerciseRouter.post('/ai-hint', async (req, res) => {
+  try {
+    const parseResult = GenerateAIHintSchema.safeParse(req.body)
+    if (!parseResult.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid request',
+        details: parseResult.error.errors
+      })
+    }
+
+    const { instructions, starterCode, currentCode, testCases, language, concept } = parseResult.data
+
+    // Build prompt
+    const userPrompt = buildAIHintPrompt(
+      instructions,
+      starterCode,
+      currentCode,
+      testCases,
+      language,
+      concept
+    )
+
+    // Generate hint from Gemini
+    const startTime = Date.now()
+    const hint = await complete(userPrompt, {
+      systemPrompt: AI_HINT_SYSTEM_PROMPT,
+      temperature: 0.7,
+      maxTokens: 200 // Keep hints concise
+    })
+    const generationTimeMs = Date.now() - startTime
+
+    res.json({
+      success: true,
+      hint: hint.trim(),
+      metadata: {
+        generationTimeMs,
+        modelUsed: 'gemini-3-flash-preview'
+      }
+    })
+  } catch (error) {
+    console.error('AI hint generation error:', error)
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate hint'
     })
   }
 })
