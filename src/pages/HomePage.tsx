@@ -61,11 +61,11 @@ export function HomePage() {
   return (
     <div className="min-h-[calc(100vh-4rem)]">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-8 px-4 overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl" />
+      <section className="relative pt-20 pb-8 px-4 overflow-visible">
+        {/* Background decoration - extends into next section */}
+        <div className="absolute inset-0 overflow-visible pointer-events-none" style={{ bottom: '-200px' }}>
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-500/25 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold-500/25 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
@@ -141,9 +141,9 @@ export function HomePage() {
       </section>
 
       {/* Contribution Grid - Compact */}
-      <section className="pt-4 pb-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card padding="lg">
+      <section className="pt-4 pb-8 px-4 overflow-visible relative z-10">
+        <div className="max-w-4xl mx-auto overflow-visible">
+          <Card padding="lg" className="relative overflow-visible bg-surface-800/30 backdrop-blur-sm border-surface-700/30">
             <ContributionGrid activityHistory={activityHistory} variant="compact" nextLessonId={nextLessonId} />
           </Card>
         </div>
