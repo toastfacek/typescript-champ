@@ -12,6 +12,7 @@ import * as pythonModule02 from './python-02-control-flow'
 import * as pythonModule03 from './python-03-functions'
 import * as pythonModule04 from './python-04-strings'
 import * as pythonModule05 from './python-05-lists'
+import * as pythonModule06 from './python-06-dicts-tuples'
 
 // Aggregate all modules
 export const modules: Module[] = [
@@ -28,6 +29,7 @@ export const modules: Module[] = [
   pythonModule03.module,
   pythonModule04.module,
   pythonModule05.module,
+  pythonModule06.module,
 ]
 
 // Aggregate all lessons into a single Record
@@ -45,7 +47,9 @@ export const lessons: Record<string, Lesson> = {
   ...pythonModule03.lessons,
   ...pythonModule04.lessons,
   ...pythonModule05.lessons,
+  ...pythonModule06.lessons,
 }
+
 
 
 
