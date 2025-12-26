@@ -24,8 +24,8 @@ export function CurriculumPage() {
 
   // Get curriculum title and description based on language
   const curriculumTitle = language === 'python' ? 'Python Fundamentals' : curriculum.title
-  const curriculumDescription = language === 'python' 
-    ? 'Master Python from the ground up' 
+  const curriculumDescription = language === 'python'
+    ? 'Master Python from the ground up'
     : curriculum.description
 
   const getLessonStatus = (lessonId: string) => {
@@ -46,11 +46,11 @@ export function CurriculumPage() {
   const handleRedoLesson = (e: React.MouseEvent, lessonId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     const confirmed = window.confirm(
       'Redo this lesson? Your progress will be reset and you won\'t earn XP again.'
     )
-    
+
     if (confirmed) {
       redoLesson(lessonId)
       navigate(`/lesson/${lessonId}`)
@@ -67,7 +67,7 @@ export function CurriculumPage() {
             </h1>
             <p className="text-surface-300">{curriculumDescription}</p>
           </div>
-          
+
           {/* Language Toggle */}
           <div className="flex items-center gap-2 bg-surface-800/50 rounded-xl p-1 border border-surface-700/50">
             <button
@@ -103,16 +103,22 @@ export function CurriculumPage() {
           const moduleProgress = getModuleProgress(module.id)
           const isComplete = moduleProgress === 1
 
+          // Use local state for expansion, but initialize based on completion status
+          // This ensures completed modules are collapsed by default
+          const [isExpanded, setIsExpanded] = useState(!isComplete)
+
           return (
             <div key={module.id}>
               {/* Module Header */}
-              <div className="flex items-center gap-4 mb-4">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full text-left flex items-center gap-4 mb-4 group focus:outline-none"
+              >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                    isComplete
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg transition-colors ${isComplete
                       ? 'bg-success-500 text-white'
                       : 'bg-accent-500/20 text-accent-400 border border-accent-500/30'
-                  }`}
+                    }`}
                 >
                   {isComplete ? (
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,26 +129,39 @@ export function CurriculumPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-heading font-semibold text-surface-100">
+                  <h2 className="text-xl font-heading font-semibold text-surface-100 group-hover:text-accent-400 transition-colors">
                     {module.title}
                   </h2>
                   <p className="text-sm text-surface-400">{module.description}</p>
                 </div>
-                <div className="text-right">
-                  <span className="text-sm text-surface-500">
-                    {Math.round(moduleProgress * 100)}% complete
-                  </span>
-                  <ProgressBar
-                    progress={moduleProgress}
-                    size="sm"
-                    color={isComplete ? 'success' : 'accent'}
-                    className="w-24"
-                  />
+                <div className="flex items-center gap-4 text-right">
+                  <div>
+                    <span className="text-sm text-surface-500 block mb-1">
+                      {Math.round(moduleProgress * 100)}% complete
+                    </span>
+                    <ProgressBar
+                      progress={moduleProgress}
+                      size="sm"
+                      color={isComplete ? 'success' : 'accent'}
+                      className="w-24 ml-auto"
+                    />
+                  </div>
+                  {/* Chevron */}
+                  <div className={`text-surface-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              </button>
 
               {/* Lessons List */}
-              <div className="ml-5 pl-9 border-l-2 border-surface-700 space-y-3">
+              <div
+                className={`
+                  ml-5 pl-9 border-l-2 border-surface-700 space-y-3 overflow-hidden transition-all duration-300
+                  ${isExpanded ? 'max-h-[2000px] opacity-100 mb-8' : 'max-h-0 opacity-0 mb-0'}
+                `}
+              >
                 {module.lessons.map((lessonId) => {
                   const lesson = lessons[lessonId]
                   if (!lesson) return null
@@ -158,27 +177,24 @@ export function CurriculumPage() {
                       >
                         <Card
                           hover={!isLocked}
-                          className={`relative ${
-                            isLocked ? 'opacity-50' : ''
-                          } ${
-                            status === 'completed'
+                          className={`relative ${isLocked ? 'opacity-50' : ''
+                            } ${status === 'completed'
                               ? 'border-success-500/30 bg-success-500/10'
                               : status === 'in-progress'
-                              ? 'border-accent-500/30 bg-accent-500/10'
-                              : ''
-                          }`}
+                                ? 'border-accent-500/30 bg-accent-500/10'
+                                : ''
+                            }`}
                           padding="sm"
                         >
                           <div className="flex items-center gap-4">
                             {/* Status Icon */}
                             <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                status === 'completed'
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${status === 'completed'
                                   ? 'bg-success-500 text-white'
                                   : status === 'in-progress'
-                                  ? 'bg-accent-500 text-surface-900'
-                                  : 'bg-surface-700 text-surface-500'
-                              }`}
+                                    ? 'bg-accent-500 text-surface-900'
+                                    : 'bg-surface-700 text-surface-500'
+                                }`}
                             >
                               {status === 'completed' ? (
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,8 +225,8 @@ export function CurriculumPage() {
                                     lesson.difficulty === 'beginner'
                                       ? 'success'
                                       : lesson.difficulty === 'intermediate'
-                                      ? 'warning'
-                                      : 'danger'
+                                        ? 'warning'
+                                        : 'danger'
                                   }
                                   size="sm"
                                 >
