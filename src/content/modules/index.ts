@@ -17,6 +17,12 @@ import * as pythonModule07 from './python-07-file-handling'
 import * as pythonModule08 from './python-08-error-handling'
 import * as pythonModule09 from './python-09-oop-basics'
 import * as pythonModule10 from './python-10-modules'
+import * as pythonModule11 from './python-11-http-apis'
+import * as pythonModule12 from './python-12-llm-concepts'
+import * as pythonModule13 from './python-13-ai-calls'
+import * as pythonModule14 from './python-14-structured-tools'
+import * as pythonModule15 from './python-15-agent-loops'
+import * as pythonModule16 from './python-16-capstone'
 import * as module09 from './09-classes'
 import * as module10 from './10-modules-imports'
 import * as module11 from './11-error-handling'
@@ -47,6 +53,12 @@ export const modules: Module[] = [
   pythonModule08.module,
   pythonModule09.module,
   pythonModule10.module,
+  pythonModule11.module,
+  pythonModule12.module,
+  pythonModule13.module,
+  pythonModule14.module,
+  pythonModule15.module,
+  pythonModule16.module,
   module09.module,
   module10.module,
   module11.module,
@@ -78,6 +90,12 @@ export const lessons: Record<string, Lesson> = {
   ...pythonModule08.lessons,
   ...pythonModule09.lessons,
   ...pythonModule10.lessons,
+  ...pythonModule11.lessons,
+  ...pythonModule12.lessons,
+  ...pythonModule13.lessons,
+  ...pythonModule14.lessons,
+  ...pythonModule15.lessons,
+  ...pythonModule16.lessons,
   ...module09.lessons,
   ...module10.lessons,
   ...module11.lessons,
