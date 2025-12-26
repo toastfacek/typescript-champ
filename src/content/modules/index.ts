@@ -17,6 +17,15 @@ import * as pythonModule07 from './python-07-file-handling'
 import * as pythonModule08 from './python-08-error-handling'
 import * as pythonModule09 from './python-09-oop-basics'
 import * as pythonModule10 from './python-10-modules'
+import * as module09 from './09-classes'
+import * as module10 from './10-modules-imports'
+import * as module11 from './11-error-handling'
+import * as module12 from './12-type-guards'
+import * as module13 from './13-testing-basics'
+import * as module14 from './14-zod-validation'
+import * as module15 from './15-http-apis'
+import * as module16 from './16-llm-concepts'
+import * as module17 from './17-first-ai-call'
 
 // Aggregate all modules
 export const modules: Module[] = [
@@ -38,6 +47,15 @@ export const modules: Module[] = [
   pythonModule08.module,
   pythonModule09.module,
   pythonModule10.module,
+  module09.module,
+  module10.module,
+  module11.module,
+  module12.module,
+  module13.module,
+  module14.module,
+  module15.module,
+  module16.module,
+  module17.module,
 ]
 
 // Aggregate all lessons into a single Record
@@ -60,6 +78,15 @@ export const lessons: Record<string, Lesson> = {
   ...pythonModule08.lessons,
   ...pythonModule09.lessons,
   ...pythonModule10.lessons,
+  ...module09.lessons,
+  ...module10.lessons,
+  ...module11.lessons,
+  ...module12.lessons,
+  ...module13.lessons,
+  ...module14.lessons,
+  ...module15.lessons,
+  ...module16.lessons,
+  ...module17.lessons,
 }
 
 
