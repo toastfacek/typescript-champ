@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect } from 'react'
 import type { CodeExerciseStep as CodeExerciseStepType, Lesson } from '@/types'
-import { Button } from '@/components/ui'
+import { Button, AIIcon } from '@/components/ui'
 import { LazyCodeEditor, OutputPanel } from '@/components/editor'
 import { runTypeScriptCode, runWithTests } from '@/lib/typescript-runner'
 import { runPythonCode, runWithTests as runPythonWithTests } from '@/lib/python-runner'
+import { useAIHint } from '@/hooks/useAIHint'
 
 interface CodeExerciseStepProps {
   step: CodeExerciseStepType
@@ -43,6 +44,17 @@ export function CodeExerciseStep({
   const language = lesson?.language || 'typescript'
   const isPython = language === 'python'
 
+  // AI Hint hook
+  const aiHint = useAIHint({
+    stepId: step.id,
+    instructions: step.instructions,
+    starterCode: step.starterCode,
+    currentCode: code,
+    testCases: step.testCases,
+    language,
+    concept: step.concept
+  })
+
   // Reset code when step changes (e.g., new exercise in practice mode)
   useEffect(() => {
     setCode(step.starterCode)
@@ -50,6 +62,7 @@ export function CodeExerciseStep({
     setTestResults([])
     setCurrentHintIndex(-1)
     setShowSolution(false)
+    // aiHint hook automatically resets when stepId changes
   }, [step.id, step.starterCode])
 
   // Execute code and show console output (no tests)
@@ -292,6 +305,18 @@ export function CodeExerciseStep({
           </Button>
         )}
 
+        {!aiHint.hasUsedHint && !isComplete && (
+          <Button 
+            variant="ghost" 
+            onClick={aiHint.requestHint}
+            isLoading={aiHint.isLoading}
+            disabled={isRunning || isRunningTests || aiHint.isLoading}
+          >
+            <AIIcon size={16} className="mr-1" />
+            Ask AI
+          </Button>
+        )}
+
         {!showSolution && !isComplete && (
           <Button 
             variant="ghost" 
@@ -304,7 +329,7 @@ export function CodeExerciseStep({
         )}
       </div>
 
-      {/* Hints */}
+      {/* Pre-generated Hints */}
       {currentHintIndex >= 0 && (
         <div className="mb-4 space-y-2">
           {step.hints.slice(0, currentHintIndex + 1).map((hint, i) => (
@@ -315,6 +340,28 @@ export function CodeExerciseStep({
               <span className="font-semibold text-gold-400">Hint {i + 1}:</span> {hint}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* AI Hint */}
+      {aiHint.hint && (
+        <div className="mb-4">
+          <div className="p-4 bg-accent-500/10 border border-accent-500/20 rounded-xl text-sm text-accent-300 animate-slide-up">
+            <div className="flex items-center gap-2 mb-2">
+              <AIIcon size={16} className="text-accent-400" />
+              <span className="font-semibold text-accent-400">AI Hint:</span>
+            </div>
+            <p>{aiHint.hint}</p>
+          </div>
+        </div>
+      )}
+
+      {/* AI Hint Error */}
+      {aiHint.error && (
+        <div className="mb-4">
+          <div className="p-4 bg-danger-500/10 border border-danger-500/20 rounded-xl text-sm text-danger-300">
+            <span className="font-semibold text-danger-400">Error:</span> {aiHint.error}
+          </div>
         </div>
       )}
 
