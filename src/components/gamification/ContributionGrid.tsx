@@ -196,10 +196,15 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
     }
   }
 
+  // Generate weekday labels dynamically from compactDays
+  const weekdayLabels = useMemo(() => {
+    return compactDays.map(day => {
+      return day.date.toLocaleDateString('en-US', { weekday: 'short' })
+    })
+  }, [compactDays])
+
   // Compact mode render
   if (variant === 'compact') {
-    const weekdayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    
     return (
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
@@ -218,8 +223,8 @@ export function ContributionGrid({ activityHistory, variant = 'full', nextLesson
         
         {/* Weekday Labels */}
         <div className="flex gap-2 mb-2">
-          {weekdayLabels.map((day) => (
-            <div key={day} className="flex-1 text-center text-xs text-surface-500">
+          {weekdayLabels.map((day, idx) => (
+            <div key={`${day}-${idx}`} className="flex-1 text-center text-xs text-surface-500">
               {day}
             </div>
           ))}
