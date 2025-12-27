@@ -1,15 +1,15 @@
 // @ts-nocheck
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase'
-import type { StudioProject, ChatMessage, ReviewStatus } from '@/types/studio'
+import type { VibeTutorProject, ChatMessage, ReviewStatus } from '@/types/vibe-tutor'
 import { useStore } from '@/store'
 
-interface StudioState {
+interface VibeTutorState {
   // Global State
-  savedProjects: StudioProject[]
+  savedProjects: VibeTutorProject[]
   
   // Active Session State
-  currentProject: StudioProject | null
+  currentProject: VibeTutorProject | null
   activeFilePath: string | null
   
   // UI/Transient State
@@ -26,7 +26,7 @@ interface StudioState {
 
   // Actions
   fetchProjects: () => Promise<void>
-  createProject: (projectData: Omit<StudioProject, 'id' | 'createdAt' | 'updatedAt' | 'currentModuleId' | 'currentStepId' | 'files'>) => Promise<void>
+  createProject: (projectData: Omit<VibeTutorProject, 'id' | 'createdAt' | 'updatedAt' | 'currentModuleId' | 'currentStepId' | 'files'>) => Promise<void>
   loadProject: (id: string) => void
   saveProject: () => Promise<void>
   deleteProject: (id: string) => Promise<void>
@@ -47,7 +47,7 @@ interface StudioState {
   resetStore: () => void
 }
 
-const mapRowToProject = (row: any): StudioProject => ({
+const mapRowToProject = (row: any): VibeTutorProject => ({
   id: row.id,
   user_id: row.user_id,
   title: row.title,
@@ -63,7 +63,7 @@ const mapRowToProject = (row: any): StudioProject => ({
 
 const TABLE_NAME = 'studio_projects' as any
 
-export const useStudioStore = create<StudioState>((set, get) => ({
+export const useVibeTutorStore = create<VibeTutorState>((set, get) => ({
   savedProjects: [],
   currentProject: null,
   activeFilePath: null,
@@ -320,7 +320,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     setTimeout(() => {
       const aiMsg: ChatMessage = {
         role: 'assistant',
-        content: "I'm the Studio Tutor. I'm currently being upgraded to support the new course generator features. Please check back soon!",
+        content: "I'm the Vibe Tutor. I'm currently being upgraded to support the new course generator features. Please check back soon!",
         timestamp: Date.now()
       }
       set(state => ({ 

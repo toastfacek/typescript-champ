@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
-import { useStudioStore } from '@/store/studio-store'
+import { useVibeTutorStore } from '@/store/vibe-tutor-store'
 import { useNavigate } from 'react-router-dom'
 import { Button, Badge } from '@/components/ui'
 import { LazyCodeEditor } from '@/components/editor'
 
-export function StudioPage() {
+export function VibeTutorPage() {
     const navigate = useNavigate()
-    const { currentProject, activeFilePath, updateFile, setActiveFile, nextStep, prevStep } = useStudioStore()
+    const { currentProject, activeFilePath, updateFile, setActiveFile, nextStep, prevStep } = useVibeTutorStore()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     useEffect(() => {
         if (!currentProject) {
-            navigate('/studio/projects')
+            navigate('/tutor/projects')
         }
     }, [currentProject, navigate])
 
@@ -65,7 +65,7 @@ export function StudioPage() {
                 </div>
 
                 <div className="p-4 border-t border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-900">
-                    <Button variant="outline" className="w-full text-[10px] h-8" onClick={() => navigate('/studio/projects')}>
+                    <Button variant="outline" className="w-full text-[10px] h-8" onClick={() => navigate('/tutor/projects')}>
                         Exit to Dashboard
                     </Button>
                 </div>

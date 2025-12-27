@@ -1,4 +1,4 @@
-export interface StudioStep {
+export interface VibeTutorStep {
   id: string
   title: string
   content: string // Markdown instruction content
@@ -7,19 +7,19 @@ export interface StudioStep {
   relatedConcepts: string[] // e.g. "Interfaces", "Async/Await"
 }
 
-export interface StudioModule {
+export interface VibeTutorModule {
   id: string
   title: string
-  steps: StudioStep[]
+  steps: VibeTutorStep[]
 }
 
-export interface StudioProject {
+export interface VibeTutorProject {
   id: string
   user_id?: string
   title: string
   description: string
   language: 'typescript' | 'python'
-  modules: StudioModule[]
+  modules: VibeTutorModule[]
   currentModuleId: string
   currentStepId: string
   files: Record<string, string> // Current file state

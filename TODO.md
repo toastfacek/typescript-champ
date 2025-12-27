@@ -120,8 +120,7 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [x] Create progress service to sync with Supabase
 - [x] Resume lesson from last step on page load
 - [x] Track time spent per lesson
-- [x] Cloud persistence for Vibe Coding Studio projects
-- [x] Cloud persistence for Vibe Coding Studio projects
+- [x] Cloud persistence for Vibe Tutor projects
 
 ### Phase 4: Gamification Enhancements
 - [x] Achievement definitions and unlock logic (types defined in `gamification.ts`, but unlock logic not implemented)

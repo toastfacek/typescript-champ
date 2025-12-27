@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useStudioStore } from '@/store/studio-store'
+import { useVibeTutorStore } from '@/store/vibe-tutor-store'
 import { Button, Badge } from '@/components/ui'
 import { useNavigate } from 'react-router-dom'
 
@@ -16,9 +16,9 @@ const SUGGESTIONS = {
     ]
 }
 
-export function StudioScoping() {
+export function VibeTutorScoping() {
     const navigate = useNavigate()
-    const { scopingChatHistory, isGeneratingPlan, sendMessage, createProject, error } = useStudioStore()
+    const { scopingChatHistory, isGeneratingPlan, sendMessage, createProject, error } = useVibeTutorStore()
     const [selectedLanguage, setSelectedLanguage] = useState<'typescript' | 'python' | null>(null)
     const [idea, setIdea] = useState('')
     const chatEndRef = useRef<HTMLDivElement>(null)
@@ -63,7 +63,7 @@ export function StudioScoping() {
                 }
             ]
         })
-        navigate('/studio')
+        navigate('/tutor')
     }
 
     if (!selectedLanguage) {

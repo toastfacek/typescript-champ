@@ -14,7 +14,7 @@ Build your coding habit through interactive, gamified lessons. Learn TypeScript,
 - 📖 **Key Concepts Glossary**: Expandable glossary panel for foundational concepts
 - 🔄 **Welcome Recap**: Pre-generated recap exercises on home page from your most challenging recent lessons
 - ⚡ **Zero-Load LLM Calls**: Recap exercises pre-generated during lesson completion for instant home page loading
-- 🎨 **Vibe Coding Studio**: Generate entire custom learning paths for your project ideas with AI guidance and cloud persistence
+- 🎨 **Vibe Tutor**: Generate entire custom learning paths for your project ideas with AI guidance and cloud persistence
 
 ## Getting Started
 
@@ -73,7 +73,7 @@ npm run typecheck
 │   │   ├── home/         # Home page components (WelcomeRecapCard, ResumeLessonCard)
 │   │   ├── lesson/        # Lesson step components
 │   │   ├── practice/      # Practice mode components
-│   │   ├── studio/        # Vibe Coding Studio components (StudioScoping)
+│   │   ├── vibe-tutor/    # Vibe Tutor components (VibeTutorScoping)
 │   │   └── ui/           # Reusable UI components
 │   ├── content/           # Lesson content
 │   │   └── modules/      # Organized by module
@@ -88,7 +88,7 @@ npm run typecheck
 │   │   ├── index.ts                  # Main app state
 │   │   ├── practice-store.ts         # Practice mode state
 │   │   ├── recap-store.ts           # Welcome recap cache state
-│   │   └── studio-store.ts          # Vibe Coding Studio cloud sync state
+│   │   └── vibe-tutor-store.ts      # Vibe Tutor cloud sync state
 │   ├── pages/            # Page components
 │   └── types/            # TypeScript type definitions
 ├── server/               # Express API server
@@ -164,7 +164,6 @@ Run the SQL in `supabase/migrations/001_initial_schema.sql` in the Supabase SQL 
 - `profiles` & `user_settings`
 - `user_progress` & `lesson_progress`
 - `practice_stats`
-- `studio_projects` (run `005_studio_projects.sql`)
 - `studio_projects` (run `005_studio_projects.sql`)
 
 ### 4. Auth Settings

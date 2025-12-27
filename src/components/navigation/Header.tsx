@@ -15,7 +15,7 @@ export function Header() {
   const navLinks = [
     { to: '/curriculum', label: 'Learn' },
     { to: '/practice', label: 'Practice' },
-    { to: '/studio', label: 'Studio' },
+    { to: '/tutor', label: 'Vibe Tutor' },
     { to: '/profile', label: 'Profile' },
   ]
 

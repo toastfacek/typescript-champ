@@ -17,9 +17,9 @@ const LessonPage = lazy(() => import('@/pages/LessonPage').then(m => ({ default:
 const PracticePage = lazy(() => import('@/pages/PracticePage').then(m => ({ default: m.PracticePage })))
 const PracticeSessionPage = lazy(() => import('@/pages/PracticeSessionPage').then(m => ({ default: m.PracticeSessionPage })))
 const FocusedPracticePage = lazy(() => import('@/pages/FocusedPracticePage').then(m => ({ default: m.FocusedPracticePage })))
-const StudioPage = lazy(() => import('@/pages/StudioPage').then(m => ({ default: m.StudioPage })))
+const VibeTutorPage = lazy(() => import('@/pages/VibeTutorPage').then(m => ({ default: m.VibeTutorPage })))
 const ProjectsPage = lazy(() => import('@/pages/ProjectsPage').then(m => ({ default: m.ProjectsPage })))
-const StudioScopingPage = lazy(() => import('@/components/studio/StudioScoping').then(m => ({ default: m.StudioScoping })))
+const VibeTutorScopingPage = lazy(() => import('@/components/vibe-tutor/VibeTutorScoping').then(m => ({ default: m.VibeTutorScoping })))
 const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })))
 
 export default function App() {
@@ -109,9 +109,9 @@ export default function App() {
               <Route path="/practice/focused/:lessonId" element={<FocusedPracticePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
-              <Route path="/studio" element={<StudioPage />} />
-              <Route path="/studio/projects" element={<ProjectsPage />} />
-              <Route path="/studio/new" element={<StudioScopingPage />} />
+              <Route path="/tutor" element={<VibeTutorPage />} />
+              <Route path="/tutor/projects" element={<ProjectsPage />} />
+              <Route path="/tutor/new" element={<VibeTutorScopingPage />} />
               <Route path="/auth" element={<AuthPage />} />
             </Routes>
           </Suspense>

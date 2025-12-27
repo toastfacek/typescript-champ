@@ -30,7 +30,7 @@ npm run typecheck    # TypeScript check without building
 - `store/index.ts` - Main app state: user progress, XP, streaks, lesson completion
 - `store/practice-store.ts` - Practice mode: sessions, AI-generated exercises, mastery tracking
 - `store/recap-store.ts` - Welcome recap: cached recap exercises, pre-generation on lesson completion
-- `store/studio-store.ts` - Vibe Coding Studio: custom project persistence via Supabase
+- `store/vibe-tutor-store.ts` - Vibe Tutor: custom project persistence via Supabase
 
 **Lesson System**: Modular curriculum structure for scalability:
 - **Lesson Files**: Each lesson in its own file (`src/content/modules/[module-name]/[lesson-id].ts`)
@@ -111,12 +111,12 @@ API runs separately from frontend. Server binds to `0.0.0.0` for Railway deploym
 - Simpler than full practice exercises (2-3 minutes to complete)
 - Bonus XP: Awards 5-10 XP for completing recap exercises
 
-**Vibe Coding Studio (Studio Mode)**: Dynamic course generator for building mini-projects:
-- **Scoping UI**: `components/studio/StudioScoping.tsx` - Chat-based interface to refine project ideas
+**Vibe Tutor**: Dynamic course generator for building mini-projects:
+- **Scoping UI**: `components/vibe-tutor/VibeTutorScoping.tsx` - Chat-based interface to refine project ideas
 - **Projects Dashboard**: `pages/ProjectsPage.tsx` - List and manage cloud-synced projects
-- **Workspace**: `pages/StudioPage.tsx` - AI-guided build environment with roadmap and code editor
+- **Workspace**: `pages/VibeTutorPage.tsx` - AI-guided build environment with roadmap and code editor
 - **Persistence**: Projects stored in `studio_projects` table on Supabase (syncs files, modules, and progress)
-- **State Management**: `studio-store.ts` handles cloud CRUD and active session state
+- **State Management**: `vibe-tutor-store.ts` handles cloud CRUD and active session state
 
 ## Key Types
 

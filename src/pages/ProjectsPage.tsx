@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
 import { Button, Card, Badge, ProgressBar } from '@/components/ui'
 import { useNavigate } from 'react-router-dom'
-import { useStudioStore } from '@/store/studio-store'
-import type { StudioProject } from '@/types/studio'
+import { useVibeTutorStore } from '@/store/vibe-tutor-store'
+import type { VibeTutorProject } from '@/types/vibe-tutor'
 
 export function ProjectsPage() {
     const navigate = useNavigate()
-    const { savedProjects, loadProject, deleteProject, fetchProjects, isFetching } = useStudioStore()
+    const { savedProjects, loadProject, deleteProject, fetchProjects, isFetching } = useVibeTutorStore()
 
     useEffect(() => {
         fetchProjects()
@@ -14,10 +14,11 @@ export function ProjectsPage() {
 
     const handleOpenProject = (id: string) => {
         loadProject(id)
+        navigate('/tutor')
     }
 
     const handleNewProject = () => {
-        navigate('/studio/new')
+        navigate('/tutor/new')
     }
 
     const handleDelete = (e: React.MouseEvent, id: string) => {
@@ -32,7 +33,7 @@ export function ProjectsPage() {
             <div className="flex items-end justify-between mb-12">
                 <div>
                     <h1 className="text-4xl font-heading font-bold text-surface-100 mb-2">My Projects</h1>
-                    <p className="text-xl text-surface-400">Manage your Vibe Coding Studio projects</p>
+                    <p className="text-xl text-surface-400">Manage your Vibe Tutor projects</p>
                 </div>
                 <Button onClick={handleNewProject} variant="primary" className="shadow-lg shadow-accent-500/20">
                     + New Project
@@ -47,7 +48,7 @@ export function ProjectsPage() {
 
             {!isFetching && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {savedProjects.map((project: StudioProject) => (
+                    {savedProjects.map((project: VibeTutorProject) => (
                         <div key={project.id} onClick={() => handleOpenProject(project.id)} className="cursor-pointer group h-full">
                             <Card hover className="h-full flex flex-col relative border-surface-700 bg-surface-800/50 hover:bg-surface-800 transition-all">
                                 <div className="flex items-start justify-between mb-4">
