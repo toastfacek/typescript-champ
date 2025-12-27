@@ -102,8 +102,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSupabaseUser(authUser)
     setIsAuthenticated(true)
 
+    // First, check if this user already has data in Supabase
+    // If they do, they're a returning user - not a demo user migrating
+    const existingData = await loadAllDataFromSupabase(authUser.id)
+    const hasExistingSupabaseData = existingData.progress !== null
+
     // Check if this is a demo user logging in for the first time
-    const isDemoUser = user?.id === 'demo-user'
+    // Only consider it a demo migration if:
+    // 1. Local store has demo-user ID
+    // 2. They have local progress to migrate
+    // 3. They DON'T already have data in Supabase (returning user)
+    const isDemoUser = user?.id === 'demo-user' && !hasExistingSupabaseData
 
     if (isDemoUser && progress) {
       console.log('Demo user detected, migrating data to Supabase')
@@ -132,23 +141,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLessonProgress(lessonId, lesson)
       }
     } else {
-      // Load user data from Supabase
+      // Use the data we already loaded above
       console.log('Loading user data from Supabase')
-      let data = await loadAllDataFromSupabase(authUser.id)
+      let data = existingData
 
       // Check if this is a new OAuth account (Google) and there's an existing email/password account
       // OAuth users have identities array with provider info
       const isOAuthUser = authUser.identities && authUser.identities.some((id: any) => id.provider === 'google')
-      
+
       // If no progress found and this is an OAuth user, try to merge with existing email account
       if (!data.progress && isOAuthUser && authUser.email) {
         console.log('OAuth user with no progress, checking for existing account to merge...')
         const existingAccount = await findAccountByEmail(authUser.email)
-        
+
         if (existingAccount && existingAccount.userId !== authUser.id) {
           console.log('Found existing account, merging progress...', existingAccount)
           const mergeResult = await mergeAccountByEmail(authUser.id, authUser.email)
-          
+
           if (mergeResult.success) {
             console.log('Account merged successfully:', mergeResult.message)
             // Reload data after merge

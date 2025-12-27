@@ -140,14 +140,21 @@ export async function getLessonProgress(userId: string, lessonId?: string): Prom
 export async function syncLessonProgress(lessonProgress: LessonProgress): Promise<boolean> {
   if (isDemoMode || lessonProgress.userId === 'demo-user') return false
 
+  // Handle dates that may be Date objects or ISO strings (from localStorage)
+  const toISOString = (date: Date | string | undefined): string | undefined => {
+    if (!date) return undefined
+    if (typeof date === 'string') return date
+    return date.toISOString()
+  }
+
   const lessonData: any = {
     user_id: lessonProgress.userId,
     lesson_id: lessonProgress.lessonId,
     status: lessonProgress.status,
     current_step_index: lessonProgress.currentStepIndex,
     steps_completed: lessonProgress.stepsCompleted,
-    started_at: lessonProgress.startedAt?.toISOString(),
-    completed_at: lessonProgress.completedAt?.toISOString(),
+    started_at: toISOString(lessonProgress.startedAt),
+    completed_at: toISOString(lessonProgress.completedAt),
     xp_earned: lessonProgress.xpEarned,
     attempts: lessonProgress.attempts,
   }
