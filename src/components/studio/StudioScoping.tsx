@@ -79,7 +79,7 @@ export function StudioScoping() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <button
                         onClick={() => setSelectedLanguage('typescript')}
-                        className="group p-8 rounded-3xl border-2 border-surface-700 bg-surface-900/50 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all text-left"
+                        className="group p-8 rounded-3xl border-2 border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900/50 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all text-left shadow-sm hover:shadow-md"
                     >
                         <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform text-blue-400">
                             TS
@@ -96,13 +96,13 @@ export function StudioScoping() {
 
                     <button
                         onClick={() => setSelectedLanguage('python')}
-                        className="group p-8 rounded-3xl border-2 border-surface-700 bg-surface-900/50 hover:border-yellow-500/50 hover:bg-yellow-500/5 transition-all text-left"
+                        className="group p-8 rounded-3xl border-2 border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900/50 hover:border-yellow-500/50 hover:bg-yellow-500/5 transition-all text-left shadow-sm hover:shadow-md"
                     >
-                        <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform text-yellow-400">
+                        <div className="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 transition-transform text-yellow-500 dark:text-yellow-400">
                             PY
                         </div>
-                        <h2 className="text-2xl font-bold text-surface-100 mb-2">Python</h2>
-                        <p className="text-surface-400 leading-relaxed mb-6">
+                        <h2 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">Python</h2>
+                        <p className="text-surface-600 dark:text-surface-400 leading-relaxed mb-6">
                             Focus on logic, data, and rapid development. Best for automation, AI experiments, and backend scripting.
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -120,16 +120,16 @@ export function StudioScoping() {
     return (
         <div className="h-[calc(100vh-4rem)] flex flex-col max-w-5xl mx-auto">
             {/* Header */}
-            <header className="px-6 py-8 border-b border-surface-700 flex items-center justify-between">
+            <header className="px-6 py-8 border-b border-surface-200 dark:border-surface-700 flex items-center justify-between bg-white/50 dark:bg-transparent backdrop-blur-sm">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => setSelectedLanguage(null)} className="text-surface-500 hover:text-white transition-colors">
+                    <button onClick={() => setSelectedLanguage(null)} className="text-surface-400 dark:text-surface-500 hover:text-accent-500 dark:hover:text-white transition-colors">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
                     <div>
-                        <h1 className="text-2xl font-heading font-bold text-surface-100">Scoping Your Project</h1>
-                        <p className="text-sm text-surface-500">Language: <span className="uppercase text-accent-400 font-bold">{selectedLanguage}</span></p>
+                        <h1 className="text-2xl font-heading font-bold text-surface-900 dark:text-surface-100">Scoping Your Project</h1>
+                        <p className="text-sm text-surface-500">Language: <span className="uppercase text-accent-600 dark:text-accent-400 font-bold">{selectedLanguage}</span></p>
                     </div>
                 </div>
 
@@ -147,9 +147,9 @@ export function StudioScoping() {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {scopingChatHistory.length === 0 && (
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <div className="bg-surface-800 rounded-3xl p-8 border border-surface-700 max-w-2xl">
-                            <h2 className="text-2xl font-bold text-white mb-4">Hello! I'm your Vibe Tutor.</h2>
-                            <p className="text-surface-300 text-lg leading-relaxed">
+                        <div className="bg-white dark:bg-surface-800 rounded-3xl p-8 border border-surface-200 dark:border-surface-700 max-w-2xl shadow-sm">
+                            <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-4">Hello! I'm your Vibe Tutor.</h2>
+                            <p className="text-surface-600 dark:text-surface-300 text-lg leading-relaxed">
                                 I'll help you turn your idea into a guided build.
                                 Tell me what you want to create, or pick one of these focused suggestions to learn specific **{selectedLanguage}** concepts.
                             </p>
@@ -160,10 +160,10 @@ export function StudioScoping() {
                                 <button
                                     key={i}
                                     onClick={() => handleSuggestion(s.title)}
-                                    className="p-4 rounded-2xl border border-surface-700 bg-surface-900/50 hover:border-accent-500/50 hover:bg-accent-500/5 transition-all text-left"
+                                    className="p-4 rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-900/50 hover:border-accent-500/50 hover:bg-accent-500/5 transition-all text-left shadow-sm hover:shadow-md"
                                 >
-                                    <h4 className="font-bold text-accent-400 mb-1">{s.title}</h4>
-                                    <p className="text-xs text-surface-500">{s.description}</p>
+                                    <h4 className="font-bold text-accent-600 dark:text-accent-400 mb-1">{s.title}</h4>
+                                    <p className="text-xs text-surface-500 dark:text-surface-500">{s.description}</p>
                                 </button>
                             ))}
                         </div>
@@ -173,8 +173,8 @@ export function StudioScoping() {
                 {scopingChatHistory.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[80%] rounded-2xl p-4 text-sm ${msg.role === 'user'
-                                ? 'bg-accent-600 text-white rounded-tr-none'
-                                : 'bg-surface-800 text-surface-200 border border-surface-700 rounded-tl-none'
+                            ? 'bg-accent-600 text-white rounded-tr-none'
+                            : 'bg-white dark:bg-surface-800 text-surface-900 dark:text-surface-200 border border-surface-200 dark:border-surface-700 rounded-tl-none shadow-sm'
                             }`}>
                             {msg.content}
                         </div>
@@ -184,9 +184,9 @@ export function StudioScoping() {
             </div>
 
             {/* Input Area */}
-            <div className="p-6 border-t border-surface-700 bg-surface-900/50">
+            <div className="p-6 border-t border-surface-200 dark:border-surface-700 bg-white/50 dark:bg-surface-900/50 backdrop-blur-sm">
                 {error && (
-                    <div className="mb-4 text-xs text-danger-400 p-2 rounded bg-danger-500/10 border border-danger-500/20">
+                    <div className="mb-4 text-xs text-danger-600 dark:text-danger-400 p-2 rounded bg-danger-500/10 border border-danger-500/20">
                         {error}
                     </div>
                 )}
@@ -196,7 +196,7 @@ export function StudioScoping() {
                         value={idea}
                         onChange={(e) => setIdea(e.target.value)}
                         placeholder="Describe your idea in a few sentences..."
-                        className="w-full pl-6 pr-16 py-4 bg-surface-800 border border-surface-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all text-white"
+                        className="w-full pl-6 pr-16 py-4 bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all text-surface-900 dark:text-white shadow-sm placeholder-surface-400 dark:placeholder-surface-500"
                     />
                     <button
                         type="submit"
