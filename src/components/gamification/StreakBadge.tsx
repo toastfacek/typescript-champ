@@ -50,14 +50,31 @@ export function StreakBadge({ size = 'md', showLabel = true, className }: Streak
       )}>
         <svg
           viewBox="0 0 24 24"
-          fill="currentColor"
+          fill="none"
           className={clsx(
             s.icon,
-            isActive ? 'text-gold-400' : 'text-surface-500',
             isActive && 'streak-animate'
           )}
         >
-          <path d="M12.75 3.033c0 1.96-1.922 2.533-2.6 4.675C9.75 9.067 11.25 10.3 11.25 12.067c0 2.275-2.031 3.292-2.738 5.125A6 6 0 1119.5 13.5c0-1.875-1.133-3.033-2.25-4.467-.625-.8-1.5-1.917-2.125-3.033-.483-.867-.842-1.775-1.542-2.292-.55-.408-1.558-.517-1.833-.675z" />
+          {/* Outer flame */}
+          <path
+            d="M12 2C12 2 7 7.5 7 12.5C7 16.09 9.24 19.09 12.5 20C12.5 20 10.5 18 10.5 15.5C10.5 13 12 11 12 11C12 11 13.5 13 13.5 15.5C13.5 18 11.5 20 11.5 20C14.76 19.09 17 16.09 17 12.5C17 7.5 12 2 12 2Z"
+            fill={isActive ? '#F59E0B' : 'currentColor'}
+            className={!isActive ? 'text-surface-500' : ''}
+          />
+          {/* Inner flame highlight */}
+          <path
+            d="M12 8C12 8 9.5 11 9.5 13.5C9.5 15.43 10.57 17 12 17C13.43 17 14.5 15.43 14.5 13.5C14.5 11 12 8 12 8Z"
+            fill={isActive ? '#FBBF24' : 'currentColor'}
+            className={!isActive ? 'text-surface-400' : ''}
+          />
+          {/* Core glow */}
+          {isActive && (
+            <path
+              d="M12 12C12 12 11 13.5 11 14.5C11 15.33 11.45 16 12 16C12.55 16 13 15.33 13 14.5C13 13.5 12 12 12 12Z"
+              fill="#FDE68A"
+            />
+          )}
         </svg>
       </div>
 
