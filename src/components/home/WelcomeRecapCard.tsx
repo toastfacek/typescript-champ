@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, Button } from '@/components/ui'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import type { RecapCache } from '@/types/recap'
 import { useRecapStore } from '@/store/recap-store'
 import { curriculum } from '@/content/curriculum'
@@ -84,42 +85,44 @@ export function WelcomeRecapCard({ cache }: WelcomeRecapCardProps) {
         {/* Exercise */}
         {!isCompleted ? (
           <div className="border-t border-surface-700 pt-6">
-            <Suspense fallback={
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="relative inline-block">
-                    <div className="w-8 h-8 border-4 border-surface-700 rounded-full" />
-                    <div className="absolute top-0 left-0 w-8 h-8 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+            <ErrorBoundary>
+              <Suspense fallback={
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="relative inline-block">
+                      <div className="w-8 h-8 border-4 border-surface-700 rounded-full" />
+                      <div className="absolute top-0 left-0 w-8 h-8 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+                    </div>
+                    <p className="mt-2 text-sm text-surface-500">Loading exercise...</p>
                   </div>
-                  <p className="mt-2 text-sm text-surface-500">Loading exercise...</p>
                 </div>
-              </div>
-            }>
-              {step.type === 'code-exercise' && (
-                <CodeExerciseStep
-                  step={step}
-                  lesson={lesson}
-                  isComplete={false}
-                  onComplete={handleComplete}
-                  onHintUsed={handleHintUsed}
-                />
-              )}
-              {step.type === 'fill-in-blank' && (
-                <FillInBlankStep
-                  step={step}
-                  isComplete={false}
-                  onComplete={handleComplete}
-                  onHintUsed={handleHintUsed}
-                />
-              )}
-              {step.type === 'quiz' && (
-                <QuizStep
-                  step={step}
-                  isComplete={false}
-                  onComplete={handleComplete}
-                />
-              )}
-            </Suspense>
+              }>
+                {step.type === 'code-exercise' && (
+                  <CodeExerciseStep
+                    step={step}
+                    lesson={lesson}
+                    isComplete={false}
+                    onComplete={handleComplete}
+                    onHintUsed={handleHintUsed}
+                  />
+                )}
+                {step.type === 'fill-in-blank' && (
+                  <FillInBlankStep
+                    step={step}
+                    isComplete={false}
+                    onComplete={handleComplete}
+                    onHintUsed={handleHintUsed}
+                  />
+                )}
+                {step.type === 'quiz' && (
+                  <QuizStep
+                    step={step}
+                    isComplete={false}
+                    onComplete={handleComplete}
+                  />
+                )}
+              </Suspense>
+            </ErrorBoundary>
           </div>
         ) : (
           <div className="border-t border-surface-700 pt-6">

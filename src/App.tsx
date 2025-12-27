@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
 import { Header } from '@/components/navigation'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { useStore } from '@/store'
 import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
@@ -16,6 +17,7 @@ const LessonPage = lazy(() => import('@/pages/LessonPage').then(m => ({ default:
 const PracticePage = lazy(() => import('@/pages/PracticePage').then(m => ({ default: m.PracticePage })))
 const PracticeSessionPage = lazy(() => import('@/pages/PracticeSessionPage').then(m => ({ default: m.PracticeSessionPage })))
 const FocusedPracticePage = lazy(() => import('@/pages/FocusedPracticePage').then(m => ({ default: m.FocusedPracticePage })))
+const StudioPage = lazy(() => import('@/pages/StudioPage').then(m => ({ default: m.StudioPage })))
 const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })))
 
 export default function App() {
@@ -25,7 +27,7 @@ export default function App() {
   const setUser = useStore((state: AppState) => state.setUser)
   const progress = useStore((state: AppState) => state.progress)
   const user = useStore((state: AppState) => state.user)
-  
+
   // Initialize theme on mount
   useTheme()
 
@@ -83,30 +85,33 @@ export default function App() {
       )}
       <Header />
       <main>
-        <Suspense
-          fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="text-center">
-                <div className="relative">
-                  <div className="w-16 h-16 border-4 border-surface-700 rounded-full" />
-                  <div className="absolute top-0 left-0 w-16 h-16 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+        <ErrorBoundary>
+          <Suspense
+            fallback={
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-4 border-surface-700 rounded-full" />
+                    <div className="absolute top-0 left-0 w-16 h-16 border-4 border-accent-500 rounded-full border-t-transparent animate-spin" />
+                  </div>
+                  <p className="mt-4 text-surface-500 font-medium">Loading...</p>
                 </div>
-                <p className="mt-4 text-surface-500 font-medium">Loading...</p>
               </div>
-            </div>
-          }
-        >
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/curriculum" element={<CurriculumPage />} />
-            <Route path="/practice" element={<PracticePage />} />
-            <Route path="/practice/session" element={<PracticeSessionPage />} />
-            <Route path="/practice/focused/:lessonId" element={<FocusedPracticePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/lesson/:lessonId" element={<LessonPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-          </Routes>
-        </Suspense>
+            }
+          >
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/curriculum" element={<CurriculumPage />} />
+              <Route path="/practice" element={<PracticePage />} />
+              <Route path="/practice/session" element={<PracticeSessionPage />} />
+              <Route path="/practice/focused/:lessonId" element={<FocusedPracticePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/lesson/:lessonId" element={<LessonPage />} />
+              <Route path="/studio" element={<StudioPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </main>
     </div>
   )
