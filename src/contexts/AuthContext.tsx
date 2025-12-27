@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { authHelpers, isDemoMode } from '@/lib/supabase'
-import { loadAllDataFromSupabase, syncAllDataToSupabase, mergeAccountByEmail, findAccountByEmail } from '@/services/supabase-sync'
+import { loadAllDataFromSupabase, syncAllDataToSupabase, mergeAccountByEmail, findAccountByEmail, getProfile } from '@/services/supabase-sync'
 import type { LessonProgress } from '@/types'
 import { useStore } from '@/store'
 import { usePracticeStore } from '@/store/practice-store'
@@ -179,14 +179,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Could add a method to update practice store if needed
     }
 
-    // Update user profile
-    setUser({
-      id: authUser.id,
-      email: authUser.email!,
-      displayName: authUser.user_metadata?.display_name || authUser.email!.split('@')[0],
-      avatarUrl: authUser.user_metadata?.avatar_url,
-      createdAt: new Date(authUser.created_at),
-    })
+    // Load user profile from database (has the most up-to-date info including merged accounts)
+    const profile = await getProfile(authUser.id)
+    if (profile) {
+      setUser(profile)
+    } else {
+      // Fallback to auth metadata if profile doesn't exist yet
+      setUser({
+        id: authUser.id,
+        email: authUser.email!,
+        displayName: authUser.user_metadata?.display_name || authUser.email!.split('@')[0],
+        avatarUrl: authUser.user_metadata?.avatar_url,
+        createdAt: new Date(authUser.created_at),
+      })
+    }
 
     setIsLoading(false)
   }
