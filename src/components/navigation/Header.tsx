@@ -15,6 +15,7 @@ export function Header() {
   const navLinks = [
     { to: '/curriculum', label: 'Learn' },
     { to: '/practice', label: 'Practice' },
+    { to: '/studio', label: 'Studio' },
     { to: '/profile', label: 'Profile' },
   ]
 
@@ -39,7 +40,7 @@ export function Header() {
           <nav className="hidden md:flex items-center">
             <div className="flex items-center bg-surface-800/50 rounded-xl p-1">
               {navLinks.map((link) => {
-                const isActive = location.pathname === link.to || 
+                const isActive = location.pathname === link.to ||
                   (link.to === '/curriculum' && location.pathname.startsWith('/lesson'))
                 return (
                   <Link

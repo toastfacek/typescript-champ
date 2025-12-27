@@ -2,6 +2,8 @@
 
 Build your coding habit through interactive, gamified lessons. Learn TypeScript, Python, and more with hands-on practice and AI-powered exercises.
 
+> **Vision**: Like Duolingo, but for coding—with real depth. Each session is designed for focused 25-minute learning blocks with interactive tutorials, hands-on exercises, and immediate feedback.
+
 ## Features
 
 - 🎯 **Multi-Language Support**: Learn TypeScript and Python (with more languages coming)
@@ -136,3 +138,32 @@ PORT=3001
 
 [Add your license here]
 
+
+## Supabase Setup (Optional)
+
+Complete this guide to enable cloud sync, magic link auth, and progress tracking across devices.
+
+### 1. Create Project
+1. Go to [supabase.com](https://supabase.com) and create a new project.
+2. In **Project Settings > API**, copy your **Project URL** and **anon/public key**.
+
+### 2. Configure Environment
+Create `.env.local` in the root directory:
+
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_API_URL=http://localhost:3001
+```
+
+### 3. Run Migrations
+Run the SQL in `supabase/migrations/001_initial_schema.sql` in the Supabase SQL Editor to create tables:
+- `profiles` & `user_settings`
+- `user_progress` & `lesson_progress`
+- `practice_stats`
+
+### 4. Auth Settings
+1. Enable **Email** provider in Authentication > Providers.
+2. Set **Site URL** in Authentication > URL Configuration to `http://localhost:5173` (dev) or your production URL.
+
+---

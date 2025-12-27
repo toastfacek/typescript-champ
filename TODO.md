@@ -147,10 +147,10 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
   - [x] Scalable architecture ready for 48 more lessons
 
 **Sprint 2: Intermediate (Lessons 16-31)**
-- [ ] Module 5: Advanced Types (4 lessons)
-- [ ] Module 6: Generics (4 lessons)
-- [ ] Module 7: Async TypeScript (4 lessons)
-- [ ] Module 8: Node.js & npm (4 lessons)
+- [x] Module 5: Advanced Types (4 lessons)
+- [x] Module 6: Generics (4 lessons)
+- [x] Module 7: Async TypeScript (4 lessons)
+- [x] Module 8: Node.js & npm (4 lessons)
 
 **Sprint 3: AI Foundations (Lessons 32-43)**
 - [ ] Module 9: HTTP & APIs (4 lessons)
@@ -165,6 +165,12 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 
 **Sprint 5: Capstone (Lessons 60-63)**
 - [ ] Module 16: Build Real Agents (4 lessons)
+
+### Python Curriculum
+- [x] Phase 1: Foundations (Modules 1-4)
+- [x] Phase 2: Intermediate (Modules 5-10)
+- [ ] Phase 3: AI Foundations (Modules 11-13)
+- [ ] Phase 4: Agent Building (Modules 14-16)
 
 ---
 
@@ -299,66 +305,7 @@ src/
 
 ---
 
-## Database Schema Reference
 
-```sql
--- Users (extends Supabase auth)
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
-  display_name TEXT NOT NULL,
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- User progress
-CREATE TABLE user_progress (
-  user_id UUID PRIMARY KEY REFERENCES profiles(id),
-  total_xp INTEGER DEFAULT 0,
-  level INTEGER DEFAULT 1,
-  current_streak INTEGER DEFAULT 0,
-  longest_streak INTEGER DEFAULT 0,
-  last_activity_date DATE
-);
-
--- Lesson progress
-CREATE TABLE lesson_progress (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES profiles(id),
-  lesson_id TEXT NOT NULL,
-  status TEXT DEFAULT 'not-started',
-  current_step_index INTEGER DEFAULT 0,
-  steps_completed TEXT[] DEFAULT '{}',
-  xp_earned INTEGER DEFAULT 0,
-  UNIQUE(user_id, lesson_id)
-);
-
--- Practice stats
-CREATE TABLE practice_stats (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES profiles(id),
-  topic TEXT NOT NULL,
-  difficulty TEXT NOT NULL,
-  attempts INTEGER DEFAULT 0,
-  completed INTEGER DEFAULT 0,
-  avg_time_seconds INTEGER DEFAULT 0,
-  last_practiced TIMESTAMPTZ,
-  UNIQUE(user_id, topic)
-);
-
--- Learning paths
-CREATE TABLE learning_paths (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES profiles(id),
-  title TEXT NOT NULL,
-  description TEXT,
-  goal_description TEXT NOT NULL,
-  theme_context JSONB,
-  modules JSONB NOT NULL,
-  progress FLOAT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
 
 ---
 

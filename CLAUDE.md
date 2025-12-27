@@ -176,3 +176,104 @@ Both frontend and backend are deployed on Railway:
 - **Frontend**: Vite preview with `--host 0.0.0.0`, uses `allowedHosts` in vite.config.ts
 - **Backend**: Express server, root directory set to `server/`, port must match Railway networking config
 - CORS is configured to allow the Railway frontend URL
+
+## Database Schema Reference
+
+```sql
+-- Users (extends Supabase auth)
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id),
+  display_name TEXT NOT NULL,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- User progress
+CREATE TABLE user_progress (
+  user_id UUID PRIMARY KEY REFERENCES profiles(id),
+  total_xp INTEGER DEFAULT 0,
+  level INTEGER DEFAULT 1,
+  current_streak INTEGER DEFAULT 0,
+  longest_streak INTEGER DEFAULT 0,
+  last_activity_date DATE
+);
+
+-- Lesson progress
+CREATE TABLE lesson_progress (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES profiles(id),
+  lesson_id TEXT NOT NULL,
+  status TEXT DEFAULT 'not-started',
+  current_step_index INTEGER DEFAULT 0,
+  steps_completed TEXT[] DEFAULT '{}',
+  xp_earned INTEGER DEFAULT 0,
+  UNIQUE(user_id, lesson_id)
+);
+
+-- Practice stats
+CREATE TABLE practice_stats (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES profiles(id),
+  topic TEXT NOT NULL,
+  difficulty TEXT NOT NULL,
+  attempts INTEGER DEFAULT 0,
+  completed INTEGER DEFAULT 0,
+  avg_time_seconds INTEGER DEFAULT 0,
+  last_practiced TIMESTAMPTZ,
+  UNIQUE(user_id, topic)
+);
+```
+
+## Lesson Specifications (Reference)
+
+### Standard Lesson Format (YAML/Frontmatter Style)
+
+```typescript
+// Lesson Definition in src/content/modules/[module]/[lesson].ts
+export const lesson: Lesson = {
+  id: 'lesson-id',
+  title: 'Lesson Title',
+  type: 'instruction', // or code-exercise, etc.
+  // ...
+  steps: [
+    {
+      type: 'instruction',
+      title: 'Step Title',
+      content: 'Markdown content...',
+    },
+    {
+      type: 'code-exercise',
+      title: 'Exercise Title',
+      instructions: 'Instructions...',
+      starterCode: '...',
+      solutionCode: '...',
+      testCases: [
+        { description: 'Test 1', code: 'assertions...' }
+      ]
+    }
+  ]
+}
+```
+
+### Python Curriculum Plan
+
+**Phase 1: Foundations (Modules 1-4)**
+- Basics (Hello Python, Variables)
+- Control Flow (If/Else, Loops)
+- Functions (Def, Return, Lambda)
+- Strings (F-strings, Slicing)
+
+**Phase 2: Intermediate (Modules 5-10)**
+- Lists, Tuples, Dictionaries, Sets
+- File Handling, Error Handling
+- OOP Basics, Modules & Packages
+
+**Phase 3: AI Foundations (Modules 11-13)**
+- HTTP & APIs (httpx, Pydantic)
+- LLM Concepts (Tokens, Roles)
+- First AI Call (OpenAI/Anthropic SDKs)
+
+**Phase 4: Agent Building (Modules 14-16)**
+- Tools & Structured Outputs
+- Agent Loops (ReAct)
+- Capstone Projects

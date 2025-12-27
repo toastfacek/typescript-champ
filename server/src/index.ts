@@ -6,6 +6,7 @@ import express from 'express'
 import cors from 'cors'
 import { exerciseRouter } from './routes/exercise.js'
 import { goalRouter } from './routes/goal.js'
+import { studioRouter } from './routes/studio.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -33,6 +34,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/exercise', exerciseRouter)
 app.use('/api/goal', goalRouter)
+app.use('/api/studio', studioRouter)
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
