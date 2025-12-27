@@ -1,276 +1,159 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useStudioStore } from '@/store/studio-store'
+import { useNavigate } from 'react-router-dom'
+import { Button, Badge } from '@/components/ui'
 import { LazyCodeEditor } from '@/components/editor'
-import { Button, Card, Badge } from '@/components/ui'
-import { runTypeScriptCode } from '@/lib/typescript-runner'
-import { runPythonCode } from '@/lib/python-runner'
 
 export function StudioPage() {
-    const currentProject = useStudioStore(state => state.currentProject)
-
-    return (
-        <div className="min-h-screen pt-16 pb-8">
-            {currentProject ? <StudioWorkspace /> : <StudioWelcome />}
-        </div>
-    )
-}
-
-function StudioWelcome() {
-    const [idea, setIdea] = useState('')
-    const [language, setLanguage] = useState<'typescript' | 'python'>('typescript')
-    const generatePlan = useStudioStore(state => state.generatePlan)
-    const isGenerating = useStudioStore(state => state.isGeneratingPlan)
-    const error = useStudioStore(state => state.error)
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!idea.trim()) return
-        generatePlan(idea, language)
-    }
-
-    return (
-        <div className="max-w-2xl mx-auto px-4 mt-20">
-            <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-5xl font-heading font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-purple-400 mb-6">
-                    Vibe Coding Studio
-                </h1>
-                <p className="text-xl text-surface-300">
-                    Build anything you imagine. Your AI Vibe Tutor will guide you step-by-step.
-                </p>
-            </div>
-
-            <Card className="p-8 border-surface-700 bg-surface-900/50 backdrop-blur-xl">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-surface-300 mb-2">
-                            What do you want to build?
-                        </label>
-                        <textarea
-                            value={idea}
-                            onChange={(e) => setIdea(e.target.value)}
-                            placeholder="e.g. A Snake game, a Fibonacci calculator, a To-Do list app..."
-                            className="w-full h-32 px-4 py-3 bg-surface-800 border border-surface-700 rounded-xl text-surface-100 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-accent-500 transition-all resize-none"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-surface-300 mb-2">
-                            Preferred Language
-                        </label>
-                        <div className="flex gap-4">
-                            <button
-                                type="button"
-                                onClick={() => setLanguage('typescript')}
-                                className={`flex-1 py-3 px-4 rounded-xl border transition-all ${language === 'typescript'
-                                        ? 'bg-blue-500/10 border-blue-500/50 text-blue-400'
-                                        : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-surface-600'
-                                    }`}
-                            >
-                                TypeScript
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setLanguage('python')}
-                                className={`flex-1 py-3 px-4 rounded-xl border transition-all ${language === 'python'
-                                        ? 'bg-yellow-500/10 border-yellow-500/50 text-yellow-400'
-                                        : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-surface-600'
-                                    }`}
-                            >
-                                Python
-                            </button>
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div className="p-4 rounded-xl bg-danger-500/10 border border-danger-500/20 text-danger-400 text-sm">
-                            {error}
-                        </div>
-                    )}
-
-                    <Button
-                        type="submit"
-                        variant="primary"
-                        className="w-full py-4 text-lg font-bold shadow-lg shadow-accent-500/20"
-                        isLoading={isGenerating}
-                        disabled={!idea.trim() || isGenerating}
-                    >
-                        {isGenerating ? 'Designing Plan...' : 'Start Building'}
-                    </Button>
-                </form>
-            </Card>
-        </div>
-    )
-}
-
-function StudioWorkspace() {
-    const store = useStudioStore()
-    const { currentProject, currentStepIndex, currentCode, chatHistory, reviewStatus } = store
-
-    const [output, setOutput] = useState<string[]>([])
-    const [isRunning, setIsRunning] = useState(false)
-    const chatEndRef = useRef<HTMLDivElement>(null)
-
-    const currentStep = currentProject?.steps[currentStepIndex]
+    const navigate = useNavigate()
+    const { currentProject, activeFilePath, updateFile, setActiveFile, nextStep, prevStep } = useStudioStore()
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [chatHistory])
-
-    if (!currentProject || !currentStep) return null
-
-    const handleRun = async () => {
-        setIsRunning(true)
-        setOutput([])
-        try {
-            const result = currentProject.language === 'python'
-                ? await runPythonCode(currentCode)
-                : await runTypeScriptCode(currentCode)
-
-            const logs = result.logs || []
-            if (!result.success && result.error) {
-                logs.push(`Error: ${result.error}`)
-            }
-            if (logs.length === 0) {
-                logs.push('Code ran successfully (no output)')
-            }
-            setOutput(logs)
-        } catch (e) {
-            setOutput([`Runtime Error: ${e}`])
+        if (!currentProject) {
+            navigate('/studio/projects')
         }
-        setIsRunning(false)
-    }
+    }, [currentProject, navigate])
+
+    if (!currentProject) return null
+
+    const currentModule = currentProject.modules.find(m => m.id === currentProject.currentModuleId)
+    const currentStep = currentModule?.steps.find(s => s.id === currentProject.currentStepId)
+    const activeFileContent = currentProject.files[activeFilePath || ''] || ''
 
     return (
-        <div className="h-[calc(100vh-4rem)] flex flex-col md:flex-row overflow-hidden">
-            {/* LEFT: Editor */}
-            <div className="flex-1 flex flex-col border-r border-surface-700 bg-surface-900 min-w-0">
-                {/* Step Header */}
-                <div className="px-6 py-4 border-b border-surface-700 bg-surface-800/50">
-                    <div className="flex items-center justify-between mb-2">
-                        <h2 className="text-lg font-bold text-surface-100">{currentStep.title}</h2>
-                        <Badge variant="accent">Step {currentStepIndex + 1} of {currentProject.steps.length}</Badge>
-                    </div>
-                    <p className="text-surface-300 text-sm">{currentStep.description}</p>
+        <div className="h-[calc(100vh-4rem)] flex overflow-hidden bg-surface-950">
+            {/* Sidebar: Roadmap */}
+            <aside className={`bg-surface-900 border-r border-surface-800 transition-all duration-300 flex flex-col ${isSidebarOpen ? 'w-80 shadow-2xl' : 'w-0'}`}>
+                <div className="p-6 border-b border-surface-800 flex items-center justify-between overflow-hidden whitespace-nowrap">
+                    <h2 className="font-heading font-bold text-surface-400 uppercase tracking-widest text-[10px]">Project Roadmap</h2>
+                    <Button variant="ghost" size="sm" onClick={() => setIsSidebarOpen(false)} className="hover:bg-surface-800">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
+                    </Button>
                 </div>
 
-                {/* Editor Area */}
-                <div className="flex-1 overflow-hidden relative">
-                    <LazyCodeEditor
-                        code={currentCode}
-                        onChange={store.updateCode}
-                        language={currentProject.language}
-                        height="100%"
-                    />
-                </div>
-
-                {/* Output Area */}
-                <div className="h-48 border-t border-surface-700 bg-black/50 overflow-y-auto p-4 font-mono text-sm">
-                    <div className="flex items-center justify-between mb-2 sticky top-0">
-                        <span className="text-surface-500 uppercase tracking-wider text-xs font-bold">Terminal Output</span>
-                        {isRunning && <span className="text-accent-400 animate-pulse">Running...</span>}
-                    </div>
-                    <div className="space-y-1">
-                        {output.map((line, i) => (
-                            <div key={i} className={line.startsWith('Error:') ? 'text-danger-400' : 'text-surface-300'}>
-                                {line}
+                <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {currentProject.modules.map((module, mIdx) => (
+                        <div key={module.id} className="space-y-3">
+                            <div className="flex items-center gap-3">
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${module.id === currentProject.currentModuleId ? 'bg-accent-500 text-surface-900 shadow-lg shadow-accent-500/20' : 'bg-surface-800 text-surface-500'
+                                    }`}>
+                                    {mIdx + 1}
+                                </div>
+                                <h3 className={`font-bold text-xs truncate ${module.id === currentProject.currentModuleId ? 'text-surface-100' : 'text-surface-500'}`}>
+                                    {module.title}
+                                </h3>
                             </div>
-                        ))}
-                        {output.length === 0 && !isRunning && <span className="text-surface-600 italic">No output yet</span>}
-                    </div>
-                </div>
 
-                {/* Action Bar */}
-                <div className="p-4 border-t border-surface-700 bg-surface-800 flex items-center gap-3">
-                    <Button variant="primary" onClick={handleRun} isLoading={isRunning}>
-                        Run Code
-                    </Button>
-                    <Button variant="secondary" onClick={() => store.requestReview()} isLoading={store.isReviewing}>
-                        Review Code
-                    </Button>
-                    <div className="ml-auto flex items-center gap-3">
-                        {store.currentStepIndex > 0 && (
-                            <Button variant="ghost" onClick={store.prevStep}>Back</Button>
-                        )}
-                        <Button
-                            variant={reviewStatus === 'pass' ? 'success' : 'outline'}
-                            onClick={store.nextStep}
-                            className={reviewStatus === 'pass' ? 'animate-pulse' : ''}
-                        >
-                            Next Step
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            {/* RIGHT: Vibe Tutor Chat */}
-            <div className="w-full md:w-[400px] flex flex-col bg-surface-800/30">
-                <div className="p-4 border-b border-surface-700 font-bold text-accent-400 flex items-center gap-2">
-                    <span className="text-xl">✨</span> Vibe Tutor
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {chatHistory.map((msg, i) => (
-                        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div
-                                className={`max-w-[85%] rounded-2xl p-4 text-sm whitespace-pre-wrap ${msg.role === 'user'
-                                        ? 'bg-accent-600 text-white rounded-tr-none'
-                                        : 'bg-surface-700 text-surface-200 rounded-tl-none border border-surface-600'
-                                    }`}
-                            >
-                                {msg.content}
+                            <div className="ml-3 pl-6 border-l border-surface-800 space-y-2">
+                                {module.steps.map((step) => (
+                                    <div
+                                        key={step.id}
+                                        className={`text-[11px] p-2 rounded-lg transition-all ${step.id === currentProject.currentStepId
+                                            ? 'bg-accent-500/10 text-accent-400 border border-accent-500/20 shadow-sm'
+                                            : 'text-surface-500 hover:text-surface-300 hover:bg-surface-800/50'
+                                            }`}
+                                    >
+                                        {step.title}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     ))}
-                    {store.isChatting && (
-                        <div className="flex justify-start">
-                            <div className="bg-surface-700 rounded-2xl p-4 rounded-tl-none border border-surface-600">
-                                <div className="flex gap-1">
-                                    <div className="w-2 h-2 bg-surface-400 rounded-full animate-bounce" />
-                                    <div className="w-2 h-2 bg-surface-400 rounded-full animate-bounce [animation-delay:0.2s]" />
-                                    <div className="w-2 h-2 bg-surface-400 rounded-full animate-bounce [animation-delay:0.4s]" />
-                                </div>
+                </div>
+
+                <div className="p-4 border-t border-surface-800 bg-surface-900">
+                    <Button variant="outline" className="w-full text-[10px] h-8" onClick={() => navigate('/studio/projects')}>
+                        Exit to Dashboard
+                    </Button>
+                </div>
+            </aside>
+
+            {!isSidebarOpen && (
+                <button
+                    onClick={() => setIsSidebarOpen(true)}
+                    className="absolute left-6 bottom-6 z-50 p-4 rounded-full bg-accent-500 text-surface-900 shadow-2xl shadow-accent-500/40 hover:scale-110 active:scale-95 transition-all"
+                >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </button>
+            )}
+
+            {/* Main Content Area */}
+            <main className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+                {/* Left: Instructions */}
+                <div className="w-full md:w-[320px] lg:w-[400px] flex flex-col bg-surface-900 border-r border-surface-800 shadow-xl overflow-hidden">
+                    <div className="p-6 border-b border-surface-800 bg-surface-900/80 backdrop-blur sticky top-0 z-10">
+                        <Badge variant="accent" className="mb-2 opacity-80">Module {currentProject.modules.indexOf(currentModule!) + 1}</Badge>
+                        <h1 className="text-xl font-heading font-bold text-surface-100 leading-tight">{currentStep?.title}</h1>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-surface-700">
+                        <div className="whitespace-pre-wrap text-surface-300 leading-relaxed text-sm antialiased">
+                            {currentStep?.content}
+                        </div>
+
+                        <div className="mt-8 pt-6 border-t border-surface-800">
+                            <h4 className="text-[10px] font-bold text-surface-500 uppercase tracking-widest mb-4">Key Concepts</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {currentStep?.relatedConcepts.map(c => (
+                                    <Badge key={c} variant="default" className="text-[10px] border-surface-700 bg-surface-800/50">{c}</Badge>
+                                ))}
                             </div>
                         </div>
-                    )}
-                    <div ref={chatEndRef} />
+                    </div>
+
+                    <div className="p-4 bg-surface-900 border-t border-surface-800 flex items-center justify-between gap-3">
+                        <Button variant="ghost" size="sm" onClick={prevStep} className="flex-1 text-xs">Back</Button>
+                        <Button variant="primary" size="sm" onClick={nextStep} className="flex-1 text-xs shadow-lg shadow-accent-500/20">Next Step</Button>
+                    </div>
                 </div>
 
-                <div className="p-4 border-t border-surface-700 bg-surface-800/80 backdrop-blur">
-                    <ChatInput onSend={store.sendMessage} disabled={store.isChatting} />
+                {/* Right: Code Editor & Terminal (Stub) */}
+                <div className="flex-1 flex flex-col bg-surface-950 min-w-0">
+                    <div className="h-11 border-b border-surface-800 flex items-center px-4 gap-2 bg-surface-900/50 backdrop-blur">
+                        {Object.keys(currentProject.files).map(path => (
+                            <button
+                                key={path}
+                                onClick={() => setActiveFile(path)}
+                                className={`px-4 h-full text-[11px] font-mono transition-all border-b-2 flex items-center gap-2 ${activeFilePath === path
+                                    ? 'text-accent-400 border-accent-400 bg-accent-400/5 antialiased font-bold'
+                                    : 'text-surface-500 border-transparent hover:text-surface-300 hover:bg-surface-800'
+                                    }`}
+                            >
+                                <svg className="w-3.5 h-3.5 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                {path}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex-1 min-h-0 relative group">
+                        <LazyCodeEditor
+                            code={activeFileContent}
+                            onChange={(code) => updateFile(activeFilePath || '', code)}
+                            language={currentProject.language}
+                            height="100%"
+                        />
+
+                        {/* Interactive floating buttons can go here */}
+                    </div>
+
+                    {/* Bottom: Mock Terminal */}
+                    <div className="h-32 bg-black/40 border-t border-surface-800 p-4 font-mono text-[11px] overflow-hidden">
+                        <div className="flex items-center justify-between mb-2 text-surface-600 uppercase tracking-tighter">
+                            <span>Terminal</span>
+                            <span className="text-accent-500/50">Ready</span>
+                        </div>
+                        <div className="text-surface-400">$ {currentProject.language} main.{currentProject.language === 'typescript' ? 'ts' : 'py'}</div>
+                        <div className="text-surface-500 mt-1">[Build System Active]</div>
+                    </div>
                 </div>
-            </div>
+            </main>
         </div>
-    )
-}
-
-function ChatInput({ onSend, disabled }: { onSend: (msg: string) => void, disabled: boolean }) {
-    const [msg, setMsg] = useState('')
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!msg.trim() || disabled) return
-        onSend(msg)
-        setMsg('')
-    }
-
-    return (
-        <form onSubmit={handleSubmit} className="relative">
-            <input
-                type="text"
-                value={msg}
-                onChange={(e) => setMsg(e.target.value)}
-                placeholder="Ask for help..."
-                className="w-full pl-4 pr-12 py-3 bg-surface-900 border border-surface-600 rounded-xl focus:outline-none focus:border-accent-500 text-surface-200 placeholder-surface-500"
-            />
-            <button
-                type="submit"
-                disabled={!msg.trim() || disabled}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-surface-400 hover:text-accent-400 disabled:opacity-50 transition-colors"
-            >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-            </button>
-        </form>
     )
 }
