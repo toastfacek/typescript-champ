@@ -292,7 +292,24 @@ export interface Database {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      find_account_by_email: {
+        Args: {
+          search_email: string
+        }
+        Returns: Array<{
+          user_id: string
+          email: string
+        }>
+      }
+      merge_account_by_email: {
+        Args: {
+          target_user_id: string
+          source_email: string
+        }
+        Returns: Json
+      }
+    }
     Enums: Record<string, never>
   }
 }

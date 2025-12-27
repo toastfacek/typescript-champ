@@ -513,7 +513,7 @@ export async function getDailyActivity(
 export async function findAccountByEmail(email: string): Promise<{ userId: string; email: string } | null> {
   if (isDemoMode) return null
 
-  const { data, error } = await supabase.rpc('find_account_by_email', {
+  const { data, error } = await (supabase.rpc as any)('find_account_by_email', {
     search_email: email,
   })
 
@@ -522,14 +522,20 @@ export async function findAccountByEmail(email: string): Promise<{ userId: strin
     return null
   }
 
-  if (!data || (Array.isArray(data) && data.length === 0)) {
+  if (!data) {
     return null
   }
 
-  const result = Array.isArray(data) ? data[0] : data
+  // The function returns an array, but we only expect 0 or 1 result
+  const results = data as Array<{ user_id: string; email: string }>
+  if (results.length === 0) {
+    return null
+  }
+
+  const result = results[0]
   return {
-    userId: (result as any).user_id,
-    email: (result as any).email,
+    userId: result.user_id,
+    email: result.email,
   }
 }
 
@@ -541,7 +547,7 @@ export async function mergeAccountByEmail(
     return { success: false, message: 'Cannot merge accounts in demo mode' }
   }
 
-  const { data, error } = await supabase.rpc('merge_account_by_email', {
+  const { data, error } = await (supabase.rpc as any)('merge_account_by_email', {
     target_user_id: targetUserId,
     source_email: sourceEmail,
   })
@@ -551,7 +557,7 @@ export async function mergeAccountByEmail(
     return { success: false, message: error.message }
   }
 
-  const result = data as any
+  const result = data as { merged: boolean; message: string; source_user_id?: string; target_user_id?: string }
   if (result?.merged) {
     return {
       success: true,
