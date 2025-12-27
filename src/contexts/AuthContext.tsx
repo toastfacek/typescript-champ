@@ -42,6 +42,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('OAuth error:', error, errorDescription)
+        console.error('Current origin:', window.location.origin)
+        console.error('Make sure this URL is added to Supabase Redirect URLs:', window.location.origin)
         // Clear hash from URL
         window.history.replaceState(null, '', window.location.pathname)
         setIsLoading(false)
@@ -49,9 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (accessToken) {
+        console.log('OAuth callback detected, waiting for Supabase to process session...')
         // OAuth callback detected, Supabase will handle it via onAuthStateChange
-        // Clear hash from URL
-        window.history.replaceState(null, '', window.location.pathname)
+        // Don't clear hash yet - let Supabase process it first
+        // The hash will be cleared after session is established
       }
     }
 
@@ -74,7 +77,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth state changes
     const { data: { subscription } } = authHelpers.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event)
+      console.log('Auth state changed:', event, session?.user?.email || 'no user')
+      
+      // Clear OAuth hash after successful authentication
+      if (event === 'SIGNED_IN' && window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+      
       if (session?.user) {
         handleAuthStateChange(session.user)
       } else {
