@@ -18,6 +18,8 @@ const PracticePage = lazy(() => import('@/pages/PracticePage').then(m => ({ defa
 const PracticeSessionPage = lazy(() => import('@/pages/PracticeSessionPage').then(m => ({ default: m.PracticeSessionPage })))
 const FocusedPracticePage = lazy(() => import('@/pages/FocusedPracticePage').then(m => ({ default: m.FocusedPracticePage })))
 const StudioPage = lazy(() => import('@/pages/StudioPage').then(m => ({ default: m.StudioPage })))
+const ProjectsPage = lazy(() => import('@/pages/ProjectsPage').then(m => ({ default: m.ProjectsPage })))
+const StudioScopingPage = lazy(() => import('@/components/studio/StudioScoping').then(m => ({ default: m.StudioScoping })))
 const AuthPage = lazy(() => import('@/pages/AuthPage').then(m => ({ default: m.AuthPage })))
 
 export default function App() {
@@ -108,6 +110,8 @@ export default function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/lesson/:lessonId" element={<LessonPage />} />
               <Route path="/studio" element={<StudioPage />} />
+              <Route path="/studio/projects" element={<ProjectsPage />} />
+              <Route path="/studio/new" element={<StudioScopingPage />} />
               <Route path="/auth" element={<AuthPage />} />
             </Routes>
           </Suspense>

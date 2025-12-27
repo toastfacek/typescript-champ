@@ -1,16 +1,30 @@
 export interface StudioStep {
+  id: string
   title: string
-  description: string
-  fileStructure: string[]
-  starterCode?: string
-  guidance: string
+  content: string // Markdown instruction content
+  files?: Record<string, string> // Initial/Expected files for this step
+  starterCode?: string // Legacy/Quick snippet
+  relatedConcepts: string[] // e.g. "Interfaces", "Async/Await"
+}
+
+export interface StudioModule {
+  id: string
+  title: string
+  steps: StudioStep[]
 }
 
 export interface StudioProject {
+  id: string
+  user_id?: string
   title: string
   description: string
   language: 'typescript' | 'python'
-  steps: StudioStep[]
+  modules: StudioModule[]
+  currentModuleId: string
+  currentStepId: string
+  files: Record<string, string> // Current file state
+  createdAt: number
+  updatedAt: number
 }
 
 export interface ChatMessage {

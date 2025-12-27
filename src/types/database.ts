@@ -249,6 +249,47 @@ export interface Database {
           updated_at?: string
         }
       }
+      studio_projects: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string | null
+          language: string
+          modules: Json
+          current_module_id: string | null
+          current_step_id: string | null
+          files: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          language: string
+          modules?: Json
+          current_module_id?: string | null
+          current_step_id?: string | null
+          files?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          language?: string
+          modules?: Json
+          current_module_id?: string | null
+          current_step_id?: string | null
+          files?: Json
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
