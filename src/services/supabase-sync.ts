@@ -508,3 +508,60 @@ export async function getDailyActivity(
 
   return activityHistory
 }
+
+// Account merging functions
+export async function findAccountByEmail(email: string): Promise<{ userId: string; email: string } | null> {
+  if (isDemoMode) return null
+
+  const { data, error } = await supabase.rpc('find_account_by_email', {
+    search_email: email,
+  })
+
+  if (error) {
+    console.error('Error finding account by email:', error)
+    return null
+  }
+
+  if (!data || (Array.isArray(data) && data.length === 0)) {
+    return null
+  }
+
+  const result = Array.isArray(data) ? data[0] : data
+  return {
+    userId: (result as any).user_id,
+    email: (result as any).email,
+  }
+}
+
+export async function mergeAccountByEmail(
+  targetUserId: string,
+  sourceEmail: string
+): Promise<{ success: boolean; message: string; sourceUserId?: string }> {
+  if (isDemoMode) {
+    return { success: false, message: 'Cannot merge accounts in demo mode' }
+  }
+
+  const { data, error } = await supabase.rpc('merge_account_by_email', {
+    target_user_id: targetUserId,
+    source_email: sourceEmail,
+  })
+
+  if (error) {
+    console.error('Error merging account:', error)
+    return { success: false, message: error.message }
+  }
+
+  const result = data as any
+  if (result?.merged) {
+    return {
+      success: true,
+      message: result.message || 'Account merged successfully',
+      sourceUserId: result.source_user_id,
+    }
+  }
+
+  return {
+    success: false,
+    message: result?.message || 'No account found to merge',
+  }
+}

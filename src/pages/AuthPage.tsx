@@ -105,8 +105,13 @@ export function AuthPage() {
                   } catch (err: any) {
                     if (err?.message?.includes('Unsupported provider') || err?.message?.includes('provider is not enabled')) {
                       setError('Google Sign-In is not enabled. Please contact the administrator.')
+                    } else if (err?.message?.includes('requested path is invalid') || err?.message?.includes('invalid redirect')) {
+                      setError(
+                        'Redirect URL not configured. Please ensure your Supabase project has the redirect URL configured: ' +
+                        window.location.origin
+                      )
                     } else {
-                      setError('An unexpected error occurred')
+                      setError(err?.message || 'An unexpected error occurred')
                     }
                     setIsLoading(false)
                   }

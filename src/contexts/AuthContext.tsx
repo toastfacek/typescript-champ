@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 import { authHelpers, isDemoMode } from '@/lib/supabase'
-import { loadAllDataFromSupabase, syncAllDataToSupabase } from '@/services/supabase-sync'
+import { loadAllDataFromSupabase, syncAllDataToSupabase, mergeAccountByEmail, findAccountByEmail } from '@/services/supabase-sync'
 import type { LessonProgress } from '@/types'
 import { useStore } from '@/store'
 import { usePracticeStore } from '@/store/practice-store'
@@ -32,6 +32,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false)
       return
     }
+
+    // Handle OAuth callback from hash fragments
+    const handleOAuthCallback = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const accessToken = hashParams.get('access_token')
+      const error = hashParams.get('error')
+      const errorDescription = hashParams.get('error_description')
+
+      if (error) {
+        console.error('OAuth error:', error, errorDescription)
+        // Clear hash from URL
+        window.history.replaceState(null, '', window.location.pathname)
+        setIsLoading(false)
+        return
+      }
+
+      if (accessToken) {
+        // OAuth callback detected, Supabase will handle it via onAuthStateChange
+        // Clear hash from URL
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+    }
+
+    handleOAuthCallback()
 
     // Check for existing session
     authHelpers.getSession().then(({ session, error }) => {
@@ -101,7 +125,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       // Load user data from Supabase
       console.log('Loading user data from Supabase')
-      const data = await loadAllDataFromSupabase(authUser.id)
+      let data = await loadAllDataFromSupabase(authUser.id)
+
+      // Check if this is a new OAuth account (Google) and there's an existing email/password account
+      // OAuth users have identities array with provider info
+      const isOAuthUser = authUser.identities && authUser.identities.some((id: any) => id.provider === 'google')
+      
+      // If no progress found and this is an OAuth user, try to merge with existing email account
+      if (!data.progress && isOAuthUser && authUser.email) {
+        console.log('OAuth user with no progress, checking for existing account to merge...')
+        const existingAccount = await findAccountByEmail(authUser.email)
+        
+        if (existingAccount && existingAccount.userId !== authUser.id) {
+          console.log('Found existing account, merging progress...', existingAccount)
+          const mergeResult = await mergeAccountByEmail(authUser.id, authUser.email)
+          
+          if (mergeResult.success) {
+            console.log('Account merged successfully:', mergeResult.message)
+            // Reload data after merge
+            data = await loadAllDataFromSupabase(authUser.id)
+          } else {
+            console.log('Merge failed or no account to merge:', mergeResult.message)
+          }
+        }
+      }
 
       // Update stores with Supabase data
       if (data.progress) {
