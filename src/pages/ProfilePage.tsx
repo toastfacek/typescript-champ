@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, ProgressBar, Badge, Button } from '@/components/ui'
 import { XPCounter, StreakBadge, ContributionGrid } from '@/components/gamification'
+import { SignOutConfirmModal } from '@/components/auth/SignOutConfirmModal'
 import { useStore } from '@/store'
 import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
@@ -14,8 +16,14 @@ export function ProfilePage() {
   const progress = useStore((state: AppState) => state.progress)
   const lessonProgress = useStore((state: AppState) => state.lessonProgress)
   const activityHistory = useStore((state: AppState) => state.activityHistory)
+  const [showSignOutModal, setShowSignOutModal] = useState(false)
 
-  async function handleSignOut() {
+  function handleSignOutClick() {
+    setShowSignOutModal(true)
+  }
+
+  async function handleSignOutConfirm() {
+    setShowSignOutModal(false)
     await signOut()
     navigate('/')
   }
@@ -213,7 +221,7 @@ export function ProfilePage() {
                 Your progress is synced across all your devices.
               </p>
             </div>
-            <Button variant="outline" onClick={handleSignOut}>
+            <Button variant="outline" onClick={handleSignOutClick}>
               Sign Out
             </Button>
           </div>
@@ -221,6 +229,12 @@ export function ProfilePage() {
       </Card>
         </div>
       </div>
+
+      <SignOutConfirmModal
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirm={handleSignOutConfirm}
+      />
     </div>
   )
 }

@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import { XPCounter, StreakBadge } from '@/components/gamification'
 import { ThemeToggle } from '@/components/ui'
+import { SignOutConfirmModal } from '@/components/auth/SignOutConfirmModal'
 import { useStore } from '@/store'
 import type { AppState } from '@/store'
 import { useAuth } from '@/contexts/AuthContext'
@@ -11,6 +13,16 @@ export function Header() {
   const progress = useStore((state: AppState) => state.progress)
   const { isAuthenticated, signOut } = useAuth()
   const location = useLocation()
+  const [showSignOutModal, setShowSignOutModal] = useState(false)
+
+  function handleSignOutClick() {
+    setShowSignOutModal(true)
+  }
+
+  function handleSignOutConfirm() {
+    setShowSignOutModal(false)
+    signOut()
+  }
 
   const navLinks = [
     { to: '/curriculum', label: 'Learn' },
@@ -85,7 +97,7 @@ export function Header() {
                   </div>
                 </Link>
                 <button
-                  onClick={signOut}
+                  onClick={handleSignOutClick}
                   className="text-sm text-surface-500 hover:text-surface-300 transition-colors"
                 >
                   Sign Out
@@ -102,6 +114,12 @@ export function Header() {
           </div>
         </div>
       </div>
+
+      <SignOutConfirmModal
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirm={handleSignOutConfirm}
+      />
     </header>
   )
 }
