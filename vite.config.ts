@@ -32,6 +32,9 @@ export default defineConfig({
     },
   },
   preview: {
-    allowedHosts: process.env.VITE_ALLOWED_HOST ? [process.env.VITE_ALLOWED_HOST] : [],
+    allowedHosts: [
+      'codehabitapp.com',
+      ...(process.env.VITE_ALLOWED_HOST ? [process.env.VITE_ALLOWED_HOST] : []),
+    ],
   },
 })
