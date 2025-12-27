@@ -10,12 +10,12 @@ export function SignOutConfirmModal({ isOpen, onClose, onConfirm }: SignOutConfi
   return (
     <Modal isOpen={isOpen} onClose={onClose} variant="danger">
       <Modal.Header>
-        <Modal.Title>Sign Out?</Modal.Title>
+        <Modal.Title className="text-surface-50">Sign Out?</Modal.Title>
         <Modal.CloseButton />
       </Modal.Header>
 
       <Modal.Body>
-        <p className="text-surface-300">
+        <p className="text-surface-200">
           Are you sure you want to sign out? Your progress is synced and will be available when you sign back in.
         </p>
       </Modal.Body>
