@@ -102,8 +102,12 @@ export function AuthPage() {
                       setIsLoading(false)
                     }
                     // Note: OAuth redirect will happen on success, so we don't navigate here
-                  } catch (err) {
-                    setError('An unexpected error occurred')
+                  } catch (err: any) {
+                    if (err?.message?.includes('Unsupported provider') || err?.message?.includes('provider is not enabled')) {
+                      setError('Google Sign-In is not enabled. Please contact the administrator.')
+                    } else {
+                      setError('An unexpected error occurred')
+                    }
                     setIsLoading(false)
                   }
                 }}
@@ -143,22 +147,20 @@ export function AuthPage() {
                 <button
                   type="button"
                   onClick={() => switchMode('signin')}
-                  className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${
-                    mode === 'signin'
+                  className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${mode === 'signin'
                       ? 'bg-gradient-to-r from-accent-500 to-accent-400 text-surface-900 shadow-glow'
                       : 'bg-surface-800 text-surface-300 hover:bg-surface-700 border border-surface-600'
-                  }`}
+                    }`}
                 >
                   Sign In
                 </button>
                 <button
                   type="button"
                   onClick={() => switchMode('signup')}
-                  className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${
-                    mode === 'signup'
+                  className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${mode === 'signup'
                       ? 'bg-gradient-to-r from-accent-500 to-accent-400 text-surface-900 shadow-glow'
                       : 'bg-surface-800 text-surface-300 hover:bg-surface-700 border border-surface-600'
-                  }`}
+                    }`}
                 >
                   Sign Up
                 </button>
