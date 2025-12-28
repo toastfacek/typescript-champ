@@ -29,9 +29,17 @@ export default function App() {
   const setUser = useStore((state: AppState) => state.setUser)
   const progress = useStore((state: AppState) => state.progress)
   const user = useStore((state: AppState) => state.user)
+  const recalculateStreakFromHistory = useStore((state: AppState) => state.recalculateStreakFromHistory)
 
   // Initialize theme on mount
   useTheme()
+
+  // Recalculate streak from activity history on mount
+  useEffect(() => {
+    if (progress) {
+      recalculateStreakFromHistory()
+    }
+  }, []) // Only run once on mount
 
   // Initialize demo progress if not authenticated and none exists
   useEffect(() => {

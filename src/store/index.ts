@@ -27,6 +27,7 @@ export interface AppState {
   redoLesson: (lessonId: string) => void
   recordActivity: () => void
   updateStreakFromActivity: () => void
+  recalculateStreakFromHistory: () => void
   getActivityForDate: (date: string) => number
   backfillActivityHistory: () => void
   setLoading: (loading: boolean) => void
@@ -169,6 +170,67 @@ export const useStore = create<AppState>()(
             lastActivityDate: today,
             currentStreak: newStreak,
             longestStreak: Math.max(currentProgress.longestStreak, newStreak),
+          }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
+
+          return { progress: newProgress }
+        }),
+
+      recalculateStreakFromHistory: () =>
+        set((state) => {
+          const { activityHistory, progress } = state
+          if (!progress) return state
+
+          // Calculate current streak from activity history
+          const today = new Date()
+          let currentStreak = 0
+          let checkDate = new Date(today)
+
+          // Count backwards from today to find consecutive days with activity
+          while (true) {
+            const dateStr = checkDate.toISOString().split('T')[0]
+            const hasActivity = (activityHistory[dateStr] || 0) > 0
+
+            if (hasActivity) {
+              currentStreak++
+              checkDate.setDate(checkDate.getDate() - 1)
+            } else {
+              // If we're checking today and there's no activity, check yesterday
+              // (streak continues if you did something yesterday)
+              if (currentStreak === 0) {
+                checkDate.setDate(checkDate.getDate() - 1)
+                const yesterdayStr = checkDate.toISOString().split('T')[0]
+                if ((activityHistory[yesterdayStr] || 0) > 0) {
+                  currentStreak = 1
+                  checkDate.setDate(checkDate.getDate() - 1)
+                  continue
+                }
+              }
+              break
+            }
+          }
+
+          // Find last activity date
+          const lastActivityDate = currentStreak > 0
+            ? (() => {
+                const date = new Date(today)
+                // If we have activity today, use today. Otherwise use yesterday
+                const todayStr = date.toISOString().split('T')[0]
+                if ((activityHistory[todayStr] || 0) > 0) {
+                  return todayStr
+                }
+                date.setDate(date.getDate() - 1)
+                return date.toISOString().split('T')[0]
+              })()
+            : progress.lastActivityDate
+
+          const newProgress = {
+            ...progress,
+            currentStreak,
+            lastActivityDate,
+            longestStreak: Math.max(progress.longestStreak, currentStreak),
           }
 
           // Auto-sync to Supabase (fire-and-forget)
