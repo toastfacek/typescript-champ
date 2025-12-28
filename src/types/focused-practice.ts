@@ -22,6 +22,7 @@ export interface FocusedPracticeMiniLesson {
   lessonTitle: string
   steps: LessonStep[]
   estimatedMinutes: number
+  language?: 'typescript' | 'python'
 }
 
 export interface ConceptProgress {
@@ -65,5 +66,6 @@ export interface StoredFocusedSession {
   status: 'in_progress' | 'completed'
   startedAt: string  // ISO string
   completedAt?: string
+  language?: 'typescript' | 'python'
 }
 

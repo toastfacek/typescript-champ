@@ -416,7 +416,8 @@ export const usePracticeStore = create<PracticeState>()(
             completedSteps: focusedCompletedSteps,
             status: focusedCompletedSteps.length === focusedMiniLesson.steps.length ? 'completed' : 'in_progress',
             startedAt: currentFocusedSession.startedAt.toISOString(),
-            completedAt: new Date().toISOString()
+            completedAt: new Date().toISOString(),
+            language: focusedMiniLesson.language
           }
 
           // Add to local history
@@ -592,7 +593,8 @@ export const usePracticeStore = create<PracticeState>()(
           completedSteps: focusedCompletedSteps,
           status: focusedCompletedSteps.length === focusedMiniLesson.steps.length ? 'completed' : 'in_progress',
           startedAt: currentFocusedSession.startedAt.toISOString(),
-          completedAt: currentFocusedSession.endedAt?.toISOString()
+          completedAt: currentFocusedSession.endedAt?.toISOString(),
+          language: focusedMiniLesson.language
         }
 
         // Update local history

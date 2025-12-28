@@ -472,7 +472,8 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
         lessonId: lessonContext.lessonId,
         lessonTitle: lessonContext.lessonTitle,
         steps: allSteps,
-        estimatedMinutes: data.estimatedMinutes || 10
+        estimatedMinutes: data.estimatedMinutes || 10,
+        language: lessonContext.language || 'typescript'
       },
       validation: {
         valid: true,

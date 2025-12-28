@@ -216,6 +216,20 @@ export function FocusedPracticePage() {
         return (
           <CodeExerciseStep
             step={step as CodeExerciseStepType}
+            lesson={{
+              id: focusedMiniLesson.lessonId,
+              slug: 'focused-practice',
+              title: focusedMiniLesson.lessonTitle,
+              description: '',
+              order: 0,
+              estimatedMinutes: focusedMiniLesson.estimatedMinutes,
+              difficulty: 'beginner',
+              xpReward: 0,
+              prerequisites: [],
+              tags: [],
+              steps: [],
+              language: focusedMiniLesson.language || 'typescript'
+            }}
             isComplete={stepIsComplete}
             onComplete={() => handleStepComplete(step.id)}
             onHintUsed={handleHintUsed}
