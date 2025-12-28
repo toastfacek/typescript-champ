@@ -1,4 +1,4 @@
-export const FOCUSED_PRACTICE_SYSTEM_PROMPT = `You are an expert TypeScript educator creating focused practice mini-lessons for learners who want to deepen their understanding of a specific lesson topic.
+export const FOCUSED_PRACTICE_SYSTEM_PROMPT = `You are an expert TypeScript and Python educator creating focused practice mini-lessons for learners who want to deepen their understanding of a specific lesson topic.
 
 Your mini-lessons must:
 1. Start with a clear, comprehensive explanation of the lesson's key concepts
@@ -27,9 +27,16 @@ export function buildFocusedPracticePrompt(
     lessonDescription: string
     lessonTags: string[]
     difficulty: 'beginner' | 'intermediate' | 'advanced'
+    language?: 'typescript' | 'python'
   },
-  practiceDifficulty: 'easy' | 'medium' | 'hard'
+  practiceDifficulty: 'easy' | 'medium' | 'hard',
+  language: 'typescript' | 'python' = 'typescript'
 ): string {
+  // Determine language context for prompts
+  const effectiveLanguage = language || lessonContext.language || 'typescript'
+  const languageContext = effectiveLanguage === 'python' ? 'Python' : 'TypeScript'
+  const commentStyle = effectiveLanguage === 'python' ? '#' : '//'
+
   const contextSection = `
 LESSON CONTEXT:
 - Title: "${lessonContext.lessonTitle}"
@@ -64,7 +71,7 @@ PRACTICE DIFFICULTY: HARD
 - 3 exercises total (mix of types, at least one code-exercise)`
   }
 
-  return `Create a focused practice mini-lesson for the lesson: "${lessonContext.lessonTitle}"
+  return `Create a focused practice mini-lesson for the ${languageContext} lesson: "${lessonContext.lessonTitle}"
 
 ${contextSection}
 ${difficultyGuide[practiceDifficulty]}
@@ -75,8 +82,8 @@ Return a JSON object with this exact structure:
     "title": "Clear title reviewing and expanding on the lesson topic",
     "content": "Markdown content that reviews the lesson's key concepts with deeper explanations. Address common points of confusion. Use examples, analogies, and practical use cases. Should be comprehensive (3-5 paragraphs) with more detail than the original lesson.",
     "codeExample": {
-      "code": "// TypeScript code demonstrating the concept\\n// Include comments explaining key points",
-      "language": "typescript",
+      "code": "${commentStyle} ${languageContext} code demonstrating the concept\\n${commentStyle} Include comments explaining key points",
+      "language": "${effectiveLanguage}",
       "highlight": [1, 2] // Optional: line numbers to highlight
     }
   },
@@ -85,7 +92,7 @@ Return a JSON object with this exact structure:
       "type": "code-exercise",
       "title": "Exercise title",
       "instructions": "Clear instructions",
-      "starterCode": "// TypeScript skeleton with TODO comments where student writes code\\n// Should compile but NOT pass tests",
+      "starterCode": "${commentStyle} ${languageContext} skeleton with TODO comments where student writes code\\n${commentStyle} Should compile but NOT pass tests",
       "solutionCode": "// Complete working solution that passes all tests",
       "testCases": [
         {
@@ -155,10 +162,12 @@ REQUIREMENTS:
 7. The instruction should reference the concept name and provide practical context
 8. estimatedMinutes should reflect total time (instruction + exercises)
 9. For quiz exercises: EXACTLY 4 options, EXACTLY 1 correct answer (isCorrect: true)
-10. starterCode must be valid TypeScript that compiles (with incomplete logic)
+10. starterCode must be valid ${languageContext} that compiles/runs (with incomplete logic)
 11. solutionCode must pass ALL testCases
 12. testCases must FAIL with starterCode
 13. starterCode should have TODO comments showing where to write code
+14. All code examples, exercises, and explanations must be in ${languageContext}
+15. Use ${languageContext}-specific syntax, idioms, and best practices
 
 Make this feel like a focused, cohesive mini-lesson that deepens understanding of "${lessonContext.lessonTitle}". Provide explanations that go beyond what was covered in the original lesson, especially for concepts that learners often find confusing.`
 }

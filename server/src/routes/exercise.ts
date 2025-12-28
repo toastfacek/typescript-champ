@@ -365,7 +365,8 @@ const GenerateFocusedPracticeSchema = z.object({
     lessonTitle: z.string(),
     lessonDescription: z.string(),
     lessonTags: z.array(z.string()),
-    difficulty: z.enum(['beginner', 'intermediate', 'advanced'])
+    difficulty: z.enum(['beginner', 'intermediate', 'advanced']),
+    language: z.enum(['typescript', 'python']).optional().default('typescript')
   }),
   practiceDifficulty: z.enum(['easy', 'medium', 'hard']).optional().default('medium')
 })
@@ -384,7 +385,8 @@ exerciseRouter.post('/generate-focused', async (req, res) => {
     const { lessonContext, practiceDifficulty } = parseResult.data
 
     // Build prompt
-    const userPrompt = buildFocusedPracticePrompt(lessonContext, practiceDifficulty || 'medium')
+    const language = lessonContext.language || 'typescript'
+    const userPrompt = buildFocusedPracticePrompt(lessonContext, practiceDifficulty || 'medium', language)
 
     // Generate mini-lesson from Gemini
     const startTime = Date.now()

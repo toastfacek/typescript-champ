@@ -362,7 +362,8 @@ export const usePracticeStore = create<PracticeState>()(
               lessonTitle: lesson.title,
               lessonDescription: lesson.description,
               lessonTags: lesson.tags,
-              difficulty: lesson.difficulty
+              difficulty: lesson.difficulty,
+              language: lesson.language
             },
             practiceDifficulty: 'medium'
           })

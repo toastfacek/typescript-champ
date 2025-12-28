@@ -134,6 +134,57 @@ See [CURRICULUM_ROADMAP.md](./CURRICULUM_ROADMAP.md) for the complete 63-lesson 
 - [ ] Contextual hint display UI (static hints exist, but not AI-generated contextual hints)
 - [ ] Track AI hint usage for analytics
 
+### Phase 5.5: Template-Based Exercise Generation (Cost Optimization)
+**Goal**: Reduce/eliminate API costs for practice exercises while maintaining quality and variety
+
+**Current State**:
+- Every practice exercise uses Gemini API (~$0.0001-0.0005 per generation)
+- 1-3 second latency per generation
+- Works well but scales poorly with user growth
+
+**Proposed Hybrid Approach**:
+- [ ] **Template Library**: Create exercise templates for common patterns
+  - Array operations (map, filter, reduce, forEach)
+  - Function patterns (pure functions, callbacks, higher-order)
+  - Type exercises (interfaces, generics, unions, intersections)
+  - Object manipulation (spread, destructuring, methods)
+  - Python-specific patterns (list comprehensions, f-strings, decorators)
+  - AI patterns (API calls, tool definitions, agent loops)
+- [ ] **Template Engine**: Build generator that fills templates with variations
+  - Parameter substitution (variable names, types, values)
+  - Randomized examples (different domains: users, products, animals, etc.)
+  - Difficulty scaling (complexity of logic, number of steps)
+- [ ] **Pre-Generation Script**: Use AI once to create exercise pools
+  - Generate 10-20 variations per lesson/topic using Gemini
+  - Store in JSON files or database
+  - Serve randomly from pool (free after generation)
+  - Regenerate pool periodically (weekly/monthly)
+- [ ] **Fallback Strategy**: Use AI for edge cases
+  - Template library handles 80% of common exercises (free)
+  - AI generation for complex/creative exercises (20%)
+  - User-requested variations trigger AI (optional)
+
+**Benefits**:
+- **Cost**: ~80% reduction in API costs (most exercises from templates)
+- **Speed**: Instant generation (no API latency)
+- **Offline**: Works without API connection
+- **Deterministic**: Consistent quality
+- **Scalable**: Cost doesn't increase with user growth
+
+**Implementation Plan**:
+1. Analyze existing generated exercises to identify patterns
+2. Build 10-15 core templates covering common exercise types
+3. Create template engine with parameter substitution
+4. Build pre-generation script (one-time AI generation → caching)
+5. A/B test: Template vs AI-generated exercises for quality comparison
+6. Migrate batch generation to use hybrid approach
+
+**Files to Create**:
+- `server/src/templates/exercise-templates.ts` - Template definitions
+- `server/src/services/template-engine.ts` - Template → Exercise generator
+- `server/src/scripts/pre-generate-exercises.ts` - Bulk generation script
+- `server/src/data/exercise-pools/` - Cached exercise pools (JSON)
+
 ### Phase 6: Content Creation
 **Sprint 1: Foundations (Lessons 1-15)** ✅ **COMPLETE**
 - [x] Module 1: Getting Started (3 lessons) - Hello TypeScript, Basic Types, Type Inference

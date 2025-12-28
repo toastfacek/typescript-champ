@@ -40,6 +40,7 @@ export interface GenerateFocusedPracticeRequest {
     lessonDescription: string
     lessonTags: string[]
     difficulty: 'beginner' | 'intermediate' | 'advanced'
+    language?: 'typescript' | 'python'
   }
   practiceDifficulty?: 'easy' | 'medium' | 'hard'
 }
