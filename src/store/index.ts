@@ -26,6 +26,7 @@ export interface AppState {
   completeLesson: (lessonId: string, xpEarned: number) => void
   redoLesson: (lessonId: string) => void
   recordActivity: () => void
+  updateStreakFromActivity: () => void
   getActivityForDate: (date: string) => number
   backfillActivityHistory: () => void
   setLoading: (loading: boolean) => void
@@ -141,6 +142,41 @@ export const useStore = create<AppState>()(
           return { activityHistory: newActivityHistory }
         }),
 
+      updateStreakFromActivity: () =>
+        set((state) => {
+          const currentProgress = state.progress || defaultProgress
+          const today = new Date().toISOString().split('T')[0]
+          const lastDate = currentProgress.lastActivityDate
+
+          // Don't update if already updated today
+          if (lastDate === today) return state
+
+          const yesterday = new Date()
+          yesterday.setDate(yesterday.getDate() - 1)
+          const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+          let newStreak = currentProgress.currentStreak
+          if (lastDate === yesterdayStr) {
+            // Continue streak
+            newStreak += 1
+          } else {
+            // Start new streak
+            newStreak = 1
+          }
+
+          const newProgress = {
+            ...currentProgress,
+            lastActivityDate: today,
+            currentStreak: newStreak,
+            longestStreak: Math.max(currentProgress.longestStreak, newStreak),
+          }
+
+          // Auto-sync to Supabase (fire-and-forget)
+          syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
+
+          return { progress: newProgress }
+        }),
+
       getActivityForDate: (date: string): number => {
         return useStore.getState().activityHistory[date] || 0
       },
@@ -213,31 +249,12 @@ export const useStore = create<AppState>()(
           } else {
             // First time completion - award XP and update streaks
             const newTotalXP = currentProgress.totalXP + xpEarned
-            const today = new Date().toISOString().split('T')[0]
-            const lastDate = currentProgress.lastActivityDate
-
-            // Calculate streak
-            let newStreak = currentProgress.currentStreak
-            if (lastDate !== today) {
-              const yesterday = new Date()
-              yesterday.setDate(yesterday.getDate() - 1)
-              const yesterdayStr = yesterday.toISOString().split('T')[0]
-
-              if (lastDate === yesterdayStr) {
-                newStreak += 1
-              } else if (lastDate !== today) {
-                newStreak = 1
-              }
-            }
 
             newProgress = {
               ...currentProgress,
               totalXP: newTotalXP,
               level: calculateLevel(newTotalXP),
               lessonsCompleted: [...currentProgress.lessonsCompleted, lessonId],
-              lastActivityDate: today,
-              currentStreak: newStreak,
-              longestStreak: Math.max(currentProgress.longestStreak, newStreak),
             }
           }
 
@@ -257,6 +274,11 @@ export const useStore = create<AppState>()(
           // Auto-sync to Supabase (fire-and-forget)
           syncUserProgress(newProgress).catch(err => console.error('Sync error:', err))
           syncLessonProgress(newLessonProgress).catch(err => console.error('Sync error:', err))
+
+          // Update streak (must happen after state update, so we schedule it)
+          setTimeout(() => {
+            useStore.getState().updateStreakFromActivity()
+          }, 0)
 
           // Trigger recap generation in background (fire-and-forget)
           setTimeout(async () => {

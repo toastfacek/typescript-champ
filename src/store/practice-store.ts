@@ -302,6 +302,8 @@ export const usePracticeStore = create<PracticeState>()(
           useStore.getState().addXP(xpAmount)
           // Record activity for exercise completion
           useStore.getState().recordActivity()
+          // Update streak
+          useStore.getState().updateStreakFromActivity()
         }
 
         // Update session

@@ -282,3 +282,4 @@ if (typeof obj.greet !== 'function') throw new Error('Should have greet method')
 
 
 
+

@@ -75,6 +75,9 @@ export const useRecapStore = create<RecapState>()(
         // Award bonus XP (5-10 XP)
         const xpReward = 7
         useStore.getState().addXP(xpReward)
+        // Record activity and update streak
+        useStore.getState().recordActivity()
+        useStore.getState().updateStreakFromActivity()
 
         // Increment completion counter
         const updatedCache: RecapCache = {
