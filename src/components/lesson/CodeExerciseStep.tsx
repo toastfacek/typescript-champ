@@ -6,6 +6,40 @@ import { runTypeScriptCode, runWithTests } from '@/lib/typescript-runner'
 import { runPythonCode, runWithTests as runPythonWithTests } from '@/lib/python-runner'
 import { useAIHint } from '@/hooks/useAIHint'
 
+// Helper function to format instructions with numbered lists
+function formatInstructions(text: string) {
+  // Check if text contains numbered list pattern (e.g., "1. ", "2. ")
+  const hasNumberedList = /\d+\.\s+/.test(text)
+
+  if (!hasNumberedList) {
+    return <p className="text-surface-300 leading-relaxed">{text}</p>
+  }
+
+  // Split by numbered patterns and filter empty strings
+  const parts = text.split(/(?=\d+\.\s+)/).filter(part => part.trim())
+
+  // Check if we have actual list items
+  if (parts.length <= 1) {
+    return <p className="text-surface-300 leading-relaxed">{text}</p>
+  }
+
+  // Extract preamble (text before first number) and list items
+  const preamble = parts[0].match(/^\d+\.\s+/) ? '' : parts.shift()?.trim()
+
+  return (
+    <div className="text-surface-300 leading-relaxed">
+      {preamble && <p className="mb-2">{preamble}</p>}
+      <ol className="list-decimal list-inside space-y-1">
+        {parts.map((item, index) => {
+          // Remove the number prefix and render the content
+          const content = item.replace(/^\d+\.\s+/, '').trim()
+          return <li key={index}>{content}</li>
+        })}
+      </ol>
+    </div>
+  )
+}
+
 interface CodeExerciseStepProps {
   step: CodeExerciseStepType
   lesson?: Lesson
@@ -248,7 +282,7 @@ export function CodeExerciseStep({
 
       {/* Instructions */}
       <div className="mb-4 p-4 bg-surface-800/50 rounded-xl border border-surface-700/50">
-        <p className="text-surface-300 leading-relaxed">{step.instructions}</p>
+        {formatInstructions(step.instructions)}
       </div>
 
       {/* Code Editor */}
