@@ -15,7 +15,8 @@ const PORT = process.env.PORT || 3001
 const allowedOrigins: string[] = [
   process.env.FRONTEND_URL,
   'http://localhost:5173',
-  'https://frontend-production-3593.up.railway.app'
+  'https://frontend-production-3593.up.railway.app',
+  'https://codehabitapp.com'
 ].filter((origin): origin is string => Boolean(origin))
 
 console.log('Allowed CORS origins:', allowedOrigins)
