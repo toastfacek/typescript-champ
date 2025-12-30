@@ -63,6 +63,7 @@ export async function generateExercise(params: {
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz'
   language?: 'typescript' | 'python'
   themeContext?: ThemeContext
+  sprintMode?: boolean
 }): Promise<GenerateExerciseResponse> {
   return fetchJson<GenerateExerciseResponse>('/api/exercise/generate', {
     method: 'POST',
