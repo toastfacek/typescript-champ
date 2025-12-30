@@ -52,15 +52,15 @@ export function SprintExerciseArea({
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Exercise Header */}
-      <div className="flex-shrink-0 p-6 border-b border-surface-700 bg-surface-900/50">
+      <div className="flex-shrink-0 p-6 border-b border-surface-200 dark:border-surface-700 bg-surface-100/50 dark:bg-surface-900/50">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <div className="text-2xl">⚡</div>
             <div>
-              <h2 className="text-xl font-heading font-bold text-surface-100">
+              <h2 className="text-xl font-heading font-bold text-surface-900 dark:text-surface-100">
                 {moduleTitle}
               </h2>
-              <div className="flex items-center gap-2 text-sm text-surface-400 mt-1">
+              <div className="flex items-center gap-2 text-sm text-surface-600 dark:text-surface-400 mt-1">
                 <span className="capitalize">{exercise.difficulty}</span>
                 <span>•</span>
                 <span className="capitalize">{exercise.topic}</span>
@@ -72,17 +72,17 @@ export function SprintExerciseArea({
 
           {/* Progress Indicator */}
           <div className="text-right">
-            <div className="text-2xl font-heading font-bold text-accent-400">
+            <div className="text-2xl font-heading font-bold text-accent-500 dark:text-accent-400">
               {exerciseNumber}
-              <span className="text-surface-600">/{totalExercises}</span>
+              <span className="text-surface-400 dark:text-surface-600">/{totalExercises}</span>
             </div>
-            <div className="text-xs text-surface-500">exercises</div>
+            <div className="text-xs text-surface-500 dark:text-surface-500">exercises</div>
           </div>
         </div>
 
         {/* Progress Bar */}
         <div className="mt-3">
-          <div className="w-full h-1.5 bg-surface-800 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-surface-200 dark:bg-surface-800 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-accent-500 to-accent-400 transition-all duration-500"
               style={{ width: `${(exerciseNumber / totalExercises) * 100}%` }}

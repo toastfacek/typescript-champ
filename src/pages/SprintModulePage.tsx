@@ -83,8 +83,8 @@ export function SprintModulePage() {
         {isGenerating && (
           <div className="flex-1 flex flex-col items-center justify-center p-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500 mb-4" />
-            <p className="text-lg font-medium text-surface-200">Generating exercise...</p>
-            <p className="text-sm text-surface-400 mt-2">
+            <p className="text-lg font-medium text-surface-800 dark:text-surface-200">Generating exercise...</p>
+            <p className="text-sm text-surface-600 dark:text-surface-400 mt-2">
               Creating a {progress?.exercisesCompleted ? 'new' : 'custom'} challenge for you
             </p>
           </div>
@@ -96,10 +96,10 @@ export function SprintModulePage() {
             <Card padding="lg" className="max-w-md">
               <div className="text-center">
                 <div className="text-4xl mb-4">😕</div>
-                <p className="text-lg font-medium text-surface-200 mb-2">
+                <p className="text-lg font-medium text-surface-800 dark:text-surface-200 mb-2">
                   Failed to generate exercise
                 </p>
-                <p className="text-sm text-danger-400 mb-4">{generationError}</p>
+                <p className="text-sm text-danger-500 dark:text-danger-400 mb-4">{generationError}</p>
                 <div className="flex gap-3 justify-center">
                   <Button onClick={handleNextExercise}>Try Again</Button>
                   <Button variant="outline" onClick={handleEndSession}>
