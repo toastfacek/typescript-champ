@@ -94,3 +94,4 @@ export function isPyodideReady(): boolean {
   return pyodideInstance !== null
 }
 
+//
