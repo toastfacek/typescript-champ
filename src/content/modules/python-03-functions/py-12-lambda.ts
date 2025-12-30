@@ -209,7 +209,7 @@ result = sorted(words, key=lambda x: x[-1])`,
         {
           id: 'test-1',
           description: 'result should be sorted by last character',
-          testCode: `assert result == ["code", "world", "python", "hello"], 'Should be sorted by last char: code(e), world(d), python(n), hello(o)'`,
+          testCode: `assert result == ["world", "code", "python", "hello"], 'Should be sorted by last char: world(d), code(e), python(n), hello(o)'`,
         },
       ],
       hints: [
