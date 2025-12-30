@@ -7,6 +7,7 @@ import { SPRINT_CONFIG } from '@/constants/sprint-config'
 interface SprintExerciseAreaProps {
   exercise: SprintExercise
   moduleTitle: string
+  moduleLanguage: 'typescript' | 'python'
   exerciseNumber: number
   totalExercises: number
   onComplete: (success: boolean, timeSeconds: number) => void
@@ -17,6 +18,7 @@ interface SprintExerciseAreaProps {
 export function SprintExerciseArea({
   exercise,
   moduleTitle,
+  moduleLanguage,
   exerciseNumber,
   totalExercises,
   onComplete,
@@ -108,7 +110,7 @@ export function SprintExerciseArea({
               prerequisites: [],
               tags: [],
               steps: [],
-              language: 'typescript'
+              language: moduleLanguage
             }}
             isComplete={isComplete}
             onComplete={handleComplete}

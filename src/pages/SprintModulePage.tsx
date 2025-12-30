@@ -116,6 +116,7 @@ export function SprintModulePage() {
           <SprintExerciseArea
             exercise={currentExercise}
             moduleTitle={currentModule.title}
+            moduleLanguage={currentModule.language}
             exerciseNumber={progress?.exercisesCompleted || 0 + 1}
             totalExercises={currentModule.targetExerciseCount}
             onComplete={handleCompleteExercise}
