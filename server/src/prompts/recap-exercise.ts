@@ -59,21 +59,13 @@ LESSON CONTEXT:
 - Language: ${languageContext}
 ${variationNote}
 
-EXERCISE REQUIREMENTS:
-- Type: ${exerciseType}
-- Difficulty: ${practiceDifficulty}
-- Must be quick (2-3 minutes to complete)
-- Should reinforce ONE core concept from the lesson - keep it focused
-- Keep it simpler than a full practice exercise - this is a refresher, NOT a test
-- For code exercises: Maximum 5-8 lines of code, single concept only
-- NO multi-step pipelines or combining unrelated operations
+REQUIREMENTS: ${practiceDifficulty} difficulty, ${exerciseType} type
+- Quick (2-3 min), ONE core concept, 5-8 lines max for code exercises
+- Simple refresher, NOT a test. No multi-step pipelines.
 
-STARTER CODE GUIDANCE:
-${language === 'python'
-  ? 'For Python: Use blank assignments (variable = ). Keep it simple - one thing to fill in.'
-  : 'For TypeScript: Use valid syntax with a TODO comment.'}
+STARTER CODE: ${language === 'python' ? 'Python: blank assignments (variable = )' : 'TypeScript: valid syntax with TODO'}
 
-Return a JSON object with this exact structure based on exercise type:
+IMPORTANT: Return ONLY valid JSON, no other text. Use this structure for exercise type:
 
 For code-exercise:
 {

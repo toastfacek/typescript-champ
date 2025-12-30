@@ -47,45 +47,18 @@ export function buildCodeExercisePrompt(
 
   const difficultyGuide = {
     easy: `
-EASY DIFFICULTY - Keep it SIMPLE:
-- ONE single concept ONLY (e.g., just string formatting OR just basic math)
-- NO combining multiple operations (no parsing + transforming + filtering)
-- Direct, straightforward task with obvious solution
-- Solution: 3-8 lines of code maximum
-- 2-3 simple test cases with expected inputs
-- If student knows the concept, they should finish in 2-3 minutes
-
-AVOID for easy:
-- Multiple string operations in sequence
-- Nested loops or complex conditionals
-- Dictionary/object transformations
-- Type conversions combined with other logic`,
+EASY: ONE concept only, 3-8 lines max, 2-3 min to complete
+- Direct task with obvious solution (e.g., just string formatting OR just basic math)
+- NO combining operations, NO nested logic, NO data transformations`,
     medium: `
-MEDIUM DIFFICULTY - Focused practice:
-- 2 closely related concepts from the SAME topic area
-- Example: "loop over list AND filter items" NOT "parse string AND create dict AND convert types"
-- One clear problem to solve, not a multi-step pipeline
-- Solution: 8-15 lines of code (if longer, it's too hard)
-- 3-4 test cases including one edge case
-- Should take 5-7 minutes to complete
-
-AVOID for medium:
-- Chaining 3+ different operations (parsing → transforming → filtering → converting)
-- Combining concepts from different topic areas
-- Nested data structure transformations
-- Complex string parsing with multiple delimiters`,
+MEDIUM: 2 related concepts from same topic, 8-15 lines max, 5-7 min to complete
+- One clear problem, NOT a multi-step pipeline
+- Example: "loop AND filter" ✓  vs "parse AND transform AND filter AND convert" ✗
+- Avoid chaining 3+ operations or complex parsing`,
     hard: `
-HARD DIFFICULTY - Challenge but focused:
-- 3-4 related concepts that test deeper understanding
-- Still focused on the sprint topic, not a general programming test
-- Solution: 15-30 lines of code (if more, break into steps)
-- 4-5 test cases including tricky edge cases
-- Should take 8-12 minutes to complete
-
-AVOID for hard:
-- Exercises that require knowledge outside the module scope
-- Overly complex multi-step pipelines
-- Production-level code with extensive error handling`
+HARD: 3-4 related concepts, 15-30 lines max, 8-12 min to complete
+- Still focused on module topic, not a general programming test
+- Avoid exercises needing knowledge outside module scope`
   }
 
   const themeSection = themeContext?.projectType
@@ -128,16 +101,12 @@ The goal: Students replace placeholder values with working logic.
 ${themeSection}
 ${difficultyGuide[difficulty]}
 
-CRITICAL - TOPIC FOCUS:
-The exercise MUST focus specifically on "${topic}" - do NOT add unrelated complexity.
-- If topic is "strings", focus on string operations, NOT parsing complex data structures
-- If topic is "loops", focus on iteration, NOT data transformations
-- If topic is "functions", focus on function syntax/parameters, NOT complex algorithms
-- Keep the exercise scope narrow and aligned with what "${topic}" actually teaches
+TOPIC FOCUS: Exercise must focus specifically on "${topic}" - no unrelated complexity.
+Keep scope narrow and aligned with what "${topic}" teaches.
 
 ${starterCodePatterns}
 
-Return a JSON object with this exact structure:
+IMPORTANT: Return ONLY valid JSON, no other text. Use this exact structure:
 {
   "title": "Short descriptive title (max 60 chars)",
   "instructions": "Clear markdown instructions explaining what to implement. Include examples if helpful.",

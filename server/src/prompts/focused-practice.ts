@@ -52,28 +52,14 @@ The learner has completed this lesson but wants more practice with deeper explan
 
   const difficultyGuide = {
     easy: `
-PRACTICE DIFFICULTY: EASY - Keep exercises SIMPLE
-- Clear explanations with straightforward examples
-- Exercises reinforce ONE core concept from the lesson
-- Code exercises: 3-8 lines, single concept only
-- 2 exercises total (1 code-exercise, 1 quiz or fill-in-blank)
-- Students should complete in 8-10 minutes total`,
+EASY: 2 exercises, ONE concept each, 3-8 lines, 8-10 min total
+- Straightforward examples reinforcing core lesson concept`,
     medium: `
-PRACTICE DIFFICULTY: MEDIUM - Focused practice
-- Deeper explanations with multiple examples
-- Exercises combine 2 closely related concepts from the lesson
-- Code exercises: 8-15 lines, avoid multi-step pipelines
-- Include one edge case per exercise
-- 3 exercises total (mix of types)
-- Students should complete in 12-15 minutes total`,
+MEDIUM: 3 exercises, 2 related concepts, 8-15 lines, 12-15 min total
+- Deeper examples, avoid multi-step pipelines, one edge case per exercise`,
     hard: `
-PRACTICE DIFFICULTY: HARD - Challenge but focused
-- Nuanced explanations with advanced examples
-- Exercises test deeper understanding, still focused on lesson topic
-- Code exercises: 15-30 lines, no overly complex pipelines
-- Include tricky edge cases specific to the lesson concepts
-- 3 exercises total (mix of types, at least one code-exercise)
-- Students should complete in 15-20 minutes total`
+HARD: 3 exercises, deeper understanding, 15-30 lines, 15-20 min total
+- Advanced examples, tricky edge cases specific to lesson, stay focused on lesson topic`
   }
 
   const starterCodeGuidance = effectiveLanguage === 'python'
@@ -88,7 +74,7 @@ ${difficultyGuide[practiceDifficulty]}
 STARTER CODE GUIDANCE:
 ${starterCodeGuidance}
 
-Return a JSON object with this exact structure:
+IMPORTANT: Return ONLY valid JSON, no other text. Use this exact structure:
 {
   "instruction": {
     "title": "Clear title reviewing and expanding on the lesson topic",
