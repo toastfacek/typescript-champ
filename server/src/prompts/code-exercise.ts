@@ -76,6 +76,31 @@ Use examples and variable names related to: ${themeContext.exampleEntities?.join
 Make the exercise feel relevant to their project goal.`
     : ''
 
+  const starterCodePatterns = language === 'python'
+    ? `
+PYTHON STARTER CODE PATTERNS:
+Use blank assignments to show exactly what students need to fill in:
+- Simple: result =
+- Multiple: filtered = \\ncount = len(filtered)
+- Function: def process(data):\\n    result = \\n    return result
+
+AVOID: pass statements (confusing), complete valid syntax
+
+Examples by difficulty:
+- Easy: "# Calculate the sum\\ntotal = "
+- Medium: "# Filter even numbers\\nevens = \\ncount = len(evens)"
+- Hard: "def process_data(items):\\n    # Initialize result\\n    result = \\n    # Calculate total\\n    total = \\n    return result"
+`
+    : `
+TYPESCRIPT STARTER CODE PATTERNS:
+Use valid syntax with TODO comments and placeholder values:
+- Simple: "// TODO: Calculate the sum\\nconst total = 0"
+- Functions: "// TODO: implement\\nreturn null"
+- Arrays: "const filtered = []"
+
+The goal: Students replace placeholder values with working logic.
+`
+
   const testCodeExample = language === 'python'
     ? 'if condition: raise AssertionError("Expected X but got Y")'
     : 'if (condition) throw new Error(\'Expected X but got Y\');'
@@ -83,12 +108,13 @@ Make the exercise feel relevant to their project goal.`
   return `Create a ${difficulty.toUpperCase()} ${languageName} code exercise about "${topic}".
 ${themeSection}
 ${difficultyGuide[difficulty]}
+${starterCodePatterns}
 
 Return a JSON object with this exact structure:
 {
   "title": "Short descriptive title (max 60 chars)",
   "instructions": "Clear markdown instructions explaining what to implement. Include examples if helpful.",
-  "starterCode": "${commentPrefix} ${languageName} code with TODO comments where student needs to write code\\n",
+  "starterCode": "${language === 'python' ? 'Python code with blank assignments (e.g., result = ) showing exactly what to fill in' : 'TypeScript code with TODO comments and valid syntax with placeholder logic'}\\n",
   "solutionCode": "${commentPrefix} Complete working solution that passes all tests\\n",
   "testCases": [
     {
@@ -105,9 +131,9 @@ Return a JSON object with this exact structure:
 }
 
 REQUIREMENTS:
-1. starterCode must be valid ${languageName} that ${language === 'python' ? 'runs' : 'compiles'} (with incomplete logic)
+1. starterCode ${language === 'python' ? 'should use blank assignments (e.g., result = ) - syntax errors are OK, students will complete the code' : 'must be valid TypeScript that compiles (with incomplete logic)'}
 2. solutionCode must pass ALL testCases
-3. testCases must FAIL with starterCode
+3. testCases must FAIL with starterCode (or raise syntax errors for Python blank assignments)
 4. Each testCode must use ${testPattern}
 5. hints should progressively reveal the solution approach
 6. All code must be ${language === 'python' ? 'pure Python (no imports)' : 'browser-safe (no Node.js, no DOM, no network)'}`

@@ -71,10 +71,17 @@ PRACTICE DIFFICULTY: HARD
 - 3 exercises total (mix of types, at least one code-exercise)`
   }
 
+  const starterCodeGuidance = effectiveLanguage === 'python'
+    ? 'For Python: Use blank assignments (variable = ) to show exactly what to fill in'
+    : 'For TypeScript: Use valid syntax with TODO comments'
+
   return `Create a focused practice mini-lesson for the ${languageContext} lesson: "${lessonContext.lessonTitle}"
 
 ${contextSection}
 ${difficultyGuide[practiceDifficulty]}
+
+STARTER CODE GUIDANCE:
+${starterCodeGuidance}
 
 Return a JSON object with this exact structure:
 {
@@ -92,8 +99,8 @@ Return a JSON object with this exact structure:
       "type": "code-exercise",
       "title": "Exercise title",
       "instructions": "Clear instructions",
-      "starterCode": "${commentStyle} ${languageContext} skeleton with TODO comments where student writes code\\n${commentStyle} Should compile but NOT pass tests",
-      "solutionCode": "// Complete working solution that passes all tests",
+      "starterCode": "${effectiveLanguage === 'python' ? 'Python code with blank assignments (e.g., result = ) - syntax errors OK' : 'TypeScript skeleton with TODO comments. Must compile but NOT pass tests'}",
+      "solutionCode": "${commentStyle} Complete working solution that passes all tests",
       "testCases": [
         {
           "id": "test-1",
@@ -162,10 +169,10 @@ REQUIREMENTS:
 7. The instruction should reference the concept name and provide practical context
 8. estimatedMinutes should reflect total time (instruction + exercises)
 9. For quiz exercises: EXACTLY 4 options, EXACTLY 1 correct answer (isCorrect: true)
-10. starterCode must be valid ${languageContext} that compiles/runs (with incomplete logic)
+10. starterCode ${effectiveLanguage === 'python' ? 'should use blank assignments (e.g., result = ) - syntax errors are OK' : 'must be valid TypeScript that compiles (with incomplete logic)'}
 11. solutionCode must pass ALL testCases
-12. testCases must FAIL with starterCode
-13. starterCode should have TODO comments showing where to write code
+12. testCases must FAIL with starterCode (or raise syntax errors for Python blank assignments)
+13. starterCode should ${effectiveLanguage === 'python' ? 'show exactly what variable to assign' : 'have TODO comments showing where to write code'}
 14. All code examples, exercises, and explanations must be in ${languageContext}
 15. Use ${languageContext}-specific syntax, idioms, and best practices
 

@@ -66,6 +66,11 @@ EXERCISE REQUIREMENTS:
 - Should reinforce the core concept from the lesson
 - Keep it simpler than a full practice exercise - this is a refresher
 
+STARTER CODE GUIDANCE:
+${language === 'python'
+  ? 'For Python: Use blank assignments (variable = ). Keep it simple - one thing to fill in.'
+  : 'For TypeScript: Use valid syntax with a TODO comment.'}
+
 Return a JSON object with this exact structure based on exercise type:
 
 For code-exercise:
@@ -73,8 +78,8 @@ For code-exercise:
   "type": "code-exercise",
   "title": "Brief exercise title",
   "instructions": "Clear, concise instructions (2-3 sentences max)",
-  "starterCode": "// ${languageContext} skeleton with TODO comments\\n// Should compile but NOT pass tests",
-  "solutionCode": "// Complete working solution",
+  "starterCode": "${language === 'python' ? 'Python code with blank assignment (e.g., result = ) - one clear thing to fill in' : 'TypeScript skeleton with TODO comment. Must compile but NOT pass tests'}",
+  "solutionCode": "${language === 'python' ? '#' : '//'} Complete working solution",
   "testCases": [
     {
       "id": "test-1",
@@ -138,9 +143,9 @@ REQUIREMENTS:
 1. Exercise must be browser-safe (no Node.js, no DOM, no network)
 2. Test cases must use if/throw pattern (no assert libraries)
 3. For quiz: EXACTLY 4 options, EXACTLY 1 correct answer
-4. starterCode must be valid ${languageContext} that compiles (with incomplete logic)
+4. starterCode ${language === 'python' ? 'should use a blank assignment (e.g., result = ) - syntax errors are OK' : 'must be valid TypeScript that compiles (with incomplete logic)'}
 5. solutionCode must pass ALL testCases
-6. testCases must FAIL with starterCode
+6. testCases must FAIL with starterCode (or raise syntax errors for Python blank assignments)
 7. Keep it brief - this is a quick recap, not a deep dive
 
 Make this feel like a quick refresher that reinforces "${lessonTitle}" without being overwhelming.`
