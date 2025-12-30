@@ -578,3 +578,76 @@ export async function mergeAccountByEmail(
     message: result?.message || 'No account found to merge',
   }
 }
+
+// Sprint progress methods
+export async function syncSprintProgress(
+  userId: string,
+  moduleId: string,
+  progress: {
+    xpEarned: number
+    exercisesAttempted: number
+    exercisesCompleted: number
+    startedAt: string | null
+    completedAt: string | null
+    lastPracticed: string | null
+    status: 'locked' | 'unlocked' | 'in-progress' | 'completed'
+  }
+): Promise<boolean> {
+  if (isDemoMode || userId === 'demo-user') return false
+
+  const progressData: any = {
+    user_id: userId,
+    module_id: moduleId,
+    xp_earned: progress.xpEarned,
+    exercises_attempted: progress.exercisesAttempted,
+    exercises_completed: progress.exercisesCompleted,
+    started_at: progress.startedAt,
+    completed_at: progress.completedAt,
+    last_practiced: progress.lastPracticed,
+    status: progress.status,
+  }
+
+  const { error } = await supabase
+    .from('sprint_module_progress')
+    .upsert(progressData, { onConflict: 'user_id,module_id' })
+
+  if (error) {
+    console.error('Error syncing sprint progress:', error)
+    return false
+  }
+
+  return true
+}
+
+export async function getSprintProgress(
+  userId: string
+): Promise<Record<string, any>> {
+  if (isDemoMode) return {}
+
+  const { data, error } = await supabase
+    .from('sprint_module_progress')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('Error fetching sprint progress:', error)
+    return {}
+  }
+
+  const progressMap: Record<string, any> = {}
+  for (const row of data || []) {
+    const record = row as any
+    progressMap[record.module_id] = {
+      moduleId: record.module_id,
+      xpEarned: record.xp_earned,
+      exercisesAttempted: record.exercises_attempted,
+      exercisesCompleted: record.exercises_completed,
+      startedAt: record.started_at,
+      completedAt: record.completed_at,
+      lastPracticed: record.last_practiced,
+      status: record.status,
+    }
+  }
+
+  return progressMap
+}

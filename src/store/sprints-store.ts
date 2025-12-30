@@ -10,6 +10,7 @@ import type { PracticeTopic, PracticeDifficulty } from '@/types/practice'
 import { getSprintModules } from '@/constants/sprint-modules'
 import { SPRINT_CONFIG } from '@/constants/sprint-config'
 import { generateExercise as apiGenerateExercise } from '@/services/api-client'
+import { syncSprintProgress } from '@/services/supabase-sync'
 import { useStore } from './index'
 
 interface SprintsState {
@@ -361,8 +362,13 @@ export const useSprintsStore = create<SprintsState>()(
           useStore.getState().updateStreakFromActivity()
         }
 
-        // TODO: Sync to Supabase (fire-and-forget)
-        // syncSprintProgress(currentModuleId, progress)
+        // Sync to Supabase (fire-and-forget)
+        const userId = useStore.getState().user?.id
+        if (userId && userId !== 'demo-user') {
+          syncSprintProgress(userId, currentModuleId, progress).catch(err =>
+            console.error('Failed to sync sprint progress:', err)
+          )
+        }
       },
 
       // Get progress for a module
