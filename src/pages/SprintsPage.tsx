@@ -37,16 +37,16 @@ export function SprintsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 to-surface-900">
+    <div className="min-h-screen bg-gradient-to-b from-surface-50 to-surface-100 dark:from-surface-950 dark:to-surface-900">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-3xl font-heading font-bold text-surface-100 mb-2">
+              <h1 className="text-3xl font-heading font-bold text-surface-900 dark:text-surface-100 mb-2">
                 ⚡ Sprints
               </h1>
-              <p className="text-surface-400">
+              <p className="text-surface-600 dark:text-surface-400">
                 Master coding through focused, XP-driven practice sessions
               </p>
             </div>
@@ -67,20 +67,20 @@ export function SprintsPage() {
             <div className="flex items-start gap-4">
               <div className="text-4xl">🎯</div>
               <div className="flex-1">
-                <h2 className="text-lg font-heading font-bold text-surface-100 mb-2">
+                <h2 className="text-lg font-heading font-bold text-surface-900 dark:text-surface-100 mb-2">
                   How Sprints Work
                 </h2>
-                <ul className="space-y-1 text-sm text-surface-300">
+                <ul className="space-y-1 text-sm text-surface-700 dark:text-surface-300">
                   <li className="flex items-start gap-2">
-                    <span className="text-accent-400 mt-0.5">•</span>
+                    <span className="text-accent-500 dark:text-accent-400 mt-0.5">•</span>
                     <span>Complete mini code exercises to earn <strong>15 XP</strong> each</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-accent-400 mt-0.5">•</span>
+                    <span className="text-accent-500 dark:text-accent-400 mt-0.5">•</span>
                     <span>Earn enough XP to <strong>unlock the next module</strong></span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-accent-400 mt-0.5">•</span>
+                    <span className="text-accent-500 dark:text-accent-400 mt-0.5">•</span>
                     <span>Build fluency through <strong>rapid-fire practice</strong></span>
                   </li>
                 </ul>
@@ -93,7 +93,7 @@ export function SprintsPage() {
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-8">
           {/* Module Grid */}
           <div>
-            <h2 className="text-xl font-heading font-bold text-surface-200 mb-4 capitalize">
+            <h2 className="text-xl font-heading font-bold text-surface-800 dark:text-surface-200 mb-4 capitalize">
               {language} Sprints
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -126,7 +126,7 @@ export function SprintsPage() {
             {modules.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-4xl mb-4">📚</div>
-                <p className="text-surface-400">No sprint modules available</p>
+                <p className="text-surface-600 dark:text-surface-400">No sprint modules available</p>
               </div>
             )}
           </div>
