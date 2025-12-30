@@ -40,6 +40,8 @@ const GenerateExerciseSchema = z.object({
   topic: z.string().min(1).max(100),
   difficulty: z.enum(['easy', 'medium', 'hard']),
   exerciseType: z.enum(['code-exercise', 'fill-in-blank', 'quiz']),
+  language: z.enum(['typescript', 'python']).optional().default('typescript'),
+  sprintMode: z.boolean().optional().default(false),
   themeContext: z.object({
     projectType: z.string().optional(),
     domain: z.string().optional(),
@@ -60,7 +62,7 @@ exerciseRouter.post('/generate', async (req, res) => {
       })
     }
 
-    const { topic, difficulty, exerciseType, themeContext } = parseResult.data
+    const { topic, difficulty, exerciseType, language, themeContext } = parseResult.data
 
     // Build prompt based on exercise type
     let systemPrompt: string
@@ -68,16 +70,16 @@ exerciseRouter.post('/generate', async (req, res) => {
 
     switch (exerciseType) {
       case 'code-exercise':
-        systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT
-        userPrompt = buildCodeExercisePrompt(topic, difficulty, themeContext)
+        systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT(language)
+        userPrompt = buildCodeExercisePrompt(topic, difficulty, language, themeContext)
         break
       case 'fill-in-blank':
-        systemPrompt = FILL_BLANK_SYSTEM_PROMPT
-        userPrompt = buildFillBlankPrompt(topic, difficulty, themeContext)
+        systemPrompt = FILL_BLANK_SYSTEM_PROMPT(language)
+        userPrompt = buildFillBlankPrompt(topic, difficulty, language, themeContext)
         break
       case 'quiz':
-        systemPrompt = QUIZ_SYSTEM_PROMPT
-        userPrompt = buildQuizPrompt(topic, difficulty, themeContext)
+        systemPrompt = QUIZ_SYSTEM_PROMPT(language)
+        userPrompt = buildQuizPrompt(topic, difficulty, language, themeContext)
         break
     }
 
@@ -190,6 +192,7 @@ const BatchGenerateSchema = z.object({
   difficulty: z.enum(['easy', 'medium', 'hard']),
   count: z.number().min(1).max(10).default(5),
   exerciseTypes: z.array(z.enum(['code-exercise', 'fill-in-blank', 'quiz'])).optional(),
+  language: z.enum(['typescript', 'python']).optional().default('typescript'),
   themeContext: z.object({
     projectType: z.string().optional(),
     domain: z.string().optional(),
@@ -209,7 +212,7 @@ exerciseRouter.post('/generate-batch', async (req, res) => {
       })
     }
 
-    const { topic, difficulty, count, exerciseTypes, themeContext } = parseResult.data
+    const { topic, difficulty, count, exerciseTypes, language, themeContext } = parseResult.data
     const types = exerciseTypes || ['code-exercise', 'fill-in-blank', 'quiz']
 
     const exercises: unknown[] = []
@@ -222,7 +225,7 @@ exerciseRouter.post('/generate-batch', async (req, res) => {
       const batch = []
       for (let j = i; j < Math.min(i + batchSize, count); j++) {
         const exerciseType = types[j % types.length]
-        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, themeContext))
+        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, language, themeContext))
       }
 
       const results = await Promise.allSettled(batch)
@@ -262,6 +265,7 @@ async function generateSingleExercise(
   topic: string,
   difficulty: 'easy' | 'medium' | 'hard',
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz',
+  language: 'typescript' | 'python' = 'typescript',
   themeContext?: any
 ) {
   let systemPrompt: string
@@ -269,16 +273,16 @@ async function generateSingleExercise(
 
   switch (exerciseType) {
     case 'code-exercise':
-      systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT
-      userPrompt = buildCodeExercisePrompt(topic, difficulty, themeContext)
+      systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT(language)
+      userPrompt = buildCodeExercisePrompt(topic, difficulty, language, themeContext)
       break
     case 'fill-in-blank':
-      systemPrompt = FILL_BLANK_SYSTEM_PROMPT
-      userPrompt = buildFillBlankPrompt(topic, difficulty, themeContext)
+      systemPrompt = FILL_BLANK_SYSTEM_PROMPT(language)
+      userPrompt = buildFillBlankPrompt(topic, difficulty, language, themeContext)
       break
     case 'quiz':
-      systemPrompt = QUIZ_SYSTEM_PROMPT
-      userPrompt = buildQuizPrompt(topic, difficulty, themeContext)
+      systemPrompt = QUIZ_SYSTEM_PROMPT(language)
+      userPrompt = buildQuizPrompt(topic, difficulty, language, themeContext)
       break
   }
 

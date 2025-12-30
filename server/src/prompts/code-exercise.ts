@@ -1,34 +1,50 @@
-export const CODE_EXERCISE_SYSTEM_PROMPT = `You are an expert TypeScript educator creating practice exercises for a learning platform.
-
-Your exercises must:
-1. Be self-contained and runnable in a browser environment
-2. Have clear, achievable learning objectives
-3. Include comprehensive test cases that validate the solution
-4. Match the specified difficulty level precisely
-5. Focus on the specified TypeScript topic
-
-For test cases:
-- Tests should throw errors on failure (use if/throw pattern, NOT assert libraries)
-- Tests should check specific outcomes, not implementation details
-- Include edge cases appropriate to difficulty level
-- Each test should be independent
-
-SECURITY RULES - NEVER generate code containing:
-- eval() or Function()
+export function CODE_EXERCISE_SYSTEM_PROMPT(language: 'typescript' | 'python' = 'typescript'): string {
+  const languageName = language === 'typescript' ? 'TypeScript' : 'Python'
+  const securityRules = language === 'python'
+    ? `- eval() or exec()
+- open(), file operations
+- requests, urllib, or any network calls
+- os, sys, or subprocess modules
+- import statements (use only built-in functions)`
+    : `- eval() or Function()
 - fetch(), XMLHttpRequest, or any network calls
 - localStorage, sessionStorage, or any storage APIs
 - document, window, or any DOM APIs
 - import() or require()
 - process, fs, or any Node.js APIs
-- setTimeout, setInterval (unless specifically about async)
+- setTimeout, setInterval (unless specifically about async)`
 
-Keep exercises focused on pure TypeScript/JavaScript logic.`
+  return `You are an expert ${languageName} educator creating practice exercises for a learning platform.
+
+Your exercises must:
+1. Be self-contained and runnable in a ${language === 'python' ? 'Python' : 'browser'} environment
+2. Have clear, achievable learning objectives
+3. Include comprehensive test cases that validate the solution
+4. Match the specified difficulty level precisely
+5. Focus on the specified ${languageName} topic
+
+For test cases:
+- Tests should throw errors on failure (use ${language === 'python' ? 'assert or if/raise pattern' : 'if/throw pattern, NOT assert libraries'})
+- Tests should check specific outcomes, not implementation details
+- Include edge cases appropriate to difficulty level
+- Each test should be independent
+
+SECURITY RULES - NEVER generate code containing:
+${securityRules}
+
+Keep exercises focused on pure ${languageName} logic.`
+}
 
 export function buildCodeExercisePrompt(
   topic: string,
   difficulty: 'easy' | 'medium' | 'hard',
+  language: 'typescript' | 'python' = 'typescript',
   themeContext?: { projectType?: string; exampleEntities?: string[] }
 ): string {
+  const languageName = language === 'typescript' ? 'TypeScript' : 'Python'
+  const commentPrefix = language === 'python' ? '#' : '//'
+  const testPattern = language === 'python' ? 'assert or if/raise pattern' : 'if/throw pattern'
+
   const difficultyGuide = {
     easy: `
 EASY DIFFICULTY:
@@ -60,7 +76,11 @@ Use examples and variable names related to: ${themeContext.exampleEntities?.join
 Make the exercise feel relevant to their project goal.`
     : ''
 
-  return `Create a ${difficulty.toUpperCase()} TypeScript code exercise about "${topic}".
+  const testCodeExample = language === 'python'
+    ? 'if condition: raise AssertionError("Expected X but got Y")'
+    : 'if (condition) throw new Error(\'Expected X but got Y\');'
+
+  return `Create a ${difficulty.toUpperCase()} ${languageName} code exercise about "${topic}".
 ${themeSection}
 ${difficultyGuide[difficulty]}
 
@@ -68,13 +88,13 @@ Return a JSON object with this exact structure:
 {
   "title": "Short descriptive title (max 60 chars)",
   "instructions": "Clear markdown instructions explaining what to implement. Include examples if helpful.",
-  "starterCode": "// TypeScript code with TODO comments where student needs to write code\\n",
-  "solutionCode": "// Complete working solution that passes all tests\\n",
+  "starterCode": "${commentPrefix} ${languageName} code with TODO comments where student needs to write code\\n",
+  "solutionCode": "${commentPrefix} Complete working solution that passes all tests\\n",
   "testCases": [
     {
       "id": "test-1",
       "description": "Human-readable description of what this tests",
-      "testCode": "if (condition) throw new Error('Expected X but got Y');"
+      "testCode": "${testCodeExample}"
     }
   ],
   "hints": [
@@ -85,10 +105,10 @@ Return a JSON object with this exact structure:
 }
 
 REQUIREMENTS:
-1. starterCode must be valid TypeScript that compiles (with incomplete logic)
+1. starterCode must be valid ${languageName} that ${language === 'python' ? 'runs' : 'compiles'} (with incomplete logic)
 2. solutionCode must pass ALL testCases
 3. testCases must FAIL with starterCode
-4. Each testCode must use if/throw pattern (no assert)
+4. Each testCode must use ${testPattern}
 5. hints should progressively reveal the solution approach
-6. All code must be browser-safe (no Node.js, no DOM, no network)`
+6. All code must be ${language === 'python' ? 'pure Python (no imports)' : 'browser-safe (no Node.js, no DOM, no network)'}`
 }
