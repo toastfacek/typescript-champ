@@ -52,23 +52,28 @@ The learner has completed this lesson but wants more practice with deeper explan
 
   const difficultyGuide = {
     easy: `
-PRACTICE DIFFICULTY: EASY
-- Keep explanations clear and accessible
-- Exercises should reinforce core concepts from the lesson
-- Use straightforward examples
-- 2 exercises total (1 code-exercise, 1 quiz or fill-in-blank)`,
+PRACTICE DIFFICULTY: EASY - Keep exercises SIMPLE
+- Clear explanations with straightforward examples
+- Exercises reinforce ONE core concept from the lesson
+- Code exercises: 3-8 lines, single concept only
+- 2 exercises total (1 code-exercise, 1 quiz or fill-in-blank)
+- Students should complete in 8-10 minutes total`,
     medium: `
-PRACTICE DIFFICULTY: MEDIUM
-- Provide deeper explanations with more examples
-- Exercises should require some problem-solving
-- Include edge cases and common pitfalls
-- 3 exercises total (mix of types)`,
+PRACTICE DIFFICULTY: MEDIUM - Focused practice
+- Deeper explanations with multiple examples
+- Exercises combine 2 closely related concepts from the lesson
+- Code exercises: 8-15 lines, avoid multi-step pipelines
+- Include one edge case per exercise
+- 3 exercises total (mix of types)
+- Students should complete in 12-15 minutes total`,
     hard: `
-PRACTICE DIFFICULTY: HARD
-- Deep dive with nuanced explanations
-- Exercises should challenge understanding
-- Include tricky edge cases and advanced applications
-- 3 exercises total (mix of types, at least one code-exercise)`
+PRACTICE DIFFICULTY: HARD - Challenge but focused
+- Nuanced explanations with advanced examples
+- Exercises test deeper understanding, still focused on lesson topic
+- Code exercises: 15-30 lines, no overly complex pipelines
+- Include tricky edge cases specific to the lesson concepts
+- 3 exercises total (mix of types, at least one code-exercise)
+- Students should complete in 15-20 minutes total`
   }
 
   const starterCodeGuidance = effectiveLanguage === 'python'

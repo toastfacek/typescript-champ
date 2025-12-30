@@ -47,26 +47,45 @@ export function buildCodeExercisePrompt(
 
   const difficultyGuide = {
     easy: `
-EASY DIFFICULTY:
-- Focus on ONE single concept
-- Provide clear, step-by-step instructions
-- Solution should be 3-10 lines of code
-- 2-3 simple test cases
-- Obvious solution path`,
+EASY DIFFICULTY - Keep it SIMPLE:
+- ONE single concept ONLY (e.g., just string formatting OR just basic math)
+- NO combining multiple operations (no parsing + transforming + filtering)
+- Direct, straightforward task with obvious solution
+- Solution: 3-8 lines of code maximum
+- 2-3 simple test cases with expected inputs
+- If student knows the concept, they should finish in 2-3 minutes
+
+AVOID for easy:
+- Multiple string operations in sequence
+- Nested loops or complex conditionals
+- Dictionary/object transformations
+- Type conversions combined with other logic`,
     medium: `
-MEDIUM DIFFICULTY:
-- Combine 2-3 related concepts
-- Require some problem-solving
-- Solution should be 10-25 lines of code
-- 3-4 test cases including edge cases
-- Multiple valid approaches possible`,
+MEDIUM DIFFICULTY - Focused practice:
+- 2 closely related concepts from the SAME topic area
+- Example: "loop over list AND filter items" NOT "parse string AND create dict AND convert types"
+- One clear problem to solve, not a multi-step pipeline
+- Solution: 8-15 lines of code (if longer, it's too hard)
+- 3-4 test cases including one edge case
+- Should take 5-7 minutes to complete
+
+AVOID for medium:
+- Chaining 3+ different operations (parsing → transforming → filtering → converting)
+- Combining concepts from different topic areas
+- Nested data structure transformations
+- Complex string parsing with multiple delimiters`,
     hard: `
-HARD DIFFICULTY:
-- Complex scenarios with multiple concepts
-- Require careful thinking about edge cases
-- Solution should be 15-40 lines of code
+HARD DIFFICULTY - Challenge but focused:
+- 3-4 related concepts that test deeper understanding
+- Still focused on the sprint topic, not a general programming test
+- Solution: 15-30 lines of code (if more, break into steps)
 - 4-5 test cases including tricky edge cases
-- May need to consider performance or optimization`
+- Should take 8-12 minutes to complete
+
+AVOID for hard:
+- Exercises that require knowledge outside the module scope
+- Overly complex multi-step pipelines
+- Production-level code with extensive error handling`
   }
 
   const themeSection = themeContext?.projectType
@@ -108,6 +127,14 @@ The goal: Students replace placeholder values with working logic.
   return `Create a ${difficulty.toUpperCase()} ${languageName} code exercise about "${topic}".
 ${themeSection}
 ${difficultyGuide[difficulty]}
+
+CRITICAL - TOPIC FOCUS:
+The exercise MUST focus specifically on "${topic}" - do NOT add unrelated complexity.
+- If topic is "strings", focus on string operations, NOT parsing complex data structures
+- If topic is "loops", focus on iteration, NOT data transformations
+- If topic is "functions", focus on function syntax/parameters, NOT complex algorithms
+- Keep the exercise scope narrow and aligned with what "${topic}" actually teaches
+
 ${starterCodePatterns}
 
 Return a JSON object with this exact structure:

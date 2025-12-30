@@ -63,8 +63,10 @@ EXERCISE REQUIREMENTS:
 - Type: ${exerciseType}
 - Difficulty: ${practiceDifficulty}
 - Must be quick (2-3 minutes to complete)
-- Should reinforce the core concept from the lesson
-- Keep it simpler than a full practice exercise - this is a refresher
+- Should reinforce ONE core concept from the lesson - keep it focused
+- Keep it simpler than a full practice exercise - this is a refresher, NOT a test
+- For code exercises: Maximum 5-8 lines of code, single concept only
+- NO multi-step pipelines or combining unrelated operations
 
 STARTER CODE GUIDANCE:
 ${language === 'python'
