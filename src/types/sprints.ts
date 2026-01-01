@@ -41,12 +41,13 @@ export interface SprintProgress {
 
 /**
  * Sprint Exercise - Code exercise only (no fill-blank or quiz)
+ * Sprints use fundamental difficulty (2-4 lines, 30-60 seconds)
  */
 export interface SprintExercise {
   id: string
   moduleId: string
   type: 'code-exercise'          // Sprints only use code exercises
-  difficulty: 'easy' | 'medium'  // No 'hard' in Sprints
+  difficulty: 'easy'              // Maps to 'fundamental' on backend (Kumon-style drilling)
   topic: string
   step: CodeExerciseStep
   generatedAt: string

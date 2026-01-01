@@ -53,27 +53,39 @@ export async function completeWithJSON<T>(
     ...options,
     systemPrompt: `${options.systemPrompt || ''}
 
-IMPORTANT: Respond with valid JSON only. No markdown, no code fences, no explanation - just the JSON object.`
+CRITICAL: You MUST respond with ONLY valid JSON. No markdown code blocks, no backticks, no explanations before or after - just the raw JSON object starting with { and ending with }.`
   })
 
-  // Extract JSON from response (handle potential markdown code blocks)
+  // Extract JSON from response (handle potential markdown code blocks and other formatting)
   let jsonStr = response.trim()
 
-  // Remove markdown code fences if present
-  if (jsonStr.startsWith('```json')) {
-    jsonStr = jsonStr.slice(7)
-  } else if (jsonStr.startsWith('```')) {
-    jsonStr = jsonStr.slice(3)
+  // Remove markdown code fences if present (handle multiple formats)
+  const codeFencePatterns = [
+    /^```json\s*/i,
+    /^```javascript\s*/i,
+    /^```\s*/,
+  ]
+
+  for (const pattern of codeFencePatterns) {
+    jsonStr = jsonStr.replace(pattern, '')
   }
-  if (jsonStr.endsWith('```')) {
-    jsonStr = jsonStr.slice(0, -3)
+
+  // Remove trailing code fences
+  jsonStr = jsonStr.replace(/\s*```\s*$/g, '').trim()
+
+  // Try to find JSON object if there's extra text
+  const jsonMatch = jsonStr.match(/\{[\s\S]*\}/)
+  if (jsonMatch) {
+    jsonStr = jsonMatch[0]
   }
-  jsonStr = jsonStr.trim()
 
   try {
     return JSON.parse(jsonStr) as T
   } catch (e) {
-    console.error('Failed to parse JSON response:', jsonStr.slice(0, 200))
+    console.error('Failed to parse JSON response from Gemini')
+    console.error('First 500 chars:', jsonStr.slice(0, 500))
+    console.error('Last 200 chars:', jsonStr.slice(-200))
+    console.error('Parse error:', e instanceof Error ? e.message : String(e))
     throw new Error('Invalid JSON response from Gemini')
   }
 }

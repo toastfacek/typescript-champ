@@ -6,7 +6,7 @@ import type {
   SprintExercise,
   SprintModuleStatus
 } from '@/types/sprints'
-import type { PracticeTopic, PracticeDifficulty } from '@/types/practice'
+import type { PracticeTopic } from '@/types/practice'
 import { getSprintModules } from '@/constants/sprint-modules'
 import { SPRINT_CONFIG } from '@/constants/sprint-config'
 import { generateExercise as apiGenerateExercise } from '@/services/api-client'
@@ -189,9 +189,7 @@ export const useSprintsStore = create<SprintsState>()(
 
         try {
           const topic = module.topics[Math.floor(Math.random() * module.topics.length)] as PracticeTopic
-          const difficulty = (SPRINT_CONFIG.ALLOWED_DIFFICULTIES[
-            Math.floor(Math.random() * SPRINT_CONFIG.ALLOWED_DIFFICULTIES.length)
-          ]) as PracticeDifficulty
+          const difficulty = SPRINT_CONFIG.DIFFICULTY  // Always use fundamental difficulty
 
           const exercise = await apiGenerateExercise({
             topic,
@@ -213,7 +211,7 @@ export const useSprintsStore = create<SprintsState>()(
             id: crypto.randomUUID(),
             moduleId: currentModuleId,
             type: 'code-exercise',
-            difficulty: difficulty as 'easy' | 'medium',
+            difficulty: 'easy' as const,  // Always fundamental difficulty
             topic,
             step: exercise.exercise.step,
             generatedAt: new Date().toISOString(),
@@ -253,11 +251,9 @@ export const useSprintsStore = create<SprintsState>()(
           const promises: Promise<SprintExercise>[] = []
 
           for (let i = 0; i < SPRINT_CONFIG.BATCH_SIZE; i++) {
-            // Randomize topic and difficulty
+            // Randomize topic only - always use fundamental difficulty
             const topic = module.topics[Math.floor(Math.random() * module.topics.length)] as PracticeTopic
-            const difficulty = (SPRINT_CONFIG.ALLOWED_DIFFICULTIES[
-              Math.floor(Math.random() * SPRINT_CONFIG.ALLOWED_DIFFICULTIES.length)
-            ]) as PracticeDifficulty
+            const difficulty = SPRINT_CONFIG.DIFFICULTY  // Always use fundamental difficulty
 
             const promise = apiGenerateExercise({
               topic,
@@ -276,7 +272,7 @@ export const useSprintsStore = create<SprintsState>()(
                 id: crypto.randomUUID(),
                 moduleId,
                 type: 'code-exercise' as const,
-                difficulty: difficulty as 'easy' | 'medium',
+                difficulty: 'easy' as const,  // Always fundamental difficulty
                 topic,
                 step: exercise.exercise.step,
                 generatedAt: new Date().toISOString(),

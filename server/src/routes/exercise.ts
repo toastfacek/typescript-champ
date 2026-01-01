@@ -62,7 +62,7 @@ exerciseRouter.post('/generate', async (req, res) => {
       })
     }
 
-    const { topic, difficulty, exerciseType, language, themeContext } = parseResult.data
+    const { topic, difficulty, exerciseType, language, themeContext, sprintMode } = parseResult.data
 
     // Build prompt based on exercise type
     let systemPrompt: string
@@ -71,7 +71,7 @@ exerciseRouter.post('/generate', async (req, res) => {
     switch (exerciseType) {
       case 'code-exercise':
         systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT(language)
-        userPrompt = buildCodeExercisePrompt(topic, difficulty, language, themeContext)
+        userPrompt = buildCodeExercisePrompt(topic, difficulty, language, themeContext, sprintMode)
         break
       case 'fill-in-blank':
         systemPrompt = FILL_BLANK_SYSTEM_PROMPT(language)
@@ -219,13 +219,15 @@ exerciseRouter.post('/generate-batch', async (req, res) => {
     const errors: string[] = []
     const startTime = Date.now()
 
+    // Note: Batch generation is not typically used for sprints
+    // Sprints use individual /generate calls with sprintMode: true
     // Generate exercises in parallel (max 3 concurrent to avoid rate limits)
     const batchSize = 3
     for (let i = 0; i < count; i += batchSize) {
       const batch = []
       for (let j = i; j < Math.min(i + batchSize, count); j++) {
         const exerciseType = types[j % types.length]
-        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, language, themeContext))
+        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, language, themeContext, false))
       }
 
       const results = await Promise.allSettled(batch)
@@ -266,7 +268,8 @@ async function generateSingleExercise(
   difficulty: 'easy' | 'medium' | 'hard',
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz',
   language: 'typescript' | 'python' = 'typescript',
-  themeContext?: any
+  themeContext?: any,
+  sprintMode?: boolean
 ) {
   let systemPrompt: string
   let userPrompt: string
@@ -274,7 +277,7 @@ async function generateSingleExercise(
   switch (exerciseType) {
     case 'code-exercise':
       systemPrompt = CODE_EXERCISE_SYSTEM_PROMPT(language)
-      userPrompt = buildCodeExercisePrompt(topic, difficulty, language, themeContext)
+      userPrompt = buildCodeExercisePrompt(topic, difficulty, language, themeContext, sprintMode)
       break
     case 'fill-in-blank':
       systemPrompt = FILL_BLANK_SYSTEM_PROMPT(language)

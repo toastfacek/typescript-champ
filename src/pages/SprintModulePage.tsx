@@ -18,6 +18,7 @@ export function SprintModulePage() {
   const isGenerating = useSprintsStore((s) => s.isGenerating)
   const generationError = useSprintsStore((s) => s.generationError)
   const getTotalSprintXP = useSprintsStore((s) => s.getTotalSprintXP)
+  const initializeModules = useSprintsStore((s) => s.initializeModules)
   const startModule = useSprintsStore((s) => s.startModule)
   const endSession = useSprintsStore((s) => s.endSession)
   const generateNextExercise = useSprintsStore((s) => s.generateNextExercise)
@@ -26,12 +27,19 @@ export function SprintModulePage() {
   const currentModule = modules.find(m => m.id === moduleId)
   const progress = moduleId ? moduleProgress[moduleId] : null
 
-  // Initialize module session
+  // Initialize modules first
   useEffect(() => {
-    if (moduleId && moduleId !== currentModuleId) {
+    if (modules.length === 0) {
+      initializeModules(language)
+    }
+  }, [])
+
+  // Initialize module session (only after modules are loaded)
+  useEffect(() => {
+    if (moduleId && moduleId !== currentModuleId && modules.length > 0) {
       startModule(moduleId)
     }
-  }, [moduleId, currentModuleId])
+  }, [moduleId, currentModuleId, modules.length])
 
   // Generate first exercise if needed
   useEffect(() => {

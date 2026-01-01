@@ -1,7 +1,9 @@
 /**
  * Sprint Mode Configuration
  *
- * Centralized config for Sprints mode XP, generation, and UI settings
+ * Sprints are designed for fundamental drilling - think "Kumon for coding"
+ * Exercises are 2-4 lines, single concept, 30-60 seconds each
+ * Focus on building confidence through repetitive practice of basics
  */
 
 export const SPRINT_CONFIG = {
@@ -30,10 +32,11 @@ export const SPRINT_CONFIG = {
   MAX_CONCURRENT_GENERATIONS: 3,
 
   /**
-   * Allowed difficulty levels for Sprint exercises
-   * Only easy and medium - no hard exercises in Sprints
+   * Difficulty level for Sprint exercises
+   * Always uses 'easy' which maps to 'fundamental' drilling on backend
+   * (2-4 lines, single concept, 30-60 seconds)
    */
-  ALLOWED_DIFFICULTIES: ['easy', 'medium'] as const,
+  DIFFICULTY: 'easy' as const,
 
   /**
    * Exercise type for Sprints
@@ -74,4 +77,4 @@ export const SPRINT_CONFIG = {
 /**
  * Type-safe difficulty type for Sprints
  */
-export type SprintDifficulty = typeof SPRINT_CONFIG.ALLOWED_DIFFICULTIES[number]
+export type SprintDifficulty = typeof SPRINT_CONFIG.DIFFICULTY

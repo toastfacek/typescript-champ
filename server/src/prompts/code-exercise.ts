@@ -39,13 +39,27 @@ export function buildCodeExercisePrompt(
   topic: string,
   difficulty: 'easy' | 'medium' | 'hard',
   language: 'typescript' | 'python' = 'typescript',
-  themeContext?: { projectType?: string; exampleEntities?: string[] }
+  themeContext?: { projectType?: string; exampleEntities?: string[] },
+  sprintMode?: boolean
 ): string {
   const languageName = language === 'typescript' ? 'TypeScript' : 'Python'
   const commentPrefix = language === 'python' ? '#' : '//'
   const testPattern = language === 'python' ? 'assert or if/raise pattern' : 'if/throw pattern'
 
+  // Use fundamental difficulty for sprint mode
+  const effectiveDifficulty = sprintMode ? 'fundamental' : difficulty
+
   const difficultyGuide = {
+    fundamental: `
+FUNDAMENTAL: Single atomic action, 2-4 lines max, 30-60 seconds to complete
+- ONE concept, ONE operation (e.g., "assign variable then print it", "call print with value")
+- Kumon-style drilling - repetitive, confidence-building, ultra-basic
+- NO logic branches, NO conditionals, NO loops, NO multiple steps
+- Just the most basic operations: assignment, print, simple arithmetic
+- Examples:
+  * Python: "Create variable x = 5 and print it" (2 lines)
+  * TypeScript: "Declare const name = 'Alice' and log it" (2 lines)
+- Must be completable in under 1 minute by absolute beginners`,
     easy: `
 EASY: ONE concept only, 3-8 lines max, 2-3 min to complete
 - Direct task with obvious solution (e.g., just string formatting OR just basic math)
@@ -97,16 +111,22 @@ The goal: Students replace placeholder values with working logic.
     ? 'if condition: raise AssertionError("Expected X but got Y")'
     : 'if (condition) throw new Error(\'Expected X but got Y\');'
 
-  return `Create a ${difficulty.toUpperCase()} ${languageName} code exercise about "${topic}".
+  return `Create a ${effectiveDifficulty.toUpperCase()} ${languageName} code exercise about "${topic}".
 ${themeSection}
-${difficultyGuide[difficulty]}
+${difficultyGuide[effectiveDifficulty]}
 
 TOPIC FOCUS: Exercise must focus specifically on "${topic}" - no unrelated complexity.
 Keep scope narrow and aligned with what "${topic}" teaches.
 
 ${starterCodePatterns}
 
-IMPORTANT: Return ONLY valid JSON, no other text. Use this exact structure:
+CRITICAL JSON OUTPUT REQUIREMENTS:
+- Return ONLY the JSON object below - no markdown, no code blocks, no backticks, no explanations
+- Start your response with { and end with }
+- Do NOT wrap the JSON in \`\`\`json or any other formatting
+- Just output the raw JSON
+
+Required JSON structure:
 {
   "title": "Short descriptive title (max 60 chars)",
   "instructions": "Clear markdown instructions explaining what to implement. Include examples if helpful.",
