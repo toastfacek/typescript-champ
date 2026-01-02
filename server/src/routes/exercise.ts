@@ -193,6 +193,7 @@ const BatchGenerateSchema = z.object({
   count: z.number().min(1).max(10).default(5),
   exerciseTypes: z.array(z.enum(['code-exercise', 'fill-in-blank', 'quiz'])).optional(),
   language: z.enum(['typescript', 'python']).optional().default('typescript'),
+  sprintMode: z.boolean().optional().default(false),
   themeContext: z.object({
     projectType: z.string().optional(),
     domain: z.string().optional(),
@@ -212,7 +213,7 @@ exerciseRouter.post('/generate-batch', async (req, res) => {
       })
     }
 
-    const { topic, difficulty, count, exerciseTypes, language, themeContext } = parseResult.data
+    const { topic, difficulty, count, exerciseTypes, language, sprintMode, themeContext } = parseResult.data
     const types = exerciseTypes || ['code-exercise', 'fill-in-blank', 'quiz']
 
     const exercises: unknown[] = []
@@ -227,7 +228,7 @@ exerciseRouter.post('/generate-batch', async (req, res) => {
       const batch = []
       for (let j = i; j < Math.min(i + batchSize, count); j++) {
         const exerciseType = types[j % types.length]
-        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, language, themeContext, false))
+        batch.push(generateSingleExercise(topic, difficulty, exerciseType as any, language, themeContext, sprintMode))
       }
 
       const results = await Promise.allSettled(batch)

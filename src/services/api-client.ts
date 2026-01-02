@@ -90,6 +90,7 @@ export async function generateExerciseBatch(params: {
   exerciseTypes?: ('code-exercise' | 'fill-in-blank' | 'quiz')[]
   language?: 'typescript' | 'python'
   themeContext?: ThemeContext
+  sprintMode?: boolean
 }): Promise<BatchGenerateResponse> {
   return fetchJson<BatchGenerateResponse>('/api/exercise/generate-batch', {
     method: 'POST',

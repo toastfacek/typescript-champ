@@ -1,6 +1,7 @@
 import type { CodeExerciseStep, FillInBlankStep, QuizStep } from './lesson'
 
 export type PracticeDifficulty = 'easy' | 'medium' | 'hard'
+export type PracticeMode = 'practice' | 'drill'
 
 export type PracticeTopic =
   // Shared topics (used by both TypeScript and Python)
@@ -47,9 +48,13 @@ export interface PracticeExercise {
 export interface PracticeSession {
   id: string
   topic: PracticeTopic
+  topicPool?: PracticeTopic[]
   difficulty: PracticeDifficulty
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed'
   language: 'typescript' | 'python'
+  mode: PracticeMode
+  moduleId?: string
+  moduleTitle?: string
   startedAt: Date
   endedAt?: Date
   exercisesAttempted: number
@@ -83,6 +88,7 @@ export interface GenerateExerciseRequest {
   exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz'
   language?: 'typescript' | 'python'
   themeContext?: ThemeContext
+  sprintMode?: boolean
 }
 
 export interface ThemeContext {

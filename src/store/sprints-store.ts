@@ -42,6 +42,7 @@ interface SprintsState {
   getTotalSprintXP: () => number
   isModuleUnlocked: (moduleId: string) => boolean
   getModuleStatus: (moduleId: string) => SprintModuleStatus
+  recordDrillCompletion: (moduleId: string, language: 'typescript' | 'python', success: boolean) => void
   reset: () => void
 }
 
@@ -403,6 +404,71 @@ export const useSprintsStore = create<SprintsState>()(
         }
 
         return progress.status
+      },
+
+      // Record a drill completion from Practice mode
+      recordDrillCompletion: (moduleId, language, success) => {
+        const { initializeModules } = get()
+        let { modules, moduleProgress } = get()
+
+        if (modules.length === 0 || get().language !== language) {
+          initializeModules(language)
+          ;({ modules, moduleProgress } = get())
+        }
+
+        const progress = moduleProgress[moduleId] || defaultProgress(moduleId)
+
+        // Update stats
+        progress.exercisesAttempted++
+        if (success) {
+          progress.exercisesCompleted++
+          progress.xpEarned += SPRINT_CONFIG.XP_PER_EXERCISE
+        }
+        progress.lastPracticed = new Date().toISOString()
+
+        if (!progress.startedAt) {
+          progress.startedAt = new Date().toISOString()
+        }
+
+        if (progress.status === 'locked' || progress.status === 'unlocked') {
+          progress.status = 'in-progress'
+        }
+
+        // Check module completion
+        const module = get().modules.find(m => m.id === moduleId)
+        if (module && progress.exercisesCompleted >= module.targetExerciseCount) {
+          if (progress.status !== 'completed') {
+            progress.status = 'completed'
+            progress.completedAt = new Date().toISOString()
+            progress.xpEarned += SPRINT_CONFIG.MODULE_COMPLETION_BONUS
+          }
+        }
+
+        // Update unlock statuses based on total XP
+        const updatedProgress = { ...moduleProgress, [moduleId]: progress }
+        const totalXP = Object.values(updatedProgress).reduce((sum, p) => sum + p.xpEarned, 0)
+
+        get().modules.forEach(m => {
+          if (m.order > 1 && updatedProgress[m.id].status === 'locked') {
+            if (totalXP >= m.unlockThresholdXP) {
+              updatedProgress[m.id] = { ...updatedProgress[m.id], status: 'unlocked' }
+            }
+          }
+        })
+
+        set({ moduleProgress: updatedProgress })
+
+        if (success) {
+          useStore.getState().recordActivity()
+          useStore.getState().updateStreakFromActivity()
+        }
+
+        const userId = useStore.getState().user?.id
+        if (userId && userId !== 'demo-user') {
+          syncSprintProgress(userId, moduleId, progress).catch(err =>
+            console.error('Failed to sync sprint progress:', err)
+          )
+        }
       },
 
       // Reset all progress

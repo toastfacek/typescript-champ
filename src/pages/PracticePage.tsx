@@ -1,15 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, Button, Tabs } from '@/components/ui'
 import { TopicSelector, DifficultyPicker, ExerciseTypeSelector } from '@/components/practice'
 import { LessonPracticeSelector } from '@/components/practice/LessonPracticeSelector'
 import { usePracticeStore } from '@/store/practice-store'
+import { useSprintsStore } from '@/store/sprints-store'
 import type { PracticeTopic, PracticeDifficulty } from '@/types/practice'
 import { getTopics } from '@/constants/practice-topics'
+import { getSprintModules } from '@/constants/sprint-modules'
 
 export function PracticePage() {
   const navigate = useNavigate()
   const startSession = usePracticeStore((s) => s.startSession)
+  const initializeModules = useSprintsStore((s) => s.initializeModules)
+  const isModuleUnlocked = useSprintsStore((s) => s.isModuleUnlocked)
   const [activeTab, setActiveTab] = useState('topics')
 
   const [selectedTopic, setSelectedTopic] = useState<PracticeTopic | null>(null)
@@ -27,10 +31,38 @@ export function PracticePage() {
     }
   }
 
+  useEffect(() => {
+    initializeModules(language)
+  }, [initializeModules, language])
+
   const handleStartPractice = () => {
     if (!selectedTopic) return
 
     startSession(selectedTopic, difficulty, exerciseType, language)
+    navigate('/practice/session')
+  }
+
+  const handleStartSprint = (moduleId: string) => {
+    const modules = getSprintModules(language)
+    const module = modules.find((mod) => mod.id === moduleId)
+    if (!module) return
+    if (!isModuleUnlocked(moduleId)) return
+
+    const moduleTopics = module.topics as PracticeTopic[]
+    const defaultTopic = moduleTopics[0] || 'basics'
+
+    startSession(
+      defaultTopic,
+      'easy',
+      'code-exercise',
+      module.language,
+      {
+        mode: 'drill',
+        moduleId: module.id,
+        moduleTitle: module.title,
+        topicPool: moduleTopics
+      }
+    )
     navigate('/practice/session')
   }
 
@@ -81,6 +113,7 @@ export function PracticePage() {
         <Tabs.List>
           <Tabs.Tab value="topics">Topics</Tabs.Tab>
           <Tabs.Tab value="lessons">Lessons</Tabs.Tab>
+          <Tabs.Tab value="sprints">Sprints</Tabs.Tab>
         </Tabs.List>
 
         {/* Topics Tab */}
@@ -136,6 +169,63 @@ export function PracticePage() {
         {/* Lessons Tab */}
         <Tabs.Panel value="lessons">
           <LessonPracticeSelector />
+        </Tabs.Panel>
+
+        {/* Sprints Tab */}
+        <Tabs.Panel value="sprints">
+          <Card className="mb-6" padding="lg">
+            <h2 className="text-lg font-heading font-semibold text-surface-100 mb-2">
+              Kumon-Style Drills
+            </h2>
+            <p className="text-sm text-surface-400">
+              Pick a sprint module to drill fundamentals with rapid-fire code exercises.
+            </p>
+          </Card>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {getSprintModules(language).map((module) => {
+              const isUnlocked = isModuleUnlocked(module.id)
+
+              return (
+                <Card key={module.id} padding="lg" className="flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-base font-heading font-semibold text-surface-100">
+                      {module.title}
+                    </h3>
+                    <p className="text-sm text-surface-400 mt-1">
+                      {module.description}
+                    </p>
+                  </div>
+                  <div className="text-2xl">{module.icon || '⚡'}</div>
+                </div>
+
+                <div className="text-xs text-surface-500">
+                  Topics: {module.topics.join(', ')}
+                </div>
+
+                <div className="flex items-center justify-between mt-2">
+                  <div className="text-xs text-surface-500">
+                    {module.targetExerciseCount} exercises • {module.estimatedMinutes} min
+                  </div>
+                  <Button
+                    size="sm"
+                    disabled={!isUnlocked}
+                    onClick={() => handleStartSprint(module.id)}
+                  >
+                    {isUnlocked ? 'Start Drill' : 'Locked'}
+                  </Button>
+                </div>
+
+                {!isUnlocked && (
+                  <div className="text-xs text-surface-500">
+                    Unlock at {module.unlockThresholdXP} XP
+                  </div>
+                )}
+              </Card>
+              )
+            })}
+          </div>
         </Tabs.Panel>
       </Tabs>
     </div>

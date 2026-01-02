@@ -27,7 +27,6 @@ export function Header() {
   const navLinks = [
     { to: '/curriculum', label: 'Learn' },
     { to: '/practice', label: 'Practice' },
-    { to: '/sprints', label: 'Sprints' },
     { to: '/tutor', label: 'Vibe Tutor' },
     { to: '/profile', label: 'Profile' },
   ]
@@ -54,8 +53,7 @@ export function Header() {
             <div className="flex items-center bg-surface-800/50 rounded-xl p-1">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.to ||
-                  (link.to === '/curriculum' && location.pathname.startsWith('/lesson')) ||
-                  (link.to === '/sprints' && location.pathname.startsWith('/sprints'))
+                  (link.to === '/curriculum' && location.pathname.startsWith('/lesson'))
                 return (
                   <Link
                     key={link.to}

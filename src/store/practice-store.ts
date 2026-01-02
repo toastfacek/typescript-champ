@@ -6,7 +6,8 @@ import type {
   PracticeExercise,
   PracticeSession,
   PracticeStats,
-  MasteryLevel
+  MasteryLevel,
+  PracticeMode
 } from '@/types/practice'
 import type {
   FocusedPracticeSession,
@@ -18,6 +19,9 @@ import type { Lesson } from '@/types/lesson'
 import { generateExercise as apiGenerateExercise, generateExerciseBatch, generateFocusedPractice } from '@/services/api-client'
 import { syncPracticeStats, saveFocusedPracticeSession, getFocusedPracticeSessions } from '@/services/supabase-sync'
 import { useStore } from './index'
+import { useSprintsStore } from './sprints-store'
+
+const DRILL_XP_PER_EXERCISE = 15
 
 interface PracticeState {
   // Current session
@@ -47,7 +51,13 @@ interface PracticeState {
     topic: PracticeTopic,
     difficulty: PracticeDifficulty,
     exerciseType: 'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed',
-    language?: 'typescript' | 'python'
+    language?: 'typescript' | 'python',
+    options?: {
+      mode?: PracticeMode
+      moduleId?: string
+      moduleTitle?: string
+      topicPool?: PracticeTopic[]
+    }
   ) => void
   endSession: () => void
   generateNextExercise: () => Promise<void>
@@ -97,6 +107,13 @@ function calculateMasteryLevel(stats: PracticeStats): MasteryLevel {
   return 'learning'
 }
 
+function getSessionTopic(session: PracticeSession): PracticeTopic {
+  const pool = session.topicPool && session.topicPool.length > 0
+    ? session.topicPool
+    : [session.topic]
+  return pool[Math.floor(Math.random() * pool.length)] || session.topic
+}
+
 export const usePracticeStore = create<PracticeState>()(
   persist(
     (set, get) => ({
@@ -119,13 +136,21 @@ export const usePracticeStore = create<PracticeState>()(
       sessionHistory: {},
 
       // Actions
-      startSession: (topic, difficulty, exerciseType, language = 'typescript') => {
+      startSession: (topic, difficulty, exerciseType, language = 'typescript', options) => {
+        const mode = options?.mode ?? 'practice'
+        const sessionDifficulty = mode === 'drill' ? 'easy' : difficulty
+        const sessionExerciseType = mode === 'drill' ? 'code-exercise' : exerciseType
+
         const session: PracticeSession = {
           id: `session-${Date.now()}`,
           topic,
-          difficulty,
-          exerciseType,
+          topicPool: options?.topicPool,
+          difficulty: sessionDifficulty,
+          exerciseType: sessionExerciseType,
           language,
+          mode,
+          moduleId: options?.moduleId,
+          moduleTitle: options?.moduleTitle,
           startedAt: new Date(),
           exercisesAttempted: 0,
           exercisesCompleted: 0
@@ -202,10 +227,11 @@ export const usePracticeStore = create<PracticeState>()(
           }
 
           const response = await apiGenerateExercise({
-            topic: currentSession.topic,
+            topic: getSessionTopic(currentSession),
             difficulty: currentSession.difficulty,
             exerciseType,
-            language: currentSession.language
+            language: currentSession.language,
+            sprintMode: currentSession.mode === 'drill'
           })
 
           if (!response.success || !response.exercise) {
@@ -235,11 +261,12 @@ export const usePracticeStore = create<PracticeState>()(
               : [currentSession.exerciseType as 'code-exercise' | 'fill-in-blank' | 'quiz']
 
           const response = await generateExerciseBatch({
-            topic: currentSession.topic,
+            topic: getSessionTopic(currentSession),
             difficulty: currentSession.difficulty,
             count: 5,
             exerciseTypes,
-            language: currentSession.language
+            language: currentSession.language,
+            sprintMode: currentSession.mode === 'drill'
           })
 
           if (response.success && response.exercises.length > 0) {
@@ -262,7 +289,7 @@ export const usePracticeStore = create<PracticeState>()(
         const { currentSession, currentExercise, practiceStats } = get()
         if (!currentSession || !currentExercise) return
 
-        const topic = currentSession.topic
+        const topic = currentExercise.topic || currentSession.topic
         const difficulty = currentSession.difficulty
         const currentStats = practiceStats[topic] || defaultStats(topic)
 
@@ -298,12 +325,22 @@ export const usePracticeStore = create<PracticeState>()(
 
         // Award XP for successful completion (50% of normal lesson XP)
         if (success) {
-          const xpAmount = difficulty === 'easy' ? 15 : difficulty === 'medium' ? 30 : 50
+          const xpAmount = currentSession.mode === 'drill'
+            ? DRILL_XP_PER_EXERCISE
+            : difficulty === 'easy' ? 15 : difficulty === 'medium' ? 30 : 50
           useStore.getState().addXP(xpAmount)
           // Record activity for exercise completion
           useStore.getState().recordActivity()
           // Update streak
           useStore.getState().updateStreakFromActivity()
+        }
+
+        if (currentSession.mode === 'drill' && currentSession.moduleId) {
+          useSprintsStore.getState().recordDrillCompletion(
+            currentSession.moduleId,
+            currentSession.language,
+            success
+          )
         }
 
         // Update session
