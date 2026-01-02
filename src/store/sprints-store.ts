@@ -26,6 +26,10 @@ interface SprintsState {
   isGenerating: boolean
   generationError: string | null
 
+  // Pre-generation tracking
+  isPreGenerating: boolean
+  preGenerationProgress: { current: number; total: number } | null
+
   // Session tracking
   sessionStartTime: Date | null
   exercisesCompletedInSession: number
@@ -33,10 +37,11 @@ interface SprintsState {
   // Actions
   initializeModules: (language: 'typescript' | 'python') => void
   setLanguage: (language: 'typescript' | 'python') => void
-  startModule: (moduleId: string) => void
+  startModule: (moduleId: string) => Promise<void>
   endSession: () => void
   generateNextExercise: () => Promise<void>
   generateBatch: (moduleId: string) => Promise<void>
+  preGenerateAllExercises: (moduleId: string) => Promise<void>
   completeExercise: (success: boolean, timeSeconds: number) => void
   getModuleProgress: (moduleId: string) => SprintProgress
   getTotalSprintXP: () => number
@@ -72,12 +77,17 @@ export const useSprintsStore = create<SprintsState>()(
       isGenerating: false,
       generationError: null,
 
+      isPreGenerating: false,
+      preGenerationProgress: null,
+
       sessionStartTime: null,
       exercisesCompletedInSession: 0,
 
       // Initialize modules for a language
       initializeModules: (language: 'typescript' | 'python') => {
+        console.log('Initializing sprint modules for language:', language)
         const modules = getSprintModules(language)
+        console.log('Found modules:', modules.length, modules.map(m => ({ id: m.id, order: m.order })))
         const existingProgress = get().moduleProgress
 
         // Initialize progress for all modules if not exists
@@ -95,11 +105,16 @@ export const useSprintsStore = create<SprintsState>()(
           const totalXP = Object.values(moduleProgress).reduce((sum, p) => sum + p.xpEarned, 0)
           const isUnlocked = module.order === 1 || totalXP >= module.unlockThresholdXP
 
-          if (moduleProgress[module.id].status === 'locked' && isUnlocked) {
+          // Force first module to be unlocked (override any stale state)
+          if (module.order === 1) {
+            console.log(`Unlocking first module: ${module.id} (order: ${module.order})`)
+            moduleProgress[module.id].status = 'unlocked'
+          } else if (moduleProgress[module.id].status === 'locked' && isUnlocked) {
             moduleProgress[module.id].status = 'unlocked'
           }
         })
 
+        console.log('Module progress after initialization:', moduleProgress)
         set({ modules, moduleProgress, language })
       },
 
@@ -109,7 +124,7 @@ export const useSprintsStore = create<SprintsState>()(
       },
 
       // Start a sprint module
-      startModule: (moduleId: string) => {
+      startModule: async (moduleId: string) => {
         const { modules, moduleProgress, isModuleUnlocked } = get()
 
         // Verify module exists and is unlocked
@@ -141,8 +156,13 @@ export const useSprintsStore = create<SprintsState>()(
           exerciseQueue: []
         })
 
-        // Start generating exercises in background
-        get().generateBatch(moduleId)
+        // Pre-generate all exercises or use batch generation
+        if (SPRINT_CONFIG.PRE_GENERATE_ALL) {
+          await get().preGenerateAllExercises(moduleId)
+        } else {
+          // Original behavior: batch generation in background
+          get().generateBatch(moduleId)
+        }
       },
 
       // End current session
@@ -306,6 +326,90 @@ export const useSprintsStore = create<SprintsState>()(
           console.error('Failed to generate batch:', error)
           set({
             isGenerating: false,
+            generationError: error instanceof Error ? error.message : 'Failed to generate exercises'
+          })
+        }
+      },
+
+      // Pre-generate all exercises for a module
+      preGenerateAllExercises: async (moduleId: string) => {
+        const { modules, language } = get()
+
+        const module = modules.find(m => m.id === moduleId)
+        if (!module) return
+
+        const targetCount = module.targetExerciseCount
+
+        set({
+          isPreGenerating: true,
+          preGenerationProgress: { current: 0, total: targetCount },
+          generationError: null
+        })
+
+        try {
+          const allExercises: SprintExercise[] = []
+
+          // Generate exercises in batches to show progress
+          for (let i = 0; i < targetCount; i += SPRINT_CONFIG.MAX_CONCURRENT_GENERATIONS) {
+            const batchPromises: Promise<SprintExercise>[] = []
+
+            // Generate up to MAX_CONCURRENT_GENERATIONS exercises
+            for (let j = i; j < Math.min(i + SPRINT_CONFIG.MAX_CONCURRENT_GENERATIONS, targetCount); j++) {
+              const topic = module.topics[Math.floor(Math.random() * module.topics.length)] as PracticeTopic
+              const difficulty = SPRINT_CONFIG.DIFFICULTY
+
+              const promise = apiGenerateExercise({
+                topic,
+                difficulty,
+                exerciseType: 'code-exercise',
+                language,
+                sprintMode: true
+              }).then(exercise => {
+                if (!exercise.exercise) {
+                  throw new Error('No exercise returned from API')
+                }
+                if (exercise.exercise.step.type !== 'code-exercise') {
+                  throw new Error('Expected code-exercise step type')
+                }
+                return {
+                  id: crypto.randomUUID(),
+                  moduleId,
+                  type: 'code-exercise' as const,
+                  difficulty: 'easy' as const,
+                  topic,
+                  step: exercise.exercise.step,
+                  generatedAt: new Date().toISOString(),
+                  aiMetadata: exercise.exercise.aiMetadata
+                }
+              })
+
+              batchPromises.push(promise)
+            }
+
+            // Wait for batch to complete
+            const batchExercises = await Promise.all(batchPromises)
+            allExercises.push(...batchExercises)
+
+            // Update progress
+            set({
+              preGenerationProgress: { current: allExercises.length, total: targetCount }
+            })
+          }
+
+          // Set first exercise as current and rest in queue
+          const [firstExercise, ...remainingExercises] = allExercises
+
+          set({
+            currentExercise: firstExercise,
+            exerciseQueue: remainingExercises,
+            isPreGenerating: false,
+            preGenerationProgress: null
+          })
+        } catch (error) {
+          console.error('Failed to pre-generate exercises:', error)
+          set({
+            isPreGenerating: false,
+            preGenerationProgress: null,
             generationError: error instanceof Error ? error.message : 'Failed to generate exercises'
           })
         }

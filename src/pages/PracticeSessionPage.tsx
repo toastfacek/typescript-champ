@@ -59,15 +59,23 @@ export function PracticeSessionPage() {
 
   // Render loading state
   if (isGenerating) {
+    const isDrillMode = currentSession.mode === 'drill'
+    const loadingMessage = isDrillMode && currentSession.moduleTitle
+      ? `Preparing ${currentSession.moduleTitle} exercises...`
+      : 'Generating exercise...'
+    const loadingDetail = isDrillMode
+      ? 'Generating fundamental drilling exercises for rapid practice'
+      : `Our AI is creating a unique ${currentSession.difficulty} exercise about ${currentSession.topic}`
+
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <SessionHeader session={currentSession} onEnd={handleEndSession} />
         <Card className="mt-6" padding="lg">
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-500 mb-4" />
-            <p className="text-lg font-medium text-surface-200">Generating exercise...</p>
+            <p className="text-lg font-medium text-surface-200">{loadingMessage}</p>
             <p className="text-sm text-surface-400 mt-2">
-              Our AI is creating a unique {currentSession.difficulty} exercise about {currentSession.topic}
+              {loadingDetail}
             </p>
           </div>
         </Card>

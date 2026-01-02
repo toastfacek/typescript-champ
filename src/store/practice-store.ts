@@ -20,6 +20,8 @@ import { generateExercise as apiGenerateExercise, generateExerciseBatch, generat
 import { syncPracticeStats, saveFocusedPracticeSession, getFocusedPracticeSessions } from '@/services/supabase-sync'
 import { useStore } from './index'
 import { useSprintsStore } from './sprints-store'
+import { SPRINT_CONFIG } from '@/constants/sprint-config'
+import { getSprintModules } from '@/constants/sprint-modules'
 
 const DRILL_XP_PER_EXERCISE = 15
 
@@ -58,10 +60,11 @@ interface PracticeState {
       moduleTitle?: string
       topicPool?: PracticeTopic[]
     }
-  ) => void
+  ) => Promise<void>
   endSession: () => void
   generateNextExercise: () => Promise<void>
   generateBatch: () => Promise<void>
+  preGenerateAllExercises: (targetCount: number) => Promise<void>
   completeExercise: (success: boolean, timeSeconds: number) => void
   getStats: (topic: PracticeTopic) => PracticeStats
   resetStats: () => void
@@ -136,7 +139,7 @@ export const usePracticeStore = create<PracticeState>()(
       sessionHistory: {},
 
       // Actions
-      startSession: (topic, difficulty, exerciseType, language = 'typescript', options) => {
+      startSession: async (topic, difficulty, exerciseType, language = 'typescript', options) => {
         const mode = options?.mode ?? 'practice'
         const sessionDifficulty = mode === 'drill' ? 'easy' : difficulty
         const sessionExerciseType = mode === 'drill' ? 'code-exercise' : exerciseType
@@ -162,7 +165,20 @@ export const usePracticeStore = create<PracticeState>()(
           generationError: null
         })
 
-        // Start batch generation in background
+        // For drill mode with PRE_GENERATE_ALL enabled, pre-generate all exercises
+        if (mode === 'drill' && SPRINT_CONFIG.PRE_GENERATE_ALL && options?.moduleId) {
+          console.log('Drill mode with PRE_GENERATE_ALL enabled')
+          const modules = getSprintModules(language)
+          const module = modules.find(m => m.id === options.moduleId)
+          if (module) {
+            console.log(`Pre-generating ${module.targetExerciseCount} exercises...`)
+            await get().preGenerateAllExercises(module.targetExerciseCount)
+            console.log('Pre-generation complete')
+            return
+          }
+        }
+
+        // Otherwise, start batch generation in background
         setTimeout(() => {
           get().generateBatch()
         }, 0)
@@ -282,6 +298,113 @@ export const usePracticeStore = create<PracticeState>()(
         } catch (error) {
           console.error('Batch generation error:', error)
           // Don't set error state - this is a background operation
+        }
+      },
+
+      preGenerateAllExercises: async (targetCount: number) => {
+        console.log('[preGenerateAllExercises] Starting with targetCount:', targetCount)
+        const { currentSession } = get()
+        if (!currentSession) {
+          console.error('[preGenerateAllExercises] No active session')
+          set({ generationError: 'No active session' })
+          return
+        }
+
+        console.log('[preGenerateAllExercises] Session found:', currentSession.mode, currentSession.topic)
+        set({ isGenerating: true, generationError: null })
+
+        try {
+          const allExercises: PracticeExercise[] = []
+          const batchSize = SPRINT_CONFIG.BATCH_SIZE
+          const maxConcurrent = SPRINT_CONFIG.MAX_CONCURRENT_GENERATIONS
+
+          // Calculate number of batches needed
+          const numBatches = Math.ceil(targetCount / batchSize)
+          console.log(`[preGenerateAllExercises] Will generate ${numBatches} batches (${batchSize} exercises each, ${maxConcurrent} concurrent)`)
+
+          // Generate in chunks of maxConcurrent batches at a time
+          for (let i = 0; i < numBatches; i += maxConcurrent) {
+            console.log(`[preGenerateAllExercises] Starting batch chunk ${i / maxConcurrent + 1}`)
+            const batchPromises: Promise<any>[] = []
+
+            for (let j = 0; j < maxConcurrent && (i + j) < numBatches; j++) {
+              const batchIndex = i + j
+
+              // Calculate count based on batch index, not current exercises
+              // This ensures concurrent batches don't over-request
+              const exercisesRequestedSoFar = batchIndex * batchSize
+              const exercisesRemaining = targetCount - exercisesRequestedSoFar
+              const count = Math.min(batchSize, exercisesRemaining)
+
+              if (count <= 0) {
+                console.log(`[preGenerateAllExercises] Skipping batch ${batchIndex + 1}: no more exercises needed`)
+                continue
+              }
+
+              console.log(`[preGenerateAllExercises] Batch ${batchIndex + 1}: requesting ${count} exercises`)
+
+              const exerciseTypes: ('code-exercise' | 'fill-in-blank' | 'quiz')[] =
+                currentSession.exerciseType === 'mixed'
+                  ? ['code-exercise', 'fill-in-blank', 'quiz']
+                  : [currentSession.exerciseType as 'code-exercise' | 'fill-in-blank' | 'quiz']
+
+              batchPromises.push(
+                generateExerciseBatch({
+                  topic: getSessionTopic(currentSession),
+                  difficulty: currentSession.difficulty,
+                  count,
+                  exerciseTypes,
+                  language: currentSession.language,
+                  sprintMode: currentSession.mode === 'drill'
+                }).catch(error => {
+                  console.error('[preGenerateAllExercises] Batch promise rejected:', error)
+                  return { success: false, exercises: [], error: error.message }
+                })
+              )
+            }
+
+            console.log(`[preGenerateAllExercises] Waiting for ${batchPromises.length} batch promises...`)
+            // Wait for this chunk of batches to complete
+            const results = await Promise.all(batchPromises)
+            console.log('[preGenerateAllExercises] Batch chunk complete, processing results...')
+
+            // Collect all successful exercises
+            for (const response of results) {
+              if (response.success && response.exercises.length > 0) {
+                const validExercises = response.exercises.filter(
+                  (ex: any): ex is PracticeExercise => ex !== undefined && ex !== null
+                )
+                console.log(`[preGenerateAllExercises] Got ${validExercises.length} valid exercises`)
+                allExercises.push(...validExercises)
+              } else {
+                console.warn('[preGenerateAllExercises] Batch failed or returned no exercises:', response)
+              }
+            }
+            console.log(`[preGenerateAllExercises] Total exercises so far: ${allExercises.length}`)
+          }
+
+          console.log(`[preGenerateAllExercises] Generation complete! Total: ${allExercises.length} exercises`)
+
+          if (allExercises.length === 0) {
+            throw new Error('Failed to generate any exercises')
+          }
+
+          // Set first exercise as current, rest in queue
+          const [firstExercise, ...remainingExercises] = allExercises
+          console.log('[preGenerateAllExercises] Setting first exercise as current, rest in queue')
+          set({
+            currentExercise: firstExercise,
+            exerciseQueue: remainingExercises,
+            isGenerating: false,
+            generationError: null
+          })
+          console.log('[preGenerateAllExercises] Done!')
+        } catch (error) {
+          console.error('[preGenerateAllExercises] Error:', error)
+          set({
+            isGenerating: false,
+            generationError: error instanceof Error ? error.message : 'Failed to generate exercises'
+          })
         }
       },
 

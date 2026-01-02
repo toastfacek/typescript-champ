@@ -14,6 +14,12 @@ export const SPRINT_CONFIG = {
   XP_PER_EXERCISE: 15,
 
   /**
+   * Pre-generate all exercises before starting sprint
+   * Better UX: one loading screen, then instant exercises
+   */
+  PRE_GENERATE_ALL: true,
+
+  /**
    * Number of exercises to generate in a batch
    * Allows for smooth UX without generation delays
    */

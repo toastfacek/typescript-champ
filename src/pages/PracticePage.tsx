@@ -15,6 +15,8 @@ export function PracticePage() {
   const initializeModules = useSprintsStore((s) => s.initializeModules)
   const isModuleUnlocked = useSprintsStore((s) => s.isModuleUnlocked)
   const [activeTab, setActiveTab] = useState('topics')
+  const [isPreGenerating, setIsPreGenerating] = useState(false)
+  const [preGenModuleName, setPreGenModuleName] = useState('')
 
   const [selectedTopic, setSelectedTopic] = useState<PracticeTopic | null>(null)
   const [difficulty, setDifficulty] = useState<PracticeDifficulty>('medium')
@@ -42,28 +44,55 @@ export function PracticePage() {
     navigate('/practice/session')
   }
 
-  const handleStartSprint = (moduleId: string) => {
-    const modules = getSprintModules(language)
-    const module = modules.find((mod) => mod.id === moduleId)
-    if (!module) return
-    if (!isModuleUnlocked(moduleId)) return
+  const handleStartSprint = async (moduleId: string) => {
+    try {
+      console.log('Starting sprint for module:', moduleId)
+      const modules = getSprintModules(language)
+      const module = modules.find((mod) => mod.id === moduleId)
 
-    const moduleTopics = module.topics as PracticeTopic[]
-    const defaultTopic = moduleTopics[0] || 'basics'
-
-    startSession(
-      defaultTopic,
-      'easy',
-      'code-exercise',
-      module.language,
-      {
-        mode: 'drill',
-        moduleId: module.id,
-        moduleTitle: module.title,
-        topicPool: moduleTopics
+      if (!module) {
+        console.error('Module not found:', moduleId)
+        return
       }
-    )
-    navigate('/practice/session')
+
+      const unlocked = isModuleUnlocked(moduleId)
+      console.log('Module unlocked?', unlocked)
+
+      if (!unlocked) {
+        console.error('Module is locked:', moduleId)
+        return
+      }
+
+      const moduleTopics = module.topics as PracticeTopic[]
+      const defaultTopic = moduleTopics[0] || 'basics'
+
+      console.log('Starting session with topic:', defaultTopic)
+
+      // Show loading modal during pre-generation
+      setIsPreGenerating(true)
+      setPreGenModuleName(module.title)
+
+      // Start session (will pre-generate all exercises if configured)
+      await startSession(
+        defaultTopic,
+        'easy',
+        'code-exercise',
+        module.language,
+        {
+          mode: 'drill',
+          moduleId: module.id,
+          moduleTitle: module.title,
+          topicPool: moduleTopics
+        }
+      )
+
+      setIsPreGenerating(false)
+      console.log('Session started, navigating...')
+      navigate('/practice/session')
+    } catch (error) {
+      console.error('Error starting sprint:', error)
+      setIsPreGenerating(false)
+    }
   }
 
   return (
@@ -185,6 +214,7 @@ export function PracticePage() {
           <div className="grid md:grid-cols-2 gap-4">
             {getSprintModules(language).map((module) => {
               const isUnlocked = isModuleUnlocked(module.id)
+              console.log(`Module ${module.id} (order: ${module.order}):`, isUnlocked)
 
               return (
                 <Card key={module.id} padding="lg" className="flex flex-col gap-3">
@@ -228,6 +258,26 @@ export function PracticePage() {
           </div>
         </Tabs.Panel>
       </Tabs>
+
+      {/* Pre-generation Loading Modal */}
+      {isPreGenerating && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="max-w-md mx-4" padding="lg">
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-accent-500 mb-6" />
+              <h3 className="text-xl font-heading font-semibold text-surface-100 mb-2">
+                Preparing {preGenModuleName}
+              </h3>
+              <p className="text-sm text-surface-400 text-center">
+                Generating fundamental drilling exercises for rapid practice...
+              </p>
+              <p className="text-xs text-surface-500 mt-4">
+                This will only take a moment
+              </p>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }

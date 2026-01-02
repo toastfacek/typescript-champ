@@ -25,29 +25,45 @@ class ApiError extends Error {
 
 async function fetchJson<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  timeoutMs: number = 30000 // 30 second default timeout
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers
+  // Create abort controller for timeout
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      signal: controller.signal
+    })
+
+    clearTimeout(timeoutId)
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Request failed',
+        response.status,
+        data.details
+      )
     }
-  })
 
-  const data = await response.json()
-
-  if (!response.ok) {
-    throw new ApiError(
-      data.error || 'Request failed',
-      response.status,
-      data.details
-    )
+    return data as T
+  } catch (error) {
+    clearTimeout(timeoutId)
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError('Request timeout', 408)
+    }
+    throw error
   }
-
-  return data as T
 }
 
 // Exercise API
