@@ -175,7 +175,7 @@ export function PracticePage() {
         <Tabs.Panel value="sprints">
           <Card className="mb-6" padding="lg">
             <h2 className="text-lg font-heading font-semibold text-surface-100 mb-2">
-              Kumon-Style Drills
+              Focused Concept Drills
             </h2>
             <p className="text-sm text-surface-400">
               Pick a sprint module to drill fundamentals with rapid-fire code exercises.
