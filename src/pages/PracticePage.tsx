@@ -14,6 +14,7 @@ export function PracticePage() {
   const startSession = usePracticeStore((s) => s.startSession)
   const initializeModules = useSprintsStore((s) => s.initializeModules)
   const isModuleUnlocked = useSprintsStore((s) => s.isModuleUnlocked)
+  const sprintModules = useSprintsStore((s) => s.modules)
   const [activeTab, setActiveTab] = useState('topics')
   const [isPreGenerating, setIsPreGenerating] = useState(false)
   const [preGenModuleName, setPreGenModuleName] = useState('')
@@ -37,6 +38,8 @@ export function PracticePage() {
     initializeModules(language)
   }, [initializeModules, language])
 
+  const resolvedSprintModules = sprintModules.length > 0 ? sprintModules : getSprintModules(language)
+
   const handleStartPractice = () => {
     if (!selectedTopic) return
 
@@ -47,8 +50,7 @@ export function PracticePage() {
   const handleStartSprint = async (moduleId: string) => {
     try {
       console.log('Starting sprint for module:', moduleId)
-      const modules = getSprintModules(language)
-      const module = modules.find((mod) => mod.id === moduleId)
+      const module = resolvedSprintModules.find((mod) => mod.id === moduleId)
 
       if (!module) {
         console.error('Module not found:', moduleId)
@@ -212,7 +214,7 @@ export function PracticePage() {
           </Card>
 
           <div className="grid md:grid-cols-2 gap-4">
-            {getSprintModules(language).map((module) => {
+            {resolvedSprintModules.map((module) => {
               const isUnlocked = isModuleUnlocked(module.id)
               console.log(`Module ${module.id} (order: ${module.order}):`, isUnlocked)
 
