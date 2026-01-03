@@ -141,7 +141,7 @@ export const usePracticeStore = create<PracticeState>()(
       // Actions
       startSession: async (topic, difficulty, exerciseType, language = 'typescript', options) => {
         const mode = options?.mode ?? 'practice'
-        const sessionDifficulty = mode === 'drill' ? 'easy' : difficulty
+        const sessionDifficulty = difficulty
         const sessionExerciseType = mode === 'drill' ? 'code-exercise' : exerciseType
 
         const session: PracticeSession = {

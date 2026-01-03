@@ -8,6 +8,7 @@ import { useSprintsStore } from '@/store/sprints-store'
 import type { PracticeTopic, PracticeDifficulty } from '@/types/practice'
 import { getTopics } from '@/constants/practice-topics'
 import { getSprintModules } from '@/constants/sprint-modules'
+import { SPRINT_CONFIG } from '@/constants/sprint-config'
 
 export function PracticePage() {
   const navigate = useNavigate()
@@ -15,6 +16,7 @@ export function PracticePage() {
   const initializeModules = useSprintsStore((s) => s.initializeModules)
   const isModuleUnlocked = useSprintsStore((s) => s.isModuleUnlocked)
   const sprintModules = useSprintsStore((s) => s.modules)
+  const sprintDifficultyStorageKey = 'typescript-champ-sprint-difficulty'
   const [activeTab, setActiveTab] = useState('topics')
   const [isPreGenerating, setIsPreGenerating] = useState(false)
   const [preGenModuleName, setPreGenModuleName] = useState('')
@@ -23,6 +25,34 @@ export function PracticePage() {
   const [difficulty, setDifficulty] = useState<PracticeDifficulty>('medium')
   const [exerciseType, setExerciseType] = useState<'code-exercise' | 'fill-in-blank' | 'quiz' | 'mixed'>('mixed')
   const [language, setLanguage] = useState<'typescript' | 'python'>('typescript')
+  const [sprintDifficultyByLanguage, setSprintDifficultyByLanguage] = useState<
+    Record<'typescript' | 'python', PracticeDifficulty>
+  >(() => {
+    const defaults = {
+      typescript: SPRINT_CONFIG.DIFFICULTY,
+      python: SPRINT_CONFIG.DIFFICULTY
+    }
+
+    if (typeof window === 'undefined') {
+      return defaults
+    }
+
+    try {
+      const stored = localStorage.getItem(sprintDifficultyStorageKey)
+      if (!stored) return defaults
+      const parsed = JSON.parse(stored) as Partial<Record<'typescript' | 'python', unknown>>
+      const isValid = (value: unknown): value is PracticeDifficulty =>
+        value === 'easy' || value === 'medium' || value === 'hard'
+
+      return {
+        typescript: isValid(parsed.typescript) ? parsed.typescript : defaults.typescript,
+        python: isValid(parsed.python) ? parsed.python : defaults.python
+      }
+    } catch {
+      return defaults
+    }
+  })
+  const sprintDifficulty = sprintDifficultyByLanguage[language]
 
   // Clear selected topic when switching languages if it's not valid for the new language
   const handleLanguageChange = (newLanguage: 'typescript' | 'python') => {
@@ -37,6 +67,10 @@ export function PracticePage() {
   useEffect(() => {
     initializeModules(language)
   }, [initializeModules, language])
+
+  useEffect(() => {
+    localStorage.setItem(sprintDifficultyStorageKey, JSON.stringify(sprintDifficultyByLanguage))
+  }, [sprintDifficultyByLanguage, sprintDifficultyStorageKey])
 
   const resolvedSprintModules = sprintModules.length > 0 ? sprintModules : getSprintModules(language)
 
@@ -77,7 +111,7 @@ export function PracticePage() {
       // Start session (will pre-generate all exercises if configured)
       await startSession(
         defaultTopic,
-        'easy',
+        sprintDifficulty,
         'code-exercise',
         module.language,
         {
@@ -211,6 +245,21 @@ export function PracticePage() {
             <p className="text-sm text-surface-400">
               Pick a sprint module to drill fundamentals with rapid-fire code exercises.
             </p>
+          </Card>
+
+          <Card className="mb-6" padding="lg">
+            <h3 className="text-base font-heading font-semibold text-surface-100 mb-2">
+              Sprint Difficulty
+            </h3>
+            <p className="text-sm text-surface-400 mb-4">
+              Applies to sprint drills only.
+            </p>
+            <DifficultyPicker
+              selected={sprintDifficulty}
+              onChange={(next) =>
+                setSprintDifficultyByLanguage((prev) => ({ ...prev, [language]: next }))
+              }
+            />
           </Card>
 
           <div className="grid md:grid-cols-2 gap-4">
