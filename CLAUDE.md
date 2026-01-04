@@ -142,7 +142,7 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
   - Managed by `store/sprints-store.ts` (module progress, unlocks) + `practice-store.ts` (session execution)
 
 - **Pre-generation**: All exercises loaded upfront for smooth UX
-  - Config: `constants/sprint-config.ts` (PRE_GENERATE_ALL: true, BATCH_SIZE: 5, MAX_CONCURRENT: 3)
+  - Config: `constants/sprint-config.ts` (PRE_GENERATE_ALL: true, BATCH_SIZE: 3, MAX_CONCURRENT: 3)
   - 8-15 exercises per module (2-4 lines, single concept, 30-60s each)
   - One loading screen at start, then instant card transitions
 
@@ -165,7 +165,7 @@ Express API server for AI-powered exercise generation:
 
 API runs separately from frontend. Server binds to `0.0.0.0` for Railway deployment.
 
-**Batch Generation**: Generates 5 exercises in parallel (3 concurrent max) for instant loading. Frontend maintains a queue and auto-refills when < 2 exercises remain.
+**Batch Generation**: Generates 3 exercises in parallel (3 concurrent max) for instant loading. Frontend maintains a queue and auto-refills when < 2 exercises remain.
 
 **Recap Generation**: Single exercise endpoint (`/generate-recap`) optimized for quick refreshers:
 - Pre-generated during lesson completion (zero LLM calls on home page)
