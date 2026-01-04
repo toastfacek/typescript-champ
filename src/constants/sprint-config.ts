@@ -21,9 +21,9 @@ export const SPRINT_CONFIG = {
 
   /**
    * Number of exercises to generate in a batch
-   * Allows for smooth UX without generation delays
+   * Reduced to 3 to prevent API timeouts during generation
    */
-  BATCH_SIZE: 5,
+  BATCH_SIZE: 3,
 
   /**
    * Minimum exercises in queue before triggering background generation
