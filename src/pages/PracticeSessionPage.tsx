@@ -4,6 +4,7 @@ import { Card, Button, ProgressBar } from '@/components/ui'
 import { CodeExerciseStep } from '@/components/lesson/CodeExerciseStep'
 import { FillInBlankStep } from '@/components/lesson/FillInBlankStep'
 import { QuizStep } from '@/components/lesson/QuizStep'
+import { ExerciseFeedbackModal, type TestResult } from '@/components/practice/ExerciseFeedbackModal'
 import { usePracticeStore } from '@/store/practice-store'
 import type { CodeExerciseStep as CodeExerciseStepType, FillInBlankStep as FillInBlankStepType, QuizStep as QuizStepType } from '@/types'
 
@@ -20,6 +21,9 @@ export function PracticeSessionPage() {
 
   const [exerciseComplete, setExerciseComplete] = useState(false)
   const [exerciseStartTime, setExerciseStartTime] = useState<number>(0)
+  const [hasGeneratedFirst, setHasGeneratedFirst] = useState(false)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [lastTestResults, setLastTestResults] = useState<TestResult[]>([])
 
   // Redirect if no session
   useEffect(() => {
@@ -28,13 +32,21 @@ export function PracticeSessionPage() {
     }
   }, [currentSession, navigate])
 
-  // Generate first exercise
+  // Reset first-generation flag when session changes
   useEffect(() => {
-    if (currentSession && !currentExercise && !isGenerating && !generationError) {
+    if (currentSession?.id) {
+      setHasGeneratedFirst(false)
+    }
+  }, [currentSession?.id])
+
+  // Generate first exercise only (not on every completion)
+  useEffect(() => {
+    if (currentSession && !currentExercise && !isGenerating && !generationError && !hasGeneratedFirst) {
       generateNextExercise()
       setExerciseStartTime(Date.now())
+      setHasGeneratedFirst(true)
     }
-  }, [currentSession, currentExercise, isGenerating, generationError, generateNextExercise])
+  }, [currentSession, currentExercise, isGenerating, generationError, generateNextExercise, hasGeneratedFirst])
 
   const handleExerciseComplete = useCallback(() => {
     setExerciseComplete(true)
@@ -47,6 +59,24 @@ export function PracticeSessionPage() {
     generateNextExercise()
     setExerciseStartTime(Date.now())
   }, [generateNextExercise])
+
+  const handleTestComplete = useCallback((results: TestResult[]) => {
+    setLastTestResults(results)
+    setShowFeedbackModal(true)
+  }, [])
+
+  const calculateXP = useCallback(() => {
+    if (!currentSession) return 0
+    const allPassed = lastTestResults.every((r) => r.passed)
+    if (!allPassed) return 0
+
+    if (currentSession.mode === 'drill') {
+      return 15 // DRILL_XP_PER_EXERCISE
+    }
+
+    const difficulty = currentSession.difficulty
+    return difficulty === 'easy' ? 15 : difficulty === 'medium' ? 30 : 50
+  }, [currentSession, lastTestResults])
 
   const handleEndSession = useCallback(() => {
     endSession()
@@ -150,6 +180,7 @@ export function PracticeSessionPage() {
             isComplete={exerciseComplete}
             onComplete={handleExerciseComplete}
             onHintUsed={() => {}}
+            onTestComplete={handleTestComplete}
           />
         )}
 
@@ -182,6 +213,20 @@ export function PracticeSessionPage() {
           </Button>
         </div>
       )}
+
+      {/* Exercise Feedback Modal */}
+      <ExerciseFeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        testResults={lastTestResults}
+        mode={currentSession?.mode || 'practice'}
+        xpEarned={calculateXP()}
+        onNextExercise={() => {
+          setShowFeedbackModal(false)
+          handleNextExercise()
+        }}
+        onRetry={() => setShowFeedbackModal(false)}
+      />
     </div>
   )
 }

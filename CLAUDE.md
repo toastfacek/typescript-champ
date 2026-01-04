@@ -88,6 +88,60 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
 - **Fallback**: Shows `ResumeLessonCard` if no cache exists but user has in-progress lesson
 - **LLM Optimization**: Zero LLM calls on home page load - exercises pre-generated during lesson completion
 
+**Speed Sprint Drills**: Fast-paced, card-based fundamental drilling (think "Kumon for coding"):
+- **UI/UX**: Full-screen card view with single challenge per card
+  - `components/drill/SprintCardView.tsx` - Main card component with compact Monaco editor (~150-200px)
+  - `components/drill/DrillProgressHeader.tsx` - Fixed header showing progress, correct/wrong counts, timer
+  - `components/drill/CorrectFeedback.tsx` - Green checkmark animation + XP float-up (1.5s celebration)
+  - `components/drill/SolutionReveal.tsx` - Slide-up overlay comparing user code vs solution (3s auto-advance)
+
+- **Session Flow**: Fast check/next cycle optimized for rapid drilling
+  1. User enters code in mini editor → clicks "Check Answer"
+  2. Silent test validation via `lib/typescript-runner.ts` or `lib/python-runner.ts` (new `runTestsSilently()` function)
+  3. If correct: Celebration animation → award 15 XP → auto-advance to next card (1.5s)
+  4. If wrong: Add to "wrong pile" → show solution overlay → auto-advance (3s) or manual continue
+  5. Session completion → navigate to comprehensive summary page
+
+- **Wrong Answer Tracking**:
+  - Each wrong answer stored with: exercise, user code, solution code, test results, time spent
+  - Tracked in `practice-store.ts` via `wrongPile: WrongAnswer[]` state
+  - Persisted to localStorage (Zustand middleware) for session restoration
+
+- **Post-Sprint Summary** (`pages/DrillSummaryPage.tsx`):
+  - Session stats: X/Y correct, total time, XP earned
+  - Topic breakdown grid: Accuracy % per topic (e.g., "Arrays: 2/5 correct, 40%")
+  - Concept gap insights: Pattern matching identifies repeated mistakes (e.g., "Struggled with array methods")
+  - Wrong answer carousel: Flip through each mistake with side-by-side code comparison
+  - Action buttons: Retry wrong answers, start new sprint, focused practice on weak topics
+
+- **Analytics Engine** (`lib/drill-analytics.ts`):
+  - `analyzeDrillSession()` - Generates comprehensive DrillSummary from session data
+  - `identifyConceptGaps()` - Pattern matching on wrong answers to detect recurring issues
+  - `generateRecommendations()` - Actionable suggestions based on gaps and topic accuracy
+  - Client-side only (no backend calls) for instant summary generation
+
+- **Key Types** (`types/drill-cards.ts`):
+  - `DrillCardSession` - Session state with correct/wrong counts, topic accuracy tracking
+  - `WrongAnswer` - Exercise + user code + solution + test results + metadata
+  - `DrillSummary` - Post-sprint analytics (session stats, wrong pile, concept gaps, recommendations)
+  - `ConceptGap` - Identified weakness with occurrences, related topics, difficulty level
+  - `TopicAccuracy` - Per-topic stats (attempted, correct, accuracy %)
+
+- **Module Progression**: XP-gated unlocking system
+  - TypeScript: 8 modules (Fundamentals, Functions, Objects, Arrays, Advanced Types, Generics, Async, AI)
+  - Python: 7 modules (Basics, Control Flow, Functions, Data Structures, Strings, OOP, AI)
+  - Unlock thresholds: 0, 120, 270, 450, 650, 900, 1200, 1500 XP
+  - Managed by `store/sprints-store.ts` (module progress, unlocks) + `practice-store.ts` (session execution)
+
+- **Pre-generation**: All exercises loaded upfront for smooth UX
+  - Config: `constants/sprint-config.ts` (PRE_GENERATE_ALL: true, BATCH_SIZE: 5, MAX_CONCURRENT: 3)
+  - 8-15 exercises per module (2-4 lines, single concept, 30-60s each)
+  - One loading screen at start, then instant card transitions
+
+- **State Management**: Dual-store architecture
+  - `practice-store.ts` - Session execution, exercise queue, wrong pile, drill card state, analytics
+  - `sprints-store.ts` - Module progression, unlock status, per-module XP tracking
+
 ### Backend (server/)
 
 Express API server for AI-powered exercise generation:
@@ -164,6 +218,50 @@ interface RecapCache {
 // Challenge scoring (src/lib/challenge-scorer.ts)
 // Score = (1 / daysSinceCompletion) * attemptMultiplier * difficultyWeight * masteryBoost
 // Higher score = more challenging/recent, prioritized for recap
+
+// Sprint drill types (src/types/drill-cards.ts)
+interface DrillCardSession {
+  sessionId: string
+  moduleId: string
+  moduleTitle: string
+  language: 'typescript' | 'python'
+  startedAt: Date
+  totalCards: number
+  correctCount: number
+  wrongCount: number
+  topicAccuracy: Record<PracticeTopic, TopicAccuracy>  // Per-topic stats
+}
+
+interface WrongAnswer {
+  exerciseId: string
+  exercise: PracticeExercise     // Full exercise data
+  userCode: string                // User's incorrect attempt
+  solutionCode: string            // Correct solution
+  testResults: TestResult[]       // Which tests failed
+  attemptedAt: Date
+  timeSpentSeconds: number
+}
+
+interface DrillSummary {
+  session: DrillCardSession
+  wrongPile: WrongAnswer[]        // All mistakes for review
+  conceptGaps: ConceptGap[]       // Identified weaknesses
+  recommendations: string[]       // "Practice more X", "Review Y"
+}
+
+interface ConceptGap {
+  concept: string                 // e.g., "array methods"
+  occurrences: number            // How many times failed
+  relatedTopics: PracticeTopic[] // Which topics to practice
+  difficulty: 'minor' | 'moderate' | 'significant'
+}
+
+interface TopicAccuracy {
+  topic: PracticeTopic
+  attempted: number
+  correct: number
+  accuracyPercent: number
+}
 ```
 
 ## Environment Variables

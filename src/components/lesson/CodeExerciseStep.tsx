@@ -46,6 +46,7 @@ interface CodeExerciseStepProps {
   isComplete: boolean
   onComplete: () => void
   onHintUsed: () => void
+  onTestComplete?: (results: TestResult[]) => void
 }
 
 interface TestResult {
@@ -66,6 +67,7 @@ export function CodeExerciseStep({
   isComplete,
   onComplete,
   onHintUsed,
+  onTestComplete,
 }: CodeExerciseStepProps) {
   const [code, setCode] = useState(step.starterCode)
   const [output, setOutput] = useState<OutputLine[]>([])
@@ -218,6 +220,11 @@ export function CodeExerciseStep({
       }
 
       setTestResults(results)
+
+      // Notify parent component (for feedback modal in practice mode)
+      if (onTestComplete) {
+        onTestComplete(results)
+      }
 
       // Check if all tests passed - only complete on test success
       const allPassed = results.every((r) => r.passed)
