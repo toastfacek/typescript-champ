@@ -88,19 +88,27 @@ The `LessonPlayer` component renders steps via discriminated union pattern - eac
 - **Fallback**: Shows `ResumeLessonCard` if no cache exists but user has in-progress lesson
 - **LLM Optimization**: Zero LLM calls on home page load - exercises pre-generated during lesson completion
 
-**Speed Sprint Drills**: Fast-paced, card-based fundamental drilling (think "Kumon for coding"):
-- **UI/UX**: Full-screen card view with single challenge per card
-  - `components/drill/SprintCardView.tsx` - Main card component with compact Monaco editor (~150-200px)
-  - `components/drill/DrillProgressHeader.tsx` - Fixed header showing progress, correct/wrong counts, timer
-  - `components/drill/CorrectFeedback.tsx` - Green checkmark animation + XP float-up (1.5s celebration)
-  - `components/drill/SolutionReveal.tsx` - Slide-up overlay comparing user code vs solution (3s auto-advance)
+**Speed Sprint Drills**: Fast-paced, fundamental drilling (think "Kumon for coding"):
+- **Current Implementation** (uses standard practice session infrastructure):
+  - `pages/PracticeSessionPage.tsx` - Handles both regular practice and sprint/drill mode
+  - `components/practice/ExerciseFeedbackModal.tsx` - Modal feedback after test completion
+  - Uses standard exercise components (CodeExerciseStep, FillInBlankStep, QuizStep)
+  - Drill mode identified via `currentSession.mode === 'drill'`
 
-- **Session Flow**: Fast check/next cycle optimized for rapid drilling
-  1. User enters code in mini editor → clicks "Check Answer"
-  2. Silent test validation via `lib/typescript-runner.ts` or `lib/python-runner.ts` (new `runTestsSilently()` function)
-  3. If correct: Celebration animation → award 15 XP → auto-advance to next card (1.5s)
-  4. If wrong: Add to "wrong pile" → show solution overlay → auto-advance (3s) or manual continue
-  5. Session completion → navigate to comprehensive summary page
+- **Session Flow**: Manual progression with clear feedback
+  1. User enters code in editor → clicks "Check Solution"
+  2. Test validation via `lib/typescript-runner.ts` or `lib/python-runner.ts`
+  3. **Feedback modal displays immediately** with test results
+  4. If correct: Celebration UI + XP earned (15 XP) + "Next Exercise" button in modal
+  5. If wrong: Failed test details + "Try Again" / "Keep Editing" buttons
+  6. User clicks "Next Exercise" in modal to advance (no auto-advance)
+  7. Session completion → navigate to comprehensive summary page
+
+- **Future Enhancement** (not yet implemented):
+  - Dedicated sprint card UI components (SprintCardView, CorrectFeedback, SolutionReveal)
+  - Full-screen card view with compact editor
+  - Auto-advance animations (1.5s for correct, 3s for wrong)
+  - Solution comparison overlay
 
 - **Wrong Answer Tracking**:
   - Each wrong answer stored with: exercise, user code, solution code, test results, time spent
