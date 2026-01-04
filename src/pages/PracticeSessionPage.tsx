@@ -24,6 +24,7 @@ export function PracticeSessionPage() {
   const [hasGeneratedFirst, setHasGeneratedFirst] = useState(false)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [lastTestResults, setLastTestResults] = useState<TestResult[]>([])
+  const [isLoadingNext, setIsLoadingNext] = useState(false)
 
   // Redirect if no session
   useEffect(() => {
@@ -54,9 +55,9 @@ export function PracticeSessionPage() {
     completeExercise(true, timeSeconds)
   }, [exerciseStartTime, completeExercise])
 
-  const handleNextExercise = useCallback(() => {
+  const handleNextExercise = useCallback(async () => {
     setExerciseComplete(false)
-    generateNextExercise()
+    await generateNextExercise()
     setExerciseStartTime(Date.now())
   }, [generateNextExercise])
 
@@ -221,11 +222,14 @@ export function PracticeSessionPage() {
         testResults={lastTestResults}
         mode={currentSession?.mode || 'practice'}
         xpEarned={calculateXP()}
-        onNextExercise={() => {
+        onNextExercise={async () => {
+          setIsLoadingNext(true)
+          await handleNextExercise()
+          setIsLoadingNext(false)
           setShowFeedbackModal(false)
-          handleNextExercise()
         }}
         onRetry={() => setShowFeedbackModal(false)}
+        isLoadingNext={isLoadingNext}
       />
     </div>
   )

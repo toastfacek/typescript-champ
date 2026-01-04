@@ -13,8 +13,9 @@ interface ExerciseFeedbackModalProps {
   testResults: TestResult[]
   mode: 'practice' | 'drill'
   xpEarned?: number
-  onNextExercise: () => void
+  onNextExercise: () => void | Promise<void>
   onRetry: () => void
+  isLoadingNext?: boolean
 }
 
 export function ExerciseFeedbackModal({
@@ -25,6 +26,7 @@ export function ExerciseFeedbackModal({
   xpEarned,
   onNextExercise,
   onRetry,
+  isLoadingNext = false,
 }: ExerciseFeedbackModalProps) {
   const allPassed = testResults.every((r) => r.passed)
   const isDrill = mode === 'drill'
@@ -190,8 +192,15 @@ export function ExerciseFeedbackModal({
 
       <Modal.Footer>
         {allPassed ? (
-          <Button size="lg" onClick={onNextExercise} className="w-full" glow>
-            Next Exercise
+          <Button
+            size="lg"
+            onClick={onNextExercise}
+            className="w-full"
+            glow
+            isLoading={isLoadingNext}
+            disabled={isLoadingNext}
+          >
+            {isLoadingNext ? 'Loading...' : 'Next Exercise'}
           </Button>
         ) : (
           <div className="flex gap-3 w-full">
